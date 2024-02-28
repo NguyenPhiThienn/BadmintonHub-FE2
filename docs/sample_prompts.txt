@@ -1,0 +1,60 @@
+========================================================================
+           DANH SÁCH MẪU CÂU HỎI TRẢI NGHIỆM AI CHATBOT - BADMINTONHUB
+========================================================================
+
+Chào mừng bạn đến với trợ lý ảo thông minh BadmintonHub AI!
+Dưới đây là danh sách các mẫu câu hỏi gợi ý từ cơ bản đến nâng cao để bạn thử nghiệm 
+và kiểm tra khả năng tương tác thông minh của chatbot.
+
+------------------------------------------------------------------------
+NHÓM 1: CÂU HỎI VỀ ĐẶT SÂN & THÔNG TIN SÂN (THÔNG TIN THỰC TẾ TRÊN HỆ THỐNG)
+------------------------------------------------------------------------
+1. "Hệ thống BadmintonHub hiện tại có những sân cầu lông nào nổi bật thế?"
+   -> Kiểm tra xem AI có đọc được danh sách sân từ database và liệt kê chính xác 
+      tên sân, địa chỉ và giá tiền hay không.
+
+2. "Sân nào có đánh giá (rating) tốt nhất trong hệ thống của bạn?"
+   -> AI sẽ phân tích dựa trên trường `averageRating` của các sân để giới thiệu.
+
+3. "Tôi muốn tìm sân cầu lông có mức giá rẻ nhất, bạn gợi ý sân nào?"
+   -> AI sẽ so sánh giá (`pricePerHour`) và đưa ra đề xuất phù hợp nhất.
+
+4. "Làm thế nào để tôi có thể đặt sân cầu lông trên website BadmintonHub?"
+   -> AI sẽ trả lời các bước đặt sân trực tuyến chuẩn (chọn sân -> chọn giờ -> thanh toán).
+
+------------------------------------------------------------------------
+NHÓM 2: CÂU HỎI VỀ GIÁ CẢ & DỊCH VỤ KHÁCH HÀNG
+------------------------------------------------------------------------
+5. "Giá thuê sân cầu lông trung bình là bao nhiêu tiền một giờ vậy?"
+   -> AI trả lời khoảng giá từ 50,000đ - 150,000đ tùy theo giờ chơi và chất lượng sân.
+
+6. "Tôi có thể thanh toán tiền sân bằng những hình thức nào?"
+   -> AI hỗ trợ trả lời về tích hợp thanh toán trực tuyến (ví dụ như VNPay đã cấu hình trong dự án).
+
+7. "Tôi có thể hủy lịch đặt sân đã thanh toán được không và chính sách thế nào?"
+   -> Kiểm tra khả năng xử lý thông tin chính sách của chatbot một cách khéo léo.
+
+------------------------------------------------------------------------
+NHÓM 3: TƯ VẤN KỸ THUẬT & KIẾN THỨC MÔN CẦU LÔNG
+------------------------------------------------------------------------
+8. "Tôi là người mới chơi cầu lông, bạn khuyên tôi nên chọn loại vợt nhẹ hay nặng đầu?"
+   -> AI tư vấn kỹ thuật chọn vợt (người mới nên chọn vợt nhẹ đầu hoặc cân bằng để dễ kiểm soát).
+
+9. "Làm thế nào để thực hiện cú đập cầu (smash) mạnh và cắm hơn?"
+   -> AI hướng dẫn kỹ thuật di chuyển, điểm tiếp xúc cầu và lực cổ tay.
+
+10. "Luật phát cầu lông đôi mới nhất quy định thế nào về chiều cao phát cầu?"
+    -> AI tư vấn luật chơi chuẩn của Liên đoàn Cầu lông Thế giới (BWF) - giới hạn chiều cao phát cầu 1.15m.
+
+------------------------------------------------------------------------
+NHÓM 4: CÂU HỎI THỬ THÁCH (NGOÀI PHẠM VI)
+------------------------------------------------------------------------
+11. "Công thức nấu phở bò Hà Nội chuẩn vị là gì?"
+    -> AI sẽ từ chối khéo léo và hướng người dùng quay lại chủ đề đặt sân cầu lông hoặc cầu lông.
+
+12. "Hãy dự báo thời tiết Hà Nội hôm nay thế nào?"
+    -> AI phản hồi lịch sự rằng không hỗ trợ dự báo thời tiết nhưng tư vấn chơi cầu lông trong nhà là giải pháp hoàn hảo cho mọi thời tiết.
+
+========================================================================
+🏸 CHÚC BẠN CÓ TRẢI NGHIỆM TUYỆT VỜI CÙNG BADMINTONHUB AI ASSISTANT! 🏸
+========================================================================

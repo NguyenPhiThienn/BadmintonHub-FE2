@@ -1,0 +1,34 @@
+============================================================
+HỆ THỐNG QUẢN LÝ DÀNH CHO CHỦ SÂN (OWNER DASHBOARD)
+============================================================
+
+1. MODULE: TỔNG QUAN (DASHBOARD & ANALYTICS) 
+-------------------------------------------
+- Báo cáo doanh thu: Thống kê chi tiết theo ngày, tháng, năm.
+- Thống kê tỷ lệ lấp đầy sân (Occupancy Rate): Theo dõi hiệu suất sử dụng sân.
+[Vị trí API: 7. DASHBOARD & THỐNG KÊ (OWNER)]
+2. MODULE: QUẢN LÝ CƠ SỞ (VENUE & COURT MANAGEMENT)
+--------------------------------------------------
+- Đăng ký thông tin cơ sở sân mới: Tên, địa chỉ
+- Cập nhật thông tin chi tiết: Giờ mở cửa, giờ đóng cửa, mô tả.
+- Quản lý giá thuê: Thiết lập đơn giá theo giờ (`pricePerHour`).
+- Quản lý danh sách sân con (Courts): Thêm, sửa, xóa các sân cụ thể trong cơ sở.
+[Vị trí API: 8. QUẢN LÝ CƠ SỞ (OWNER)]
+3. MODULE: QUẢN LÝ ĐẶT SÂN (BOOKING MANAGEMENT)
+----------------------------------------------
+- [DONE] Xem danh sách đơn đặt sân: Quản lý tập trung toàn bộ đơn hàng của các cơ sở.
+- [DONE] Theo dõi trạng thái đơn đặt sân: Chờ xác nhận, Đã thanh toán, Đã hoàn thành.
+- [DONE] Xác nhận hoặc Hủy đơn đặt sân từ phía khách hàng.
+- [DONE] Tạo đơn đặt sân thủ công: Nhập thông tin khách đặt qua điện thoại hoặc khách vãng lai để giữ chỗ trên hệ thống.
+- Khóa sân tạm thời: Đóng sân trong các trường hợp bảo trì, sửa chữa hoặc phục vụ sự kiện riêng.
+- Giao diện lịch biểu (Calendar/Timeline View): Xem trực quan toàn bộ lịch đặt sân của cơ sở trên trục thời gian để quản lý trạng thái sân dễ dàng hơn.
+[Vị trí API: 9. QUẢN LÝ ĐẶT SÂN (OWNER)]
+4. MODULE: QUẢN LÝ KHÁCH HÀNG (CUSTOMER MANAGEMENT)
+--------------------------------------------------
+- Quản lý danh sách khách hàng thân thiết: Xem lịch sử chơi và tần suất đặt sân của từng người.
+
+5. MODULE: QUẢN LÝ CÁ NHÂN (PROFILE & ACCOUNT SETTINGS)
+--------------------------------------------------------
+- Quản lý hồ sơ cá nhân: Cập nhật thông tin liên lạc, Avatar.
+- Thay đổi mật khẩu và bảo mật tài khoản.
+- Trung tâm thông báo (Notifications): Nhận tin về đơn đặt sân mới hoặc đánh giá của khách.

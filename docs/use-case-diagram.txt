@@ -1,0 +1,283 @@
+================================================================================
+                    HỆ THỐNG ĐẶT SÂN CẦU LÔNG - BADMINTONHUB
+                          USE-CASE DIAGRAM (BIỂU ĐỒ USE-CASE)
+================================================================================
+
+I. ACTORS (Các tác nhân)
+================================================================================
+
+1. Guest (Khách vãng lai) - Chưa có tài khoản hoặc chưa đăng nhập
+2. User (Abstract) - Tác nhân cơ sở chứa thông tin định danh
+   └── Người chơi (Player) - Khách hàng đặt sân cầu lông
+   └── Chủ sân (Court Owner) - Đối tác sở hữu và quản lý cơ sở sân
+   └── Quản trị viên (Admin) - Quản lý toàn bộ hệ thống BadmintonHub
+
+Quan hệ kế thừa & Phân quyền:
+- Player, Court Owner, Admin đều kế thừa từ User.
+- Tất cả các tác nhân đã đăng nhập (User) đều có quyền: Đăng nhập, Quản lý tài khoản cá nhân, Đổi mật khẩu, Xem thông báo.
+
+
+================================================================================
+II. USE-CASES CHÍNH THEO TỪNG ACTOR
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ A. KHÁCH VÃNG LAI (GUEST)                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Đăng ký tài khoản
+   - Mô tả: Đăng ký tài khoản mới với vai trò là Người chơi hoặc Chủ sân.
+   - Include: Không có
+   - Extend: Không có
+
+2. Đăng nhập
+   - Mô tả: Xác thực tài khoản bằng Email/Mật khẩu để vào hệ thống.
+   - Include: Không có
+   - Extend: Không có
+
+3. Tìm kiếm và Xem cơ sở sân (Venues)
+   - Mô tả: Tìm kiếm sân theo tên, địa chỉ, khoảng giá, giờ mở cửa.
+   - Include: Không có
+   - Extend:
+     * Xem chi tiết cơ sở sân (Hình ảnh, danh sách sân nhỏ, bảng giá, đánh giá)
+     * Lọc danh sách sân gần nhất (Geospatial search - theo kinh độ/vĩ độ)
+
+4. Xem lịch trống (Availability)
+   - Mô tả: Xem danh sách khung giờ trống của từng sân nhỏ tại cơ sở theo ngày đã chọn.
+   - Include: Không có
+   - Extend: Không có
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ B. NGƯỜI CHƠI (PLAYER) - Kế thừa Guest & User                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Đặt sân trực tuyến (Create Booking)
+   - Mô tả: Chọn ngày chơi, chọn khung giờ trống và đặt sân cầu lông.
+   - Include:
+     * Chọn cơ sở và sân nhỏ (Court)
+     * Chọn ngày & khung giờ chơi trống
+   - Extend:
+     * Khóa giờ tạm thời (Lock Slot - để giữ chỗ trong 5-10 phút khi đang thanh toán)
+     * Áp dụng mã giảm giá (Apply Promotion)
+     * Đặt lịch định kỳ hàng tuần (Weekly Booking)
+
+2. Thanh toán hóa đơn đặt sân (Process Payment)
+   - Mô tả: Thực hiện thanh toán trực tuyến qua cổng VNPay/Momo hoặc chọn thanh toán bằng Tiền mặt tại sân.
+   - Include:
+     * Tạo đường dẫn thanh toán trực tuyến (Generate Payment URL)
+   - Extend: Không có
+
+3. Quản lý lịch sử đặt sân (My Bookings)
+   - Mô tả: Xem danh sách các đơn đặt sân cá nhân và theo dõi trạng thái.
+   - Include: Không có
+   - Extend:
+     * Hủy đơn đặt sân (Cancel Booking - chỉ áp dụng trước giờ chơi quy định)
+     * Xem chi tiết đơn đặt sân (Mã đơn, thông tin sân, giờ chơi, tổng tiền)
+
+4. Viết đánh giá & Phản hồi (Write Review)
+   - Mô tả: Đánh giá số sao (1-5★) và gửi nhận xét cho cơ sở sân sau khi đã hoàn thành buổi chơi.
+   - Include: Không có
+   - Extend: Tải lên hình ảnh kèm đánh giá
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C. CHỦ SÂN (COURT OWNER) - Kế thừa User                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Đăng ký & Quản lý cơ sở sân (Manage Venues)
+   - Mô tả: Đăng ký thông tin sân mới lên hệ thống và quản lý các cơ sở thuộc sở hữu của mình.
+   - Include:
+     * Đăng ký thông tin cơ sở mới (Địa chỉ, bản đồ, thời gian hoạt động, giá cơ bản)
+   - Extend:
+     * Cập nhật thông tin cơ sở sân (Sửa tên, mô tả, giờ mở/đóng cửa)
+     * Thêm hình ảnh cơ sở sân (Tải ảnh không gian sân, thảm đấu)
+     * Xóa cơ sở sân
+
+2. Quản lý sân nhỏ (Manage Courts)
+   - Mô tả: Quản lý các sân nhỏ (Sân số 1, Sân số 2, loại thảm PVC/sàn gỗ) trong từng cơ sở.
+   - Include: Không có
+   - Extend:
+     * Thêm sân nhỏ mới
+     * Cập nhật thông tin sân (Tên sân, loại sàn, trạng thái sẵn sàng)
+     * Xóa sân nhỏ
+
+3. Thiết lập bảng giá linh hoạt (Manage Pricing)
+   - Mô tả: Đặt giá tiền thuê sân theo các khung giờ (Giờ bình thường vs Giờ vàng) hoặc theo ngày trong tuần (Thứ 2-6 vs Cuối tuần).
+   - Include: Không có
+   - Extend: Không có
+
+4. Chặn khung giờ / Lịch bảo trì (Block Availability)
+   - Mô tả: Chủ động khóa các khung giờ chơi để phục vụ việc bảo trì, sửa chữa sân hoặc tổ chức giải đấu nội bộ.
+   - Include: Không có
+   - Extend: Không có
+
+5. Quản lý đơn đặt sân của cơ sở (Manage Venue Bookings)
+   - Mô tả: Xem toàn bộ danh sách khách hàng đặt sân tại cơ sở của mình và cập nhật trạng thái đơn.
+   - Include: Không có
+   - Extend:
+     * Đặt sân thủ công (Manual Booking - cho khách vãng lai gọi điện đặt trực tiếp)
+     * Xác nhận đơn đặt sân (Confirm Booking)
+     * Hủy đơn đặt sân (Cancel Booking)
+     * Xem lịch đặt sân dưới dạng lịch biểu trực quan (Calendar View)
+
+6. Trả lời đánh giá (Reply Review)
+   - Mô tả: Phản hồi lại các đánh giá, đóng góp ý kiến từ người chơi tại cơ sở của mình.
+   - Include: Không có
+   - Extend: Không có
+
+7. Thống kê & Dự báo doanh thu (Owner Dashboard)
+   - Mô tả: Xem báo cáo trực quan về hiệu suất hoạt động, công suất sử dụng sân và dự báo doanh thu tương lai.
+   - Include:
+     * Xem biểu đồ thống kê doanh thu (Theo ngày, tuần, tháng)
+     * Xem báo cáo tỷ lệ lấp đầy sân (Occupancy Rate)
+   - Extend:
+     * Dự báo doanh thu thông minh bằng AI (AI Revenue Prediction - tích hợp mô hình phân tích)
+
+8. Quản lý khuyến mãi riêng (Manage Owner Promotions)
+   - Mô tả: Tạo ra các chương trình giảm giá, mã khuyến mãi riêng chỉ áp dụng cho cơ sở sân của mình.
+   - Include: Không có
+   - Extend: Không có
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ D. QUẢN TRỊ VIÊN (ADMIN) - Kế thừa User                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Quản trị hệ thống & Phê duyệt cơ sở (Approve Venues)
+   - Mô tả: Xét duyệt các hồ sơ đăng ký cơ sở sân mới của các chủ sân đối tác trước khi hiển thị công khai trên ứng dụng.
+   - Include: Không có
+   - Extend:
+     * Duyệt cơ sở sân (Approve)
+     * Từ chối cơ sở sân (Reject - kèm lý do cụ thể)
+     * Đình chỉ/Vô hiệu hóa hoạt động của sân (Suspend/Deactivate)
+
+2. Quản lý người dùng (Manage Users)
+   - Mô tả: Xem danh sách, tạo mới, chỉnh sửa thông tin hoặc khóa/mở khóa tài khoản người dùng (Player & Court Owner) trong toàn hệ thống.
+   - Include: Không có
+   - Extend:
+     * Phân quyền tài khoản (Roles Management)
+
+3. Quản lý giao dịch và doanh thu hệ thống (Manage Payments & Global Revenue)
+   - Mô tả: Giám sát toàn bộ các giao dịch thanh toán trực tuyến của hệ thống và lập báo cáo tài chính.
+   - Include: Không có
+   - Extend:
+     * Xuất báo cáo doanh thu toàn hệ thống (Excel/PDF)
+     * Lọc lịch sử giao dịch theo thời gian, theo chủ sân hoặc theo cơ sở sân
+
+4. Quản lý khuyến mãi toàn hệ thống (Manage Global Promotions)
+   - Mô tả: Tạo các mã giảm giá, chiến dịch khuyến mãi áp dụng trên toàn bộ các sân trong hệ thống BadmintonHub.
+   - Include: Không có
+   - Extend: Không có
+
+5. Quản lý đánh giá độc hại (Moderate Reviews)
+   - Mô tả: Xóa bỏ các đánh giá có nội dung thô tục, không chính xác hoặc mang tính phá hoại cơ sở của chủ sân.
+   - Include: Không có
+   - Extend: Không có
+
+6. Dashboard tổng quan hệ thống (Admin Dashboard Summary)
+   - Mô tả: Bảng điều khiển trung tâm hiển thị doanh thu tổng, số lượng đơn đặt, tỷ lệ hoạt động trực tuyến thời gian thực.
+   - Include: Không có
+   - Extend: Không có
+
+
+================================================================================
+III. QUAN HỆ GIỮA CÁC USE-CASE
+================================================================================
+
+A. INCLUDE (Bao gồm - Quan hệ bắt buộc)
+────────────────────────────────────────
+
+1. "Đặt sân trực tuyến" <<include>> "Chọn cơ sở và sân nhỏ"
+2. "Đặt sân trực tuyến" <<include>> "Chọn ngày & khung giờ chơi trống"
+3. "Thanh toán hóa đơn" <<include>> "Tạo đường dẫn thanh toán trực tuyến"
+4. "Đăng ký cơ sở sân" <<include>> "Nhập thông tin cơ sở mới"
+5. "Thống kê doanh thu" <<include>> "Xem biểu đồ thống kê doanh thu"
+6. "Thống kê doanh thu" <<include>> "Xem báo cáo tỷ lệ lấp đầy sân"
+
+B. EXTEND (Mở rộng - Quan hệ tùy chọn)
+────────────────────────────────────────
+
+1. "Khóa giờ tạm thời" <<extend>> "Đặt sân trực tuyến" (Chỉ chạy khi bắt đầu chọn slot để giữ chỗ tránh tranh chấp)
+2. "Áp dụng mã giảm giá" <<extend>> "Đặt sân trực tuyến" (Tùy chọn nhập mã khuyến mãi nếu có)
+3. "Đặt lịch định kỳ hàng tuần" <<extend>> "Đặt sân trực tuyến" (Tùy chọn dành cho người chơi muốn cố định giờ hàng tuần)
+4. "Xem chi tiết cơ sở sân" <<extend>> "Tìm kiếm và Xem cơ sở sân"
+5. "Lọc danh sách sân gần nhất" <<extend>> "Tìm kiếm và Xem cơ sở sân"
+6. "Hủy đơn đặt sân" <<extend>> "Quản lý lịch sử đặt sân"
+7. "Xem chi tiết đơn đặt sân" <<extend>> "Quản lý lịch sử đặt sân"
+8. "Tải lên hình ảnh kèm đánh giá" <<extend>> "Viết đánh giá & Phản hồi"
+9. "Cập nhật thông tin cơ sở" <<extend>> "Đăng ký & Quản lý cơ sở sân"
+10. "Thêm hình ảnh cơ sở" <<extend>> "Đăng ký & Quản lý cơ sở sân"
+11. "Xóa cơ sở sân" <<extend>> "Đăng ký & Quản lý cơ sở sân"
+12. "Thêm sân nhỏ mới" <<extend>> "Quản lý sân nhỏ"
+13. "Cập nhật thông tin sân" <<extend>> "Quản lý sân nhỏ"
+14. "Xóa sân nhỏ" <<extend>> "Quản lý sân nhỏ"
+15. "Đặt sân thủ công" <<extend>> "Quản lý đơn đặt sân của cơ sở"
+16. "Xác nhận đơn đặt sân" <<extend>> "Quản lý đơn đặt sân của cơ sở"
+17. "Hủy đơn đặt sân" <<extend>> "Quản lý đơn đặt sân của cơ sở"
+18. "Xem lịch đặt sân dạng lịch biểu" <<extend>> "Quản lý đơn đặt sân của cơ sở"
+19. "Dự báo doanh thu thông minh bằng AI" <<extend>> "Thống kê & Dự báo doanh thu"
+20. "Duyệt/Từ chối/Đình chỉ cơ sở sân" <<extend>> "Quản trị hệ thống & Phê duyệt cơ sở"
+21. "Phân quyền tài khoản" <<extend>> "Quản lý người dùng"
+22. "Xuất báo cáo doanh thu" <<extend>> "Quản lý giao dịch và doanh thu hệ thống"
+
+
+================================================================================
+IV. MA TRẬN PHÂN QUYỀN USE-CASE
+================================================================================
+
+┌──────────────────────────────────────┬─────────┬─────────┬─────────────┬───────┐
+│ Use-case                             │  Guest  │ Player  │ Court Owner │ Admin │
+├──────────────────────────────────────┼─────────┼─────────┼─────────────┼───────┤
+│ Đăng ký tài khoản                    │    ✓    │         │             │       │
+│ Đăng nhập                            │    ✓    │         │             │       │
+│ Xem danh sách & Tìm kiếm cơ sở sân   │    ✓    │    ✓    │      ✓      │   ✓   │
+│ Xem lịch trống của sân               │    ✓    │    ✓    │      ✓      │   ✓   │
+│ Quản lý tài khoản cá nhân & Đổi pass │         │    ✓    │      ✓      │   ✓   │
+│ Đặt sân trực tuyến (Trừu tượng)      │         │    ✓    │             │       │
+│ Khóa giờ tạm thời (Lock slot)        │         │    ✓    │      ✓      │       │
+│ Áp dụng mã giảm giá                  │         │    ✓    │             │       │
+│ Thanh toán hóa đơn trực tuyến        │         │    ✓    │             │       │
+│ Xem lịch sử đặt sân & Chi tiết đơn   │         │    ✓    │      ✓      │   ✓   │
+│ Hủy đơn đặt sân cá nhân              │         │    ✓    │             │       │
+│ Viết đánh giá cơ sở sân              │         │    ✓    │             │       │
+│ Đăng ký cơ sở sân mới                │         │         │      ✓      │       │
+│ Sửa/Thêm hình ảnh/Xóa cơ sở sân      │         │         │      ✓      │   ✓   │
+│ Quản lý danh sách sân nhỏ (Courts)   │         │         │      ✓      │   ✓   │
+│ Thiết lập bảng giá giờ vàng/thường   │         │         │      ✓      │       │
+│ Chặn khung giờ / Bảo trì sân         │         │         │      ✓      │       │
+│ Đặt sân thủ công (Manual Booking)    │         │         │      ✓      │       │
+│ Quản lý & Xác nhận/Hủy đơn cơ sở     │         │         │      ✓      │   ✓   │
+│ Phản hồi đánh giá của khách          │         │         │      ✓      │       │
+│ Thống kê doanh thu & Tỷ lệ lấp đầy   │         │         │      ✓      │   ✓   │
+│ Dự báo doanh thu bằng AI             │         │         │      ✓      │       │
+│ Tạo chương trình khuyến mãi riêng    │         │         │      ✓      │       │
+│ Phê duyệt cơ sở sân (Approve/Reject) │         │         │             │   ✓   │
+│ Quản lý và phân quyền người dùng     │         │         │             │   ✓   │
+│ Quản lý giao dịch toàn hệ thống      │         │         │             │   ✓   │
+│ Tạo chương trình khuyến mãi hệ thống │         │         │             │   ✓   │
+│ Xóa các đánh giá độc hại/spam        │         │         │             │   ✓   │
+│ Dashboard tổng quan toàn hệ thống    │         │         │             │   ✓   │
+└──────────────────────────────────────┴─────────┴─────────┴─────────────┴───────┘
+
+
+================================================================================
+V. GHI CHÚ VÀ QUY ƯỚC
+================================================================================
+
+1. Ký hiệu:
+   - <<include>>: Quan hệ bao gồm (bắt buộc phải thực hiện khi use-case chính chạy)
+   - <<extend>>: Quan hệ mở rộng (chỉ thực hiện trong một số trường hợp tự chọn hoặc có điều kiện thỏa mãn)
+   - ✓: Tác nhân có quyền thực hiện use-case tương ứng.
+
+2. Quan hệ kế thừa:
+   - Player, Court Owner, Admin thừa hưởng tất cả các thuộc tính của User (đã đăng nhập).
+   - Player thừa hưởng khả năng xem sân và xem lịch trống của Guest (khách chưa đăng nhập).
+
+3. Kiến trúc nghiệp vụ đặc trưng của dự án:
+   - Hệ thống hỗ trợ "Khóa giờ tạm thời (Lock slot)" trực tiếp từ giao diện đặt sân, giúp giữ sân ngay lập tức cho người chơi trong lúc chuyển hướng đến trang thanh toán của VNPay/Momo, tránh việc người khác đặt trùng giờ.
+   - Dự báo doanh thu thông minh được tích hợp trực tiếp vào trang Dashboard của Chủ sân (Court Owner) giúp chủ sân tối ưu hóa giá thuê giờ vàng.
+
+================================================================================
+                             END OF DOCUMENT
+================================================================================

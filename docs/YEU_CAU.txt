@@ -1,0 +1,12 @@
+Đề tài của tôi : Phần mềm quản lý sân Cầu Lông (BadmintonHub) tích hợp AI
+1. Mô tả đề tài: Phần mềm là nền tảng kết nối giữa chủ sân cầu lông và người chơi. 
+Chủ sân có thể dễ dàng quản lý lịch sân, giá thuê, đặt sân và doanh thu trên một hệ thống duy nhất. 
+Người chơi có thể nhanh chóng tìm sân trống, xem giá, đặt sân và thanh toán online chỉ với vài thao tác.
+2. Mục tiêu đề tài: Xây dựng một nền tảng số giúp kết nối chủ sân cầu lông và 
+người chơi, tối ưu việc quản lý sân, 
+nâng cao trải nghiệm đặt sân và gia tăng hiệu quả kinh doanh cho chủ sân.
+
+PENDING: Đơn hàng đang được giữ chỗ, chờ thanh toán hoặc chờ xác nhận từ hệ thống.
+CONFIRMED: Đặt sân thành công (đã nhận được tiền hoặc được phê duyệt).
+COMPLETED: Buổi tập đã diễn ra hoàn tất.
+CANCELLED: Đơn đặt sân bị hủy.

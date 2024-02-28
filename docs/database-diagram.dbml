@@ -1,0 +1,267 @@
+Table Users {
+  _id ObjectId [primary key]
+  fullName varchar [not null]
+  email varchar [not null, unique]
+  phone varchar [not null, unique]
+  role varchar [not null, default: 'PLAYER']
+  passwordHash varchar [not null]
+  avatarUrl varchar
+  lastLogin timestamp
+  status varchar [default: 'ACTIVE']
+  createdAt timestamp
+  updatedAt timestamp
+
+  indexes {
+    email [unique]
+    phone [unique]
+  }
+}
+
+Table Venues {
+  _id ObjectId [primary key]
+  ownerId ObjectId [not null]
+  name varchar [not null]
+  address varchar [not null]
+  coordinates json
+  description varchar
+  openTime varchar [not null]
+  closeTime varchar [not null]
+  averageRating decimal [default: 0]
+  pricePerHour decimal [not null, default: 0]
+  status varchar [not null, default: 'PENDING']
+  statusReason varchar
+  createdAt timestamp
+  updatedAt timestamp
+
+  indexes {
+    ownerId
+  }
+}
+
+Table AIAnalysisMetadata {
+  _id ObjectId [primary key]
+  venueId ObjectId [not null]
+  peakHoursPrediction json
+  lastAnalyzedAt timestamp
+
+  indexes {
+    venueId
+  }
+}
+
+Table PlayerSearchHistories {
+  _id ObjectId [primary key]
+  playerId ObjectId [not null]
+  searchedAddress varchar
+  searchedCoordinates json
+  createdAt timestamp
+
+  indexes {
+    playerId
+  }
+}
+
+Table SlotLocks {
+  _id ObjectId [primary key]
+  courtId ObjectId [not null]
+  date varchar [not null]
+  startTime varchar [not null]
+  endTime varchar [not null]
+  userId varchar [not null]
+  createdAt timestamp
+  updatedAt timestamp
+
+  indexes {
+    courtId
+  }
+}
+
+Table BookingDetails {
+  _id ObjectId [primary key]
+  bookingId ObjectId [not null]
+  courtId ObjectId [not null]
+  bookingDate timestamp [not null]
+  startTime varchar [not null]
+  endTime varchar [not null]
+  price decimal [not null]
+  createdAt timestamp
+
+  indexes {
+    bookingId
+    courtId
+  }
+}
+
+Table Bookings {
+  _id ObjectId [primary key]
+  playerId ObjectId
+  isGuest boolean [default: false]
+  venueId ObjectId [not null]
+  promotionId ObjectId
+  totalPrice decimal [not null]
+  finalPrice decimal [not null]
+  status varchar [not null, default: 'PENDING']
+  note varchar
+  isWeekly boolean [default: false]
+  customerName varchar
+  customerPhone varchar
+  customerEmail varchar
+  createdAt timestamp
+  updatedAt timestamp
+
+  indexes {
+    playerId
+    venueId
+    promotionId
+  }
+}
+
+Table CourtUnavailableTimes {
+  _id ObjectId [primary key]
+  courtId ObjectId [not null]
+  startDatetime timestamp [not null]
+  endDatetime timestamp [not null]
+  reason varchar
+  createdAt timestamp
+
+  indexes {
+    courtId
+  }
+}
+
+Table Courts {
+  _id ObjectId [primary key]
+  venueId ObjectId [not null]
+  name varchar [not null]
+  type varchar
+  status varchar [not null, default: 'AVAILABLE']
+  createdAt timestamp
+
+  indexes {
+    venueId
+  }
+}
+
+Table Notifications {
+  _id ObjectId [primary key]
+  user_id ObjectId [not null]
+  title varchar [not null]
+  body varchar [not null]
+  type varchar [not null, default: 'SYSTEM']
+  is_read boolean [default: false]
+  createdAt timestamp
+
+  indexes {
+    user_id
+  }
+}
+
+Table OwnerRequests {
+  _id ObjectId [primary key]
+  userId ObjectId [not null]
+  identityCard varchar [not null]
+  courtAddress varchar [not null]
+  courtImages varchar[] [not null]
+  businessLicense varchar [not null]
+  status varchar [not null, default: 'PENDING']
+  rejectReason varchar
+  createdAt timestamp
+  updatedAt timestamp
+
+  indexes {
+    userId
+  }
+}
+
+Table Payments {
+  _id ObjectId [primary key]
+  bookingId ObjectId [not null]
+  amount decimal [not null]
+  method varchar [not null]
+  status varchar [not null, default: 'PENDING']
+  transaction_id varchar
+  createdAt timestamp
+
+  indexes {
+    bookingId
+  }
+}
+
+Table Pricings {
+  _id ObjectId [primary key]
+  venueId ObjectId [not null]
+  dayOfWeek integer
+  startTime varchar [not null]
+  endTime varchar [not null]
+  pricePerHour decimal [not null]
+  createdAt timestamp
+
+  indexes {
+    venueId
+  }
+}
+
+Table Promotions {
+  _id ObjectId [primary key]
+  venueId ObjectId
+  code varchar [not null, unique]
+  discountPercentage decimal [not null]
+  maxDiscountAmount decimal
+  startDate timestamp [not null]
+  endDate timestamp [not null]
+  isActive boolean [default: true]
+  createdAt timestamp
+
+  indexes {
+    code [unique]
+    venueId
+  }
+}
+
+Table Reviews {
+  _id ObjectId [primary key]
+  venueId ObjectId [not null]
+  playerId ObjectId [not null]
+  rating integer [not null]
+  comment varchar
+  likes ObjectId[]
+  createdAt timestamp
+
+  indexes {
+    venueId
+    playerId
+  }
+}
+
+Table VenueImages {
+  _id ObjectId [primary key]
+  venueId ObjectId [not null]
+  imageUrl varchar [not null]
+  isPrimary boolean [default: false]
+  createdAt timestamp
+
+  indexes {
+    venueId
+  }
+}
+
+Ref: Venues.ownerId > Users._id
+Ref: AIAnalysisMetadata.venueId > Venues._id
+Ref: PlayerSearchHistories.playerId > Users._id
+Ref: SlotLocks.courtId > Courts._id
+Ref: BookingDetails.bookingId > Bookings._id
+Ref: BookingDetails.courtId > Courts._id
+Ref: Bookings.playerId > Users._id
+Ref: Bookings.venueId > Venues._id
+Ref: Bookings.promotionId > Promotions._id
+Ref: CourtUnavailableTimes.courtId > Courts._id
+Ref: Courts.venueId > Venues._id
+Ref: Notifications.user_id > Users._id
+Ref: OwnerRequests.userId > Users._id
+Ref: Payments.bookingId > Bookings._id
+Ref: Pricings.venueId > Venues._id
+Ref: Promotions.venueId > Venues._id
+Ref: Reviews.venueId > Venues._id
+Ref: Reviews.playerId > Users._id
+Ref: Reviews.likes > Users._id
+Ref: VenueImages.venueId > Venues._id
