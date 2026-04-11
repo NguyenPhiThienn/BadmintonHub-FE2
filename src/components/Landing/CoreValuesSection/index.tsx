@@ -150,7 +150,7 @@ export function CoreValuesSection() {
                     <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Lợi ích nhân đôi cho mọi người
                     </motion.h2>
-                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-muted-foreground">
+                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
                         Dù bạn là người chơi hay chủ sân, BadmintonHub mang đến giải pháp toàn diện giúp nâng cao trải nghiệm cầu lông.
                     </motion.p>
                 </motion.div>
@@ -183,7 +183,7 @@ export function CoreValuesSection() {
                                 <h3 className="text-xl font-semibold text-primary">
                                     {value.title}
                                 </h3>
-                                <p className="mt-2 text-lg font-normal leading-relaxed text-muted-foreground">
+                                <p className="mt-2 text-lg font-normal leading-relaxed text-neutral-400">
                                     {value.description}
                                 </p>
                             </div>
@@ -238,7 +238,7 @@ export function CoreValuesSection() {
                                         <h4 className="text-xl font-semibold text-primary">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-lg leading-relaxed text-muted-foreground">
+                                        <p className="text-lg leading-relaxed text-neutral-400">
                                             {benefit.description}
                                         </p>
                                     </div>
@@ -292,7 +292,7 @@ export function CoreValuesSection() {
                                         <h4 className="text-xl font-semibold text-primary">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-lg leading-relaxed text-muted-foreground">
+                                        <p className="text-lg leading-relaxed text-neutral-400">
                                             {benefit.description}
                                         </p>
                                     </div>

@@ -8,6 +8,30 @@ export const useLogin = () => {
   });
 };
 
+export const useRegister = () => {
+  return useMutation({
+    mutationFn: (data: any) => authApi.register(data),
+    onSuccess: () => {
+      toast.success("Đăng ký thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Đăng ký thất bại");
+    },
+  });
+};
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: (data: { email: string }) => authApi.forgotPassword(data),
+    onSuccess: () => {
+      toast.success("Vui lòng kiểm tra email để đặt lại mật khẩu");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Gửi yêu cầu thất bại");
+    },
+  });
+};
+
 export const useLogout = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -139,7 +139,7 @@ export function HowItWorksSection() {
                                         </h3>
                                     </div>
 
-                                    <p className="text-base leading-relaxed text-muted-foreground">
+                                    <p className="text-base leading-relaxed text-neutral-400">
                                         {step.description}
                                     </p>
 

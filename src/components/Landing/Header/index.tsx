@@ -3,21 +3,32 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiMenu, mdiClose } from "@mdi/js"
+import { mdiMenu, mdiClose, mdiBellOutline, mdiAccountOutline, mdiLogout, mdiLockReset, mdiTicketOutline } from "@mdi/js"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
+import { AuthDialogs, AuthMode } from "@/components/auth/AuthDialogs"
+import { useUser } from "@/context/useUserContext"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const navLinks = [
-    { label: "Tính năng", href: "#features" },
-    { label: "Người chơi", href: "#player" },
-    { label: "Chủ sân", href: "#owner" },
-    { label: "Công nghệ AI", href: "#ai" },
-    { label: "Liên hệ", href: "#footer" },
+    { label: "Trang chủ", href: "/" },
+    { label: "Bản đồ sân", href: "/venues" },
+    { label: "Lịch của tôi", href: "/my-bookings" },
 ]
 
 export function Header() {
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [authMode, setAuthMode] = useState<AuthMode>(null)
+    const { user, logoutUser: handleLogout } = useUser()
 
     return (
         <motion.header
@@ -49,27 +60,91 @@ export function Header() {
 
                 {/* CTA + Mobile toggle */}
                 <div className="flex items-center gap-3">
-                    <Button variant="default" asChild>
-                        <Link href="#cta">Đăng nhập</Link>
-                    </Button>
-                    <Button variant="accent" asChild>
-                        <Link href="#cta">Đăng ký</Link>
-                    </Button>
-                    <Button
-                        variant="ghost-badminton"
-                        size="sm"
-                        className="md:hidden"
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
-                    >
-                        {mobileOpen ? <Icon path={mdiClose} size={0.8} /> : <Icon path={mdiMenu} size={0.8} />}
-                    </Button>
+                    {user ? (
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost-badminton" size="icon" asChild className="relative">
+                                <Link href="/notifications">
+                                    <Icon path={mdiBellOutline} size={0.8} />
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-background"></span>
+                                </Link>
+                            </Button>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                                        <Avatar className="h-10 w-10 border border-border/40">
+                                            <AvatarImage
+                                                src={user.avatar_url || `https://api.dicebear.com/9.x/bottts/svg?seed=${user.full_name}`}
+                                                alt={user.full_name}
+                                            />
+                                            <AvatarFallback className="bg-primary/10 text-primary">
+                                                {user.full_name?.charAt(0) || "U"}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56" align="end" forceMount>
+                                    <DropdownMenuLabel className="font-normal">
+                                        <div className="flex flex-col space-y-1">
+                                            <p className="text-sm font-medium leading-none">{user.full_name}</p>
+                                            <p className="text-sm leading-none text-neutral-400">{user.email}</p>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/profile" className="cursor-pointer">
+                                            <Icon path={mdiAccountOutline} size={0.8} className="mr-2" />
+                                            <span>Trang cá nhân</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/vouchers" className="cursor-pointer">
+                                            <Icon path={mdiTicketOutline} size={0.8} className="mr-2" />
+                                            <span>Ví Voucher</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/change-password" className="cursor-pointer">
+                                            <Icon path={mdiLockReset} size={0.8} className="mr-2" />
+                                            <span>Đổi mật khẩu</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
+                                        <Icon path={mdiLogout} size={0.8} className="mr-2" />
+                                        <span>Đăng xuất</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    ) : (
+                        <div className="hidden md:flex items-center gap-3">
+                            <Button variant="default" onClick={() => setAuthMode("login")}>
+                                Đăng nhập
+                            </Button>
+                            <Button variant="accent" onClick={() => setAuthMode("register")}>
+                                Đăng ký
+                            </Button>
+                        </div>
+                    )}
+
+                    {!user && (
+                        <Button
+                            variant="ghost-badminton"
+                            size="sm"
+                            className="md:hidden"
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
+                        >
+                            {mobileOpen ? <Icon path={mdiClose} size={0.8} /> : <Icon path={mdiMenu} size={0.8} />}
+                        </Button>
+                    )}
                 </div>
             </div>
 
-            {/* Mobile Nav */}
+            {/* Mobile Nav (Burger Menu - Only for Guest) */}
             <AnimatePresence>
-                {mobileOpen && (
+                {!user && mobileOpen && (
                     <motion.nav
                         className="border-t border-border/40 bg-background px-4 py-4 md:hidden"
                         initial={{ height: 0, opacity: 0 }}
@@ -89,13 +164,22 @@ export function Header() {
                                     <Link href={link.href}>{link.label}</Link>
                                 </Button>
                             ))}
-                            <Button variant="badminton" className="mt-2 bg-primary hover:bg-secondary text-secondary" asChild>
-                                <Link href="#cta" onClick={() => setMobileOpen(false)}>Bắt đầu ngay</Link>
+                            <Button
+                                variant="badminton"
+                                className="mt-2 bg-primary hover:bg-secondary text-secondary"
+                                onClick={() => {
+                                    setMobileOpen(false);
+                                    setAuthMode("register");
+                                }}
+                            >
+                                Bắt đầu ngay
                             </Button>
                         </div>
                     </motion.nav>
                 )}
             </AnimatePresence>
+
+            <AuthDialogs mode={authMode} setMode={setAuthMode} />
         </motion.header>
     )
 }

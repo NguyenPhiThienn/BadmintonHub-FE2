@@ -1,24 +1,28 @@
 import { IEmployee } from './employee';
 import { IPartner } from './partner';
 
-export type UserRole = 'admin' | 'employee' | 'customer' | 'driver' | 'partner';
+export type UserRole = 'admin' | 'employee' | 'customer' | 'driver' | 'partner' | 'PLAYER' | 'COURT_OWNER';
 export type DriverStatus = 'PENDING' | 'APPROVED' | 'LOCKED' | 'REJECTED';
 
 
 export interface IUser {
   id: string;
   _id?: string; // MongoDB ID
-  username: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  role: UserRole | string;
+  avatar_url?: string;
+  username?: string;
   fullName?: string;
   avatar?: string;
-  role: UserRole | string;
+  phoneNumber?: string;
   employeeId?: string;
   employeeName?: string;
   employeeCode?: string;
   employee?: IEmployee;
   department?: string;
   position?: string;
-  phoneNumber?: string;
   permissions?: string[];
   partnerName?: string;
   partner?: IPartner;
@@ -29,6 +33,7 @@ export interface IUser {
 
 export interface IAuthResponse {
   statusCode: number;
+  status?: number;
   message: string;
   data: {
     accessToken: string;
@@ -43,6 +48,7 @@ export interface IAuthResponse {
 
 export interface IRefreshTokenResponse {
   statusCode: number;
+  status?: number;
   message: string;
   data: {
     accessToken: string;
@@ -56,6 +62,7 @@ export interface IRefreshTokenResponse {
 
 export interface IProfileResponse {
   statusCode: number;
+  status?: number;
   message: string;
   data: IUser;
   meta: {

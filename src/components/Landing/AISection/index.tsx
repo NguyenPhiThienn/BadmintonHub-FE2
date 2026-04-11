@@ -80,7 +80,7 @@ export function AISection() {
                     <motion.h2 custom={1} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Trí tuệ nhân tạo, sức mạnh vượt trội
                     </motion.h2>
-                    <motion.p custom={2} variants={fadeUp} className="text-xl leading-relaxed text-muted-foreground">
+                    <motion.p custom={2} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
                         Công nghệ AI tiên tiến giúp tối ưu hóa mọi trải nghiệm từ người chơi đến chủ sân.
                     </motion.p>
                 </motion.div>

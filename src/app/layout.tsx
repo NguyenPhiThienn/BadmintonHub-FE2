@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { BottomNav } from '@/components/navigation/BottomNav'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-mainBackgroundV1 min-h-screen" suppressHydrationWarning>
+      <body className="bg-mainBackgroundV1 min-h-screen pb-20 md:pb-0" suppressHydrationWarning>
         <NextTopLoader
           color="#41C651"
           initialPosition={0.08}
@@ -47,6 +49,7 @@ export default function RootLayout({
           <UserProvider>
             <ToastProvider />
             {children}
+            <BottomNav />
           </UserProvider>
         </ReactQueryClientProvider>
       </body>

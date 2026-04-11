@@ -41,7 +41,7 @@ export default function StickerBoard({
         <div className="w-80 bg-background dark:bg-zinc-900 p-0 rounded-sm">
             <div className="p-2 border-b">
                 <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-neutral-400" />
                     <Input
                         placeholder="Tìm kiếm sticker"
                         className="pl-8 bg-background border"

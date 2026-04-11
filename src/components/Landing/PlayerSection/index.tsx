@@ -85,7 +85,7 @@ export function PlayerSection() {
                     <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Tìm sân thông minh, đặt chỗ siêu nhanh
                     </motion.h2>
-                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-muted-foreground">
+                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
                         Chỉ cần nhập vị trí, AI sẽ gợi ý sân tốt nhất cho bạn. Trải nghiệm đặt sân chưa bao giờ dễ dàng đến thế.
                     </motion.p>
                 </motion.div>
@@ -165,12 +165,12 @@ export function PlayerSection() {
                                     </div>
                                 </div>
 
-                                <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                                <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-400">
                                     <Icon path={mdiMap} size={0.8} />
                                     {court.address}
                                 </div>
 
-                                <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                                <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-400">
                                     <Icon path={mdiClock} size={0.8} />
                                     {court.time}
                                 </div>
