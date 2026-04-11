@@ -1,0 +1,150 @@
+Vậy tại sao id của {
+                "_id": "699701736736007120a4cb25",
+                "partnerId": {
+                    "_id": "699701366736007120a4cb04",
+                    "partnerName": "CÔNG TY CP ĐIỆN GIÓ KHE SANH",
+                    "address": "Thôn Húc, Xã Khe Sanh, Tỉnh Quảng Trị",
+                    "contacts": [],
+                    "isActive": false,
+                    "createdBy": "698d39cbe9d8b1e6d371ba03",
+                    "createdAt": "2026-02-19T12:25:26.750Z",
+                    "updatedAt": "2026-02-19T13:28:24.144Z",
+                    "__v": 0
+                },
+                "partnerName": "CÔNG TY CP ĐIỆN GIÓ KHE SANH",
+                "constructionPlansFileUrl": "https://sgp.cloud.appwrite.io/v1/storage/buckets/69950122001a9ed25c98/files/6997016a00029bdc9fe0/view?project=6994eff6001814216466",
+                "description": "phương án thi công thí nghiệm định kỳ năm 2025",
+                "uploadedAt": "2026-02-19T12:26:27.079Z",
+                "uploadedBy": "698d39cbe9d8b1e6d371ba03",
+                "isActive": true,
+                "createdAt": "2026-02-19T12:26:27.082Z",
+                "updatedAt": "2026-02-24T15:05:06.665Z",
+                "__v": 0,
+                "updatedBy": "698d39cbe9d8b1e6d371ba03"
+            }
+ở http://localhost:5000/api/v1/construction-plans?page=1&limit=10&search=
+lại khác như thế
+{
+    "statusCode": 200,
+    "message": "Lấy danh sách phương án thi công thành công",
+    "data": {
+        "plans": [
+            {
+                "_id": "69b7484dc3182c3583cf16fc",
+                "partnerId": {
+                    "_id": "69ad3d86f18ee8b4e03891c0",
+                    "partnerName": "CÔNG TY CỔ PHẦN QUANG ĐIỆN PHÚ KHÁNH",
+                    "address": "Tầng 9, tòa nhà Estar Building, 147-149 Võ Văn Tần, Phường Võ Thị Sáu, Thành phố Hồ Chí Minh",
+                    "contacts": [],
+                    "isActive": true,
+                    "createdBy": "698d39cbe9d8b1e6d371ba03",
+                    "createdAt": "2026-03-08T09:12:38.649Z",
+                    "updatedAt": "2026-03-08T09:12:38.649Z",
+                    "__v": 0
+                },
+                "partnerName": "CÔNG TY CỔ PHẦN QUANG ĐIỆN PHÚ KHÁNH",
+                "constructionPlansFileUrl": "https://eascompany.s3.ca-east-006.backblazeb2.com/documents/ce04fb0f-3335-49c6-87e9-3d1e1b240447-PA thay dong ho nhiet do dau MBA T1.pdf",
+                "description": "Phương án thi công thay thế đồng hồ chỉ thị nhiệt độ dầu MBA T1",
+                "uploadedAt": "2026-03-16T00:01:17.096Z",
+                "uploadedBy": "698d39cbe9d8b1e6d371ba03",
+                "isActive": true,
+                "createdAt": "2026-03-16T00:01:17.097Z",
+                "updatedAt": "2026-03-16T00:01:17.097Z",
+                "__v": 0
+            },
+            {
+                "_id": "699dc209020e33bcc1311c2c",
+                "partnerId": {
+                    "_id": "699dc1e6020e33bcc1311bf9",
+                    "partnerName": "CÔNG TY CỔ PHẦN ĐIỆN GIÓ PHONG LIỆU",
+                    "address": "Xã Khe Sanh, Tỉnh Quảng Trị",
+                    "contacts": [
+                        {
+                            "name": "Phạm Thành Chung",
+                            "phoneNumber": "0905011353",
+                            "_id": "699dc1e6020e33bcc1311bfa"
+                        }
+                    ],
+                    "isActive": true,
+                    "createdBy": "698d39cbe9d8b1e6d371ba03",
+                    "createdAt": "2026-02-24T15:21:10.792Z",
+                    "updatedAt": "2026-02-24T15:21:10.792Z",
+                    "__v": 0
+                },
+                "partnerName": "CÔNG TY CỔ PHẦN ĐIỆN GIÓ PHONG LIỆU",
+                "constructionPlansFileUrl": "https://sgp.cloud.appwrite.io/v1/storage/buckets/69950122001a9ed25c98/files/699dc2020005a189ee63/view?project=6994eff6001814216466",
+                "description": "phương án thi công thí nghiệm định kỳ năm 2025",
+                "uploadedAt": "2026-02-24T15:21:45.030Z",
+                "uploadedBy": "698d39cbe9d8b1e6d371ba03",
+                "isActive": true,
+                "createdAt": "2026-02-24T15:21:45.030Z",
+                "updatedAt": "2026-02-24T15:21:45.030Z",
+                "__v": 0
+            },
+            {
+                "_id": "699701736736007120a4cb25",
+                "partnerId": {
+                    "_id": "699701366736007120a4cb04",
+                    "partnerName": "CÔNG TY CP ĐIỆN GIÓ KHE SANH",
+                    "address": "Thôn Húc, Xã Khe Sanh, Tỉnh Quảng Trị",
+                    "contacts": [],
+                    "isActive": false,
+                    "createdBy": "698d39cbe9d8b1e6d371ba03",
+                    "createdAt": "2026-02-19T12:25:26.750Z",
+                    "updatedAt": "2026-02-19T13:28:24.144Z",
+                    "__v": 0
+                },
+                "partnerName": "CÔNG TY CP ĐIỆN GIÓ KHE SANH",
+                "constructionPlansFileUrl": "https://sgp.cloud.appwrite.io/v1/storage/buckets/69950122001a9ed25c98/files/6997016a00029bdc9fe0/view?project=6994eff6001814216466",
+                "description": "phương án thi công thí nghiệm định kỳ năm 2025",
+                "uploadedAt": "2026-02-19T12:26:27.079Z",
+                "uploadedBy": "698d39cbe9d8b1e6d371ba03",
+                "isActive": true,
+                "createdAt": "2026-02-19T12:26:27.082Z",
+                "updatedAt": "2026-02-24T15:05:06.665Z",
+                "__v": 0,
+                "updatedBy": "698d39cbe9d8b1e6d371ba03"
+            },
+            {
+                "_id": "698d39cde9d8b1e6d371ba7b",
+                "partnerId": {
+                    "_id": "698d39cce9d8b1e6d371ba4b",
+                    "partnerName": "Tập đoàn Xây dựng 1 Việt Nam",
+                    "address": "Số 1 Đường Lê Lợi, TP.HCM",
+                    "contacts": [
+                        {
+                            "name": "Người liên hệ 1",
+                            "phoneNumber": "0900000010",
+                            "_id": "6990b28e2e00e6b9fd6c555f"
+                        }
+                    ],
+                    "isActive": false,
+                    "createdBy": "698d39cce9d8b1e6d371ba27",
+                    "createdAt": "2026-02-12T02:24:12.636Z",
+                    "updatedAt": "2026-02-18T08:23:19.935Z",
+                    "__v": 0,
+                    "updatedBy": "698d39cce9d8b1e6d371ba27"
+                },
+                "partnerName": "Tập đoàn Xây dựng 1 Việt Nam",
+                "description": "Mô tả phương án thi công số 1",
+                "uploadedBy": "698d39cce9d8b1e6d371ba27",
+                "isActive": true,
+                "uploadedAt": "2026-02-12T02:24:13.256Z",
+                "createdAt": "2026-02-12T02:24:13.267Z",
+                "updatedAt": "2026-02-12T02:24:13.267Z",
+                "__v": 0,
+                "constructionPlansFileUrl": "https://example.com/plan.pdf"
+            }
+        ],
+        "pagination": {
+            "page": 1,
+            "limit": 10,
+            "total": 4,
+            "totalPages": 1
+        }
+    },
+    "meta": {
+        "timestamp": "2026-04-02T07:05:00.896Z",
+        "apiVersion": "v1.2"
+    }
+}
