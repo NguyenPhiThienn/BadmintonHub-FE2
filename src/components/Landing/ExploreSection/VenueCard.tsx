@@ -66,7 +66,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
           )}
 
           {/* Price tag */}
-          <div className="absolute bottom-4 right-4 rounded-lg bg-white/95 px-3 py-1.5 text-sm font-bold text-primary shadow-md backdrop-blur-sm">
+          <div className="absolute bottom-4 right-4 rounded-lg bg-white/95 px-3 py-1.5 text-sm font-semibold text-primary shadow-md backdrop-blur-sm">
             {displayPrice}
           </div>
         </div>
@@ -101,7 +101,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
                 key={feature}
                 className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2.5 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
               >
-                <Icon path={mdiCheckCircle} size={0.5} />
+                <Icon path={mdiCheckCircle} size={0.6} />
                 {feature}
               </span>
             ))}

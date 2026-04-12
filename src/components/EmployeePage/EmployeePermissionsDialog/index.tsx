@@ -227,7 +227,7 @@ export const EmployeePermissionsDialog = ({
                                         onCheckedChange={() => togglePermission(mod.id, mod.subMenu, mod.actions)}
                                         className="h-6 w-6 border-primary/60 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                     />
-                                    <Label htmlFor={mod.id} className="text-primary font-bold text-sm md:text-base cursor-pointer select-none">
+                                    <Label htmlFor={mod.id} className="text-primary font-semibold text-sm md:text-base cursor-pointer select-none">
                                         {mod.name}
                                     </Label>
                                 </div>

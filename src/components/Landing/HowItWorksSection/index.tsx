@@ -81,7 +81,7 @@ export function HowItWorksSection() {
                     <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-secondary/80">
                         Cách thức hoạt động
                     </motion.p>
-                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-secondary/90 sm:text-4xl lg:text-5xl">
+                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-secondary/90 sm:text-4xl lg:text-5xl">
                         3 bước đơn giản để bắt đầu
                     </motion.h2>
                     <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-secondary/80">
@@ -123,7 +123,7 @@ export function HowItWorksSection() {
                                             <span className="text-sm font-semibold uppercase tracking-wider">
                                                 Bước
                                             </span>
-                                            <span className="text-2xl font-bold leading-none">
+                                            <span className="text-2xl font-semibold leading-none">
                                                 {step.step}
                                             </span>
                                         </div>

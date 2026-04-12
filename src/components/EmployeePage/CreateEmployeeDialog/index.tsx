@@ -55,7 +55,7 @@ export const CreateEmployeeDialog = ({
         if (missingFields.length > 0) {
             toast.warning(
                 <div className="flex flex-col gap-1">
-                    <p className="font-bold border-b border-orange-400/20 pb-1 mb-1 text-sm">Vui lòng điền đủ thông tin:</p>
+                    <p className="font-semibold border-b border-orange-400/20 pb-1 mb-1 text-sm">Vui lòng điền đủ thông tin:</p>
                     <ul className="list-disc ml-4 text-xs space-y-1">
                         {missingFields.map((field, index) => (
                             <li key={index}>{field}</li>

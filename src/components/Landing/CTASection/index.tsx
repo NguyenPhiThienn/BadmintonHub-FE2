@@ -50,7 +50,7 @@ export function CTASection() {
                 viewport={{ once: true, margin: "-100px" }}
             >
                 <div className="mx-auto max-w-3xl text-center">
-                    <motion.h2 custom={0} variants={fadeUp} className="text-3xl font-bold tracking-tight text-secondary sm:text-4xl lg:text-5xl">
+                    <motion.h2 custom={0} variants={fadeUp} className="text-3xl font-semibold tracking-tight text-secondary sm:text-4xl lg:text-5xl">
                         Sẵn sàng trải nghiệm tương lai của cầu lông?
                     </motion.h2>
                     <motion.p custom={1} variants={fadeUp} className="mt-6 text-xl leading-relaxed text-secondary/80">

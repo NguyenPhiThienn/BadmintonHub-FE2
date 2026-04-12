@@ -112,9 +112,9 @@ export const TestingDeviceDetailsDialog = ({
                         <table className="w-full border-collapse text-sm">
                             <thead>
                                 <tr className="bg-white/5">
-                                    <th className="border border-darkBorderV1 p-2 text-center w-12 text-neutral-400 font-bold">#</th>
+                                    <th className="border border-darkBorderV1 p-2 text-center w-12 text-neutral-400 font-semibold">#</th>
                                     {Array.from({ length: cols }).map((_, cIdx) => (
-                                        <th key={cIdx} className="border border-darkBorderV1 p-2 text-center text-accent font-bold">
+                                        <th key={cIdx} className="border border-darkBorderV1 p-2 text-center text-accent font-semibold">
                                             Cột {cIdx + 1}
                                         </th>
                                     ))}
@@ -125,7 +125,7 @@ export const TestingDeviceDetailsDialog = ({
                                     const r = rIdx + 1;
                                     return (
                                         <tr key={rIdx}>
-                                            <td className="border border-darkBorderV1 p-2 text-center font-bold text-accent bg-white/5">
+                                            <td className="border border-darkBorderV1 p-2 text-center font-semibold text-accent bg-white/5">
                                                 H{r}
                                             </td>
                                             {Array.from({ length: cols }).map((_, cIdx) => {

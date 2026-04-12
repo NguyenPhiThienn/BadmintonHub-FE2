@@ -30,8 +30,8 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
                   <img src="/images/logo.png" className="w-[100px] h-auto object-contain" alt="Logo" />
                 </div>
                 <div className="flex-1 p-3 text-center flex flex-col justify-center bg-white border-l border-l-black">
-                  <div className="text-[12pt] font-bold text-[#2D508E] leading-tight mb-0.5">CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN</div>
-                  <div className="text-[12pt] font-bold text-[#FF0000] leading-tight mb-1">ELECTRIC AUTOMATION SOLUTION</div>
+                  <div className="text-[12pt] font-semibold text-[#2D508E] leading-tight mb-0.5">CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN</div>
+                  <div className="text-[12pt] font-semibold text-[#FF0000] leading-tight mb-1">ELECTRIC AUTOMATION SOLUTION</div>
                   <div className="text-[13pt] leading-tight text-black">
                     <div>452 Tôn Đức Thắng – Phường Hòa Khánh – TP. Đà Nẵng</div>
                     <div>Website: giaiphaptudongdien.com – Email: giaiphaptudongdien@gmail.com</div>
@@ -41,10 +41,10 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
 
               {/* Title Row */}
               <div className="p-3 text-center bg-white">
-                <div className="text-[14pt] font-bold text-[#0070BF] uppercase leading-tight">
+                <div className="text-[14pt] font-semibold text-[#0070BF] uppercase leading-tight">
                   BIÊN BẢN THÍ NGHIỆM BẢO VỆ SO LỆCH THANH CÁI MỨC NGĂN
                 </div>
-                <div className="text-[14pt] font-bold text-[#C05711] italic leading-tight mt-0.5">
+                <div className="text-[14pt] font-semibold text-[#C05711] italic leading-tight mt-0.5">
                   (Bay unit busbar differential protection Test Report)
                 </div>
               </div>
@@ -192,7 +192,7 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
             <table className="w-full border-collapse text-[13pt]">
               <thead>
                 <tr className="leading-tight text-center">
-                  <th colSpan={2} className="py-0 px-2 text-left font-bold" style={{ borderLeft: BORDER, borderRight: BORDER, borderBottom: BORDER, borderTop: BORDER }}>
+                  <th colSpan={2} className="py-0 px-2 text-left font-semibold" style={{ borderLeft: BORDER, borderRight: BORDER, borderBottom: BORDER, borderTop: BORDER }}>
                     Các hạng mục đã thí nghiệm <span className="italic">(Tested items):</span>
                   </th>
                   <th className="w-[130px] font-normal text-center py-0 px-2" style={{ borderLeft: BORDER, borderRight: BORDER, borderBottom: BORDER, borderTop: BORDER }}>
@@ -231,12 +231,12 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
 
             {/* Remark & Conclusion Section */}
             <div>
-              <div className="py-0 px-2 text-left font-bold border border-black border-t-0">
-                <span className="font-bold">GHI CHÚ</span> <span className="italic text-[11pt] font-normal">(Remark):</span> <span className="font-normal text-[13pt]">{job.notes || "/"}</span>
+              <div className="py-0 px-2 text-left font-semibold border border-black border-t-0">
+                <span className="font-semibold">GHI CHÚ</span> <span className="italic text-[11pt] font-normal">(Remark):</span> <span className="font-normal text-[13pt]">{job.notes || "/"}</span>
               </div>
               <div className="py-0 px-2 text-left border border-black border-t-0">
                 <div className="leading-tight">
-                  <span className="font-bold uppercase">KẾT LUẬN</span> <span className="italic font-normal text-[11pt] ">(Conclusion):</span>{" "}
+                  <span className="font-semibold uppercase">KẾT LUẬN</span> <span className="italic font-normal text-[11pt] ">(Conclusion):</span>{" "}
                   <span className="font-normal text-[13pt]">
                     {(() => {
                       const text = job.conclusion || "Các hạng mục đã thí nghiệm đạt yêu cầu kỹ thuật.";
@@ -263,7 +263,7 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
               <div className="flex justify-between px-4 text-center pb-10">
                 {/* Testers */}
                 <div className="w-1/3 flex flex-col items-center">
-                  <div className="font-bold text-[#0070BF] text-[13pt]">Người thí nghiệm</div>
+                  <div className="font-semibold text-[#0070BF] text-[13pt]">Người thí nghiệm</div>
                   <div className="italic text-[11pt] mb-1">(Testers)</div>
                   <div className="h-16 flex items-center justify-center">
                     {job.testerId?.digitalSignature ? (
@@ -279,26 +279,26 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
 
                 {/* Approver */}
                 <div className="w-1/3 flex flex-col items-center">
-                  <div className="font-bold text-[#0070BF] text-[13pt]">Người kiểm duyệt</div>
+                  <div className="font-semibold text-[#0070BF] text-[13pt]">Người kiểm duyệt</div>
                   <div className="italic text-[11pt] mb-1">(Approver)</div>
                   <div className="h-16 flex items-center justify-center">
                     {job.approverId?.digitalSignature ? (
                       <img src={job.approverId.digitalSignature} className="h-16 w-auto object-contain print:block" alt="Signature" />
                     ) : <div className="h-16"></div>}
                   </div>
-                  <div className="font-bold text-[13pt] mt-2">{job.approverId?.fullName || job.approverName}</div>
+                  <div className="font-semibold text-[13pt] mt-2">{job.approverId?.fullName || job.approverName}</div>
                 </div>
 
                 {/* Director */}
                 <div className="w-1/3 flex flex-col items-center">
-                  <div className="font-bold text-black text-[13pt]">GIÁM ĐỐC</div>
+                  <div className="font-semibold text-black text-[13pt]">GIÁM ĐỐC</div>
                   <div className="italic text-[11pt] mb-1">(Director)</div>
                   <div className="h-16 flex items-center justify-center">
                     {job.directorId?.digitalSignature ? (
                       <img src={job.directorId.digitalSignature} className="h-16 w-auto object-contain print:block" alt="Signature" />
                     ) : <div className="h-16"></div>}
                   </div>
-                  <div className="font-bold text-[13pt] mt-2">{job.directorId?.fullName || job.directorName}</div>
+                  <div className="font-semibold text-[13pt] mt-2">{job.directorId?.fullName || job.directorName}</div>
                 </div>
               </div>
             </div>
@@ -312,7 +312,7 @@ export const RoleBaoVeSoLechThanhCaiMucNganTemplate = ({ job, device, categories
         <div className="flex-1 flex flex-col box-border">
           <div className="relative mb-4 px-1">
             <div className="text-center">
-              <div className="text-[14pt] font-bold uppercase leading-tight">KẾT QUẢ THÍ NGHIỆM</div>
+              <div className="text-[14pt] font-semibold uppercase leading-tight">KẾT QUẢ THÍ NGHIỆM</div>
               <div className="text-[11pt] italic font-normal">(TESTING RESULTS)</div>
             </div>
           </div>

@@ -97,7 +97,7 @@ export const ExploreSection = () => {
             className="flex items-center justify-between max-w-7xl mx-auto"
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
           >
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               DÀNH RIÊNG CHO BẠN
             </h2>
             <span className="text-base text-accent cursor-pointer hover:underline">Xem tất cả</span>
@@ -136,7 +136,7 @@ export const ExploreSection = () => {
           className="flex items-center justify-between max-w-7xl mx-auto"
           initial="hidden" animate="visible" variants={fadeUp} custom={5}
         >
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
             DANH SÁCH SÂN QUANH ĐÂY
           </h2>
           <span className="text-base text-neutral-400 cursor-pointer hover:underline">Gần bạn nhất</span>

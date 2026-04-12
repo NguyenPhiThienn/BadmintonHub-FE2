@@ -82,7 +82,7 @@ export function HeroSection() {
                         <motion.h1
                             custom={1}
                             variants={fadeUp}
-                            className="max-w-2xl text-4xl font-bold tracking-tight text-secondary sm:text-5xl lg:text-6xl flex flex-col gap-3"
+                            className="max-w-2xl text-4xl font-semibold tracking-tight text-secondary sm:text-5xl lg:text-6xl flex flex-col gap-3"
                         >
                             <span>
                                 Đặt sân thông minh,{" "}
@@ -136,7 +136,7 @@ export function HeroSection() {
                                 </div>
                                 <div>
                                     <p className="text-base font-semibold text-secondary/80">Lượt đặt hôm nay</p>
-                                    <p className="text-2xl font-bold text-secondary">+2,847</p>
+                                    <p className="text-2xl font-semibold text-secondary">+2,847</p>
                                 </div>
                             </div>
                             <div className="flex gap-2 rotate-180">
@@ -166,7 +166,7 @@ export function HeroSection() {
                         { value: "98%", label: "Hài lòng" },
                     ].map((stat, i) => (
                         <motion.div key={stat.label} custom={i} variants={statsStagger} className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/10 p-4 shadow-2xl backdrop-blur-md">
-                            <span className="text-3xl font-bold text-accent lg:text-4xl">
+                            <span className="text-3xl font-semibold text-accent lg:text-4xl">
                                 {stat.value}
                             </span>
                             <span className="mt-1 text-base text-secondary/80 font-semibold">{stat.label}</span>

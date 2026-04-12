@@ -382,7 +382,7 @@ function MobileLoginPage({
           {/* Header */}
           <div className="text-center space-y-3 md:space-y-4 flex flex-col items-center">
             <img src="/images/logo.webp" alt="Logo" className="h-24 w-24 rounded-full" draggable={false} />
-            <h2 className="text-xl font-bold text-secondary uppercase">
+            <h2 className="text-xl font-semibold text-secondary uppercase">
               Đăng nhập hệ thống
             </h2>
             <p className="text-neutral-400 text-sm text-center">
@@ -543,7 +543,7 @@ function TabletLoginPage({
               {/* Header */}
               <div className="text-center space-y-3 md:space-y-4 flex flex-col items-center">
                 <img src="/images/logo.webp" alt="Logo" className="h-24 w-24" draggable={false} />
-                <h2 className="text-2xl font-bold text-primary uppercase">
+                <h2 className="text-2xl font-semibold text-primary uppercase">
                   Đăng nhập hệ thống
                 </h2>
                 <p className="text-neutral-400 text-sm">
@@ -643,7 +643,7 @@ function TabletLoginPage({
                       </p>
                     )}
                   </div>
-                  <Button type="submit" disabled={isPending} className="w-full h-12 bg-primary hover:bg-primary/90 text-darkBackgroundV1 font-bold text-base">
+                  <Button type="submit" disabled={isPending} className="w-full h-12 bg-primary hover:bg-primary/90 text-darkBackgroundV1 font-semibold text-base">
                     {isPending ? (
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-4 h-4 border-2 border-darkBackgroundV1/30 border-t-darkBackgroundV1 rounded-full animate-spin"></div>

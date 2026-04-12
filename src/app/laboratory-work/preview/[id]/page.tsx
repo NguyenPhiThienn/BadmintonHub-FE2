@@ -200,7 +200,7 @@ export default function LaboratoryWorkPreviewPage() {
 
         return (
             <div key={category._id}>
-                <div className="font-bold text-[13pt] flex items-center flex-wrap gap-x-2">
+                <div className="font-semibold text-[13pt] flex items-center flex-wrap gap-x-2">
                     {index && <span>{index}. </span>}
                     <span>{vnName}</span>
                     {engName && <span className="italic font-normal text-[11pt]">({engName})</span>}
@@ -245,7 +245,7 @@ export default function LaboratoryWorkPreviewPage() {
                                             ))
                                         ) : (
                                             value[0] && Object.keys(value[0]).map((key, i) => (
-                                                <th key={i} className="border border-black p-1 font-bold text-[13pt]">
+                                                <th key={i} className="border border-black p-1 font-semibold text-[13pt]">
                                                     {renderCellContent(key)}
                                                 </th>
                                             ))

@@ -171,7 +171,7 @@ const UploadBox = ({
         <Card className="bg-darkCardV1 border-2 border-darkBorderV1 overflow-hidden shadow-lg flex flex-col">
             <div className={`p-3 ${headerColor} border-b border-white/10 flex items-center gap-2`}>
                 <Icon path={icon} size={0.8} className="text-white" />
-                <h3 className="text-sm font-bold text-white">{title}</h3>
+                <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
 
             <div className="p-4 pt-0 flex-1 flex flex-col">

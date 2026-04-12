@@ -14,7 +14,7 @@ export function TextMessage({ content, isMe, replyTo }: TextMessageProps) {
             }`}>
             {replyTo && (
                 <div className={`mb-1 pl-3 py-1 border-l-2 border-accent/60 bg-white/5 rounded-r-md text-sm cursor-pointer`}>
-                    <div className="font-bold text-neutral-300 text-sm mb-0.5">
+                    <div className="font-semibold text-neutral-300 text-sm mb-0.5">
                         {replyTo.senderName}
                     </div>
                     <div className="text-neutral-400 italic truncate line-clamp-1">

@@ -229,7 +229,7 @@ export function ConstructionLogsDetailsDialog({
                                                         <span>Dự án</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-neutral-300 font-bold">{logData?.projectName || <span className="text-neutral-400 italic font-normal">Chưa có tên dự án</span>}</TableCell>
+                                                <TableCell className="text-neutral-300 font-semibold">{logData?.projectName || <span className="text-neutral-400 italic font-normal">Chưa có tên dự án</span>}</TableCell>
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell className="text-neutral-300 font-semibold w-[220px]">
@@ -346,7 +346,7 @@ export function ConstructionLogsDetailsDialog({
                                                 <TableCell>
                                                     <div className="flex items-center gap-2 flex-wrap">
                                                         <span className="text-sm text-neutral-300">{logData?.weather || <span className="text-neutral-400 italic">Chưa cập nhật thời tiết</span>}</span>
-                                                        {logData?.temperature && <Badge variant="orange" className="font-bold">{logData.temperature}°C</Badge>}
+                                                        {logData?.temperature && <Badge variant="orange" className="font-semibold">{logData.temperature}°C</Badge>}
                                                     </div>
                                                 </TableCell>
                                             </TableRow>

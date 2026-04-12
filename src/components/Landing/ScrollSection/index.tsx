@@ -178,7 +178,7 @@ export const ScrollSection = () => {
             style={{ opacity: titleOpacity, y: titleY, x: contentX }}
             className="absolute inset-0 w-fit flex flex-col gap-8 items-center justify-center"
           >
-            <div className="w-full text-4xl md:text-7xl  font-bold text-primary text-wrap uppercase">
+            <div className="w-full text-4xl md:text-7xl  font-semibold text-primary text-wrap uppercase">
               <div className="flex items-center gap-4">
                 <h1>GIẢI PHÁP</h1>
                 <Loader />
@@ -204,7 +204,7 @@ export const ScrollSection = () => {
                       />
                     </div>
                   ))}
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-secondary text-xs font-bold text-primary ring-2 ring-transparent">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-secondary text-xs font-semibold text-primary ring-2 ring-transparent">
                     +250
                   </div>
                 </div>
@@ -212,16 +212,16 @@ export const ScrollSection = () => {
                   <div className="flex flex-col justify-between h-full gap-1">
                     <div className="flex items-center gap-1">
                       <Icon path={mdiCheckDecagram} size={0.6} className="text-secondary" />
-                      <span className="text-sm font-bold text-secondary/80">Công ty tin cậy</span>
+                      <span className="text-sm font-semibold text-secondary/80">Công ty tin cậy</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Icon path={mdiAccountTie} size={0.6} className="text-secondary" />
-                      <span className="text-sm font-bold text-secondary/80">Khách hàng doanh nghiệp</span>
+                      <span className="text-sm font-semibold text-secondary/80">Khách hàng doanh nghiệp</span>
                     </div>
                   </div>
 
                   <div className="ml-2 border-l-2 border-secondary/20 pl-4 h-full flex flex-col justify-center">
-                    <div className="text-xl font-black text-secondary">98%</div>
+                    <div className="text-xl font-semibold text-secondary">98%</div>
                     <div className="text-sm font-semibold text-secondary/80">Hài lòng</div>
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export const ScrollSection = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-secondary/80">Sản phẩm tiêu biểu</span>
                       </div>
-                      <h3 className="text-sm md:text-base font-bold text-secondary leading-tight truncate">Rơle trung gian Schneider</h3>
+                      <h3 className="text-sm md:text-base font-semibold text-secondary leading-tight truncate">Rơle trung gian Schneider</h3>
 
                       {/* Stars - Now below title */}
                       <div className="flex gap-0.5">
@@ -279,9 +279,9 @@ export const ScrollSection = () => {
             className="absolute inset-0 top-1/4 w-[40%] flex flex-col gap-8 items-center justify-center"
           >
             <div className="flex-1 w-full text-left">
-              <h2 className="text-4xl font-bold text-primary leading-tight">Thiết bị điều khiển & giám sát.</h2>
+              <h2 className="text-4xl font-semibold text-primary leading-tight">Thiết bị điều khiển & giám sát.</h2>
               <p className="text-xl text-primary my-4 font-normal text-justify italic">Cung cấp Rơle trung gian, bộ chuyển đổi tín hiệu và thiết bị bảo vệ từ các thương hiệu hàng đầu: Carlo Gavazzi, Schneider, Phoenix Contact.</p>
-              <h2 className="text-4xl font-bold text-primary leading-tight">Thí nghiệm & kiểm định.</h2>
+              <h2 className="text-4xl font-semibold text-primary leading-tight">Thí nghiệm & kiểm định.</h2>
               <p className="text-xl text-primary mt-4 font-normal text-justify italic">Dịch vụ thí nghiệm định kỳ, bảo dưỡng thiết bị điện cao áp và kiểm định trạm biến áp lên đến 220kV.</p>
             </div>
           </motion.div>
@@ -292,11 +292,11 @@ export const ScrollSection = () => {
             className="absolute inset-0 flex flex-col items-start justify-center px-4"
           >
             <div className="max-w-xl w-full text-left">
-              <h2 className="text-5xl md:text-7xl font-bold text-primary tracking-tighter mb-8 uppercase leading-[1]">An Toàn &<br />Hiệu Quả.</h2>
+              <h2 className="text-5xl md:text-7xl font-semibold text-primary tracking-tighter mb-8 uppercase leading-[1]">An Toàn &<br />Hiệu Quả.</h2>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="pointer-events-auto w-fit px-10 py-4 bg-primary text-secondary font-bold  rounded-2xl text-lg cursor-pointer hover:bg-primary/95 transition-all shadow-2xl flex items-center gap-3 group"
+                className="pointer-events-auto w-fit px-10 py-4 bg-primary text-secondary font-semibold  rounded-2xl text-lg cursor-pointer hover:bg-primary/95 transition-all shadow-2xl flex items-center gap-3 group"
               >
                 <Icon path={mdiPhone} size={1} className="group-hover:rotate-12 transition-transform" />
                 <span>Liên Hệ Ngay</span>

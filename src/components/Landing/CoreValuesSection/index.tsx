@@ -147,7 +147,7 @@ export function CoreValuesSection() {
                     <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-primary">
                         Giá trị cốt lõi
                     </motion.p>
-                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
+                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Lợi ích nhân đôi cho mọi người
                     </motion.h2>
                     <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
@@ -214,7 +214,7 @@ export function CoreValuesSection() {
                                         <Icon path={mdiAccountGroup} size={0.8} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-secondary">
+                                        <h3 className="text-xl font-semibold text-secondary">
                                             Dành cho Người chơi
                                         </h3>
                                         <p className="text-lg text-secondary/80">Trải nghiệm đặt sân hoàn hảo</p>
@@ -268,7 +268,7 @@ export function CoreValuesSection() {
                                         <Icon path={mdiChartBar} size={0.8} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-secondary">
+                                        <h3 className="text-xl font-semibold text-secondary">
                                             Dành cho Chủ sân
                                         </h3>
                                         <p className="text-lg text-secondary/80">Quản lý hiệu quả, tăng doanh thu</p>

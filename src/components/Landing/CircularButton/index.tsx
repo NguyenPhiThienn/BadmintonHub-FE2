@@ -5,7 +5,7 @@ const CircularButton = ({ text = "ELECTRIC • AUTOMATION • SOLUTION • " }: 
     const rotationStep = 360 / characters.length;
 
     return (
-        <button className="group relative grid place-content-center w-[120px] h-[120px] rounded-full overflow-hidden bg-primary text-secondary transition-all duration-500 hover:bg-black hover:scale-110 border-none cursor-pointer font-bold pointer-events-auto">
+        <button className="group relative grid place-content-center w-[120px] h-[120px] rounded-full overflow-hidden bg-primary text-secondary transition-all duration-500 hover:bg-black hover:scale-110 border-none cursor-pointer font-semibold pointer-events-auto">
             {/* Rotating Text */}
             <div className="absolute inset-0 animate-text-rotation">
                 {characters.map((char, i) => (

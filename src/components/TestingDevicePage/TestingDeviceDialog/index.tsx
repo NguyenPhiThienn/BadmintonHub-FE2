@@ -264,7 +264,7 @@ export const TestingDeviceDialog = ({ isOpen, onClose, device }: TestingDeviceDi
         if (missingFields.length > 0) {
             toast.warning(
                 <div>
-                    <p className="font-bold mb-1">Vui lòng điền đủ thông tin:</p>
+                    <p className="font-semibold mb-1">Vui lòng điền đủ thông tin:</p>
                     <ul className="list-disc ml-4 text-xs">
                         {missingFields.map((f, i) => <li key={i}>{f}</li>)}
                     </ul>

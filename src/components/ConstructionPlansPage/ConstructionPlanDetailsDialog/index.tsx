@@ -289,7 +289,7 @@ export function ConstructionPlanDetailsDialog({
                                                         <span>Công ty</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-accent font-bold">{planData?.partnerName || "-"}</TableCell>
+                                                <TableCell className="text-accent font-semibold">{planData?.partnerName || "-"}</TableCell>
                                             </TableRow>
                                             <TableRow className="border-b border-darkBorderV1/50 hover:bg-transparent">
                                                 <TableCell className="text-neutral-300 font-semibold w-[220px]">

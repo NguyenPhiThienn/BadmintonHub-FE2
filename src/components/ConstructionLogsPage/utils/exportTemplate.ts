@@ -83,7 +83,7 @@ export const generateConstructionLogHtml = (logData: IConstructionLog) => {
         p, ul, ol, li { margin-top: 0; padding-top: 0; margin-bottom: 0; padding-bottom: 0; }
         ul, ol, li { line-height: 2.25; }
         .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
+        .font-semibold { font-weight: bold; }
         .uppercase { text-transform: uppercase; }
         .page-break { page-break-before: always; }
         .cover-border {

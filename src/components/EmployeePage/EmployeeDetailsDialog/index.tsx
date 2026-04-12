@@ -606,7 +606,7 @@ export const EmployeeDetailsDialog = ({
                                                                     size={0.8}
                                                                     className={employeeData?.permissions?.includes(mod.id) ? "text-accent" : "text-accent"}
                                                                 />
-                                                                <span className="text-sm font-bold text-accent">{mod.name}</span>
+                                                                <span className="text-sm font-semibold text-accent">{mod.name}</span>
                                                             </div>
 
                                                             {mod.actions && (

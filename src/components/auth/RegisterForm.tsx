@@ -7,15 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  mdiAccountOutline, 
-  mdiEmailOutline, 
-  mdiPhoneOutline, 
-  mdiLockOutline, 
-  mdiEye, 
-  mdiEyeOff, 
-  mdiAccountPlus, 
-  mdiLoading 
+import {
+  mdiAccountOutline,
+  mdiEmailOutline,
+  mdiPhoneOutline,
+  mdiLockOutline,
+  mdiEye,
+  mdiEyeOff,
+  mdiAccountPlus,
+  mdiLoading
 } from "@mdi/js";
 import { useRegister } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -90,7 +90,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
             <Input
               id="email"
               type="email"
-              {...register("email", { 
+              {...register("email", {
                 required: "Vui lòng nhập email",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -136,7 +136,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
-            {...register("password", { 
+            {...register("password", {
               required: "Vui lòng nhập mật khẩu",
               minLength: { value: 6, message: "Mật khẩu phải ít nhất 6 ký tự" }
             })}
@@ -163,10 +163,10 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
           name="role"
           control={control}
           render={({ field }) => (
-            <RadioGroup 
-              value={field.value} 
+            <RadioGroup
+              value={field.value}
               onValueChange={field.onChange}
-              className="flex gap-6 mt-1"
+              className="flex gap-4 mt-1"
             >
               <div className="flex items-center space-x-2 cursor-pointer">
                 <RadioGroupItem value="PLAYER" id="player" />
@@ -200,7 +200,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
       <p className="text-center text-sm text-neutral-400">
         Đã có tài khoản?{" "}
         {isDialog ? (
-          <button 
+          <button
             type="button"
             onClick={onSwitchLogin}
             className="text-accent font-semibold hover:underline"

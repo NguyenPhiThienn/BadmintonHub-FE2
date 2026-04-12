@@ -82,7 +82,7 @@ export function PlayerSection() {
                     <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-primary">
                         Dành cho người chơi
                     </motion.p>
-                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
+                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Tìm sân thông minh, đặt chỗ siêu nhanh
                     </motion.h2>
                     <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
@@ -147,7 +147,7 @@ export function PlayerSection() {
                                 )}
 
                                 {/* Price tag */}
-                                <div className="absolute bottom-4 right-4 rounded-lg bg-white/95 px-3 py-1.5 text-sm font-bold text-primary shadow-md backdrop-blur-sm">
+                                <div className="absolute bottom-4 right-4 rounded-lg bg-white/95 px-3 py-1.5 text-sm font-semibold text-primary shadow-md backdrop-blur-sm">
                                     {court.price}
                                 </div>
                             </div>

@@ -7,7 +7,7 @@ import { mdiMenu, mdiClose, mdiBellOutline, mdiAccountOutline, mdiLogout, mdiLoc
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { AuthDialogs, AuthMode } from "@/components/auth/AuthDialogs"
+import { AuthDialogs, AuthMode } from "@/components/Auth/AuthDialogs"
 import { useUser } from "@/context/useUserContext"
 import {
     DropdownMenu,

@@ -190,7 +190,7 @@ export const LaboratoryWorkDetailsDialog = ({
                                                         <span className="text-neutral-300 font-semibold text-nowrap">Tên thiết bị</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-accent font-bold">
+                                                <TableCell className="text-accent font-semibold">
                                                     {(device as any)?.operatingName ? <Badge variant="green">{(device as any)?.operatingName}</Badge> : <span className="text-neutral-400 italic">Chưa có tên vận hành</span  >}
                                                 </TableCell>
                                             </TableRow>
@@ -348,7 +348,7 @@ export const LaboratoryWorkDetailsDialog = ({
                                                         <span className="text-neutral-300 font-semibold text-nowrap">Vị trí lắp đặt (Site)</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-accent font-bold">
+                                                <TableCell className="text-accent font-semibold">
                                                     <Badge variant="green">{(job as any)?.site || ""}</Badge>
                                                 </TableCell>
                                             </TableRow>
@@ -386,7 +386,7 @@ export const LaboratoryWorkDetailsDialog = ({
                                                         <span className="text-neutral-300 font-semibold text-nowrap">Số biên bản</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-neutral-300 font-bold">
+                                                <TableCell className="text-neutral-300 font-semibold">
                                                     <Badge variant="neutral">{job.reportNumber}</Badge>
                                                 </TableCell>
                                             </TableRow>

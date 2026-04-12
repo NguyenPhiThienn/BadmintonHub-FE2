@@ -139,7 +139,7 @@ export function ConstructionLogsTable({
                                             </Badge>
                                         )}
                                         {log.shiftEndTime && (
-                                            <span className="text-sm font-bold text-cyan-400 uppercase tracking-tighter">
+                                            <span className="text-sm font-semibold text-cyan-400 uppercase tracking-tighter">
                                                 Kết thúc: {new Date(log.shiftEndTime).toLocaleTimeString("vi-VN", {
                                                     hour: "2-digit",
                                                     minute: "2-digit",

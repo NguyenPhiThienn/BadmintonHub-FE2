@@ -64,7 +64,7 @@ export function QuantityInput({
                     type="number"
                     value={value}
                     onChange={handleInputChange}
-                    className="h-full border-none border-l border-white/10 bg-transparent text-center focus-visible:ring-0 focus-visible:ring-offset-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none font-bold"
+                    className="h-full border-none border-l border-white/10 bg-transparent text-center focus-visible:ring-0 focus-visible:ring-offset-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none font-semibold"
                 />
                 <div className="flex">
                     <Button

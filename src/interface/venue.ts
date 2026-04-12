@@ -15,6 +15,14 @@ export interface IVenue {
   reviews?: number; // mock
   features?: string[]; // mock
   available?: number; // mock
+  location?: {
+    lat: number;
+    lng: number;
+  };
+  coordinates?: {
+    type: string;
+    coordinates: [number, number]; // [lng, lat]
+  };
 }
 
 export interface IVenueResponse {

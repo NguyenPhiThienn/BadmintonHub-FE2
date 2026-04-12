@@ -379,7 +379,7 @@ button[type="button"].absolute:focus {
 }
 
 .marquee-premium-text {
-  @apply text-sm font-bold uppercase tracking-[0.2em] whitespace-nowrap;
+  @apply text-sm font-semibold uppercase tracking-[0.2em] whitespace-nowrap;
   background: linear-gradient(to right, #41C651 0%, #68e076 25%, #41C651 50%, #68e076 75%, #41C651 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;

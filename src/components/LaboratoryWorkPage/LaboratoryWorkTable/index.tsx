@@ -87,7 +87,7 @@ export const LaboratoryWorkTable = ({
                         <TableCell className="text-center">
                             {(currentPage - 1) * pageSize + index + 1}
                         </TableCell>
-                        <TableCell className="text-center font-bold">
+                        <TableCell className="text-center font-semibold">
                             <Badge variant="green">{job.reportNumber || ""}</Badge>
                         </TableCell>
                         <TableCell>

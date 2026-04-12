@@ -1,6 +1,6 @@
 "use client"
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { usePathname } from "next/navigation";
 

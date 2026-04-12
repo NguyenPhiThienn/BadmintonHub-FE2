@@ -51,7 +51,7 @@ function MetricCard({
                   {title}
                 </p>
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-bold mt-2">{value}</h3>
+                  <h3 className="text-2xl font-semibold mt-2">{value}</h3>
                   <div className="p-3 rounded-full bg-darkBorderV1 text-neutral-300">
                     {icon}
                   </div>
@@ -185,7 +185,7 @@ export default function StatisticsPage() {
     <div className="space-y-3 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-300">
+          <h1 className="text-3xl font-semibold text-neutral-300">
             Bảng điều khiển
           </h1>
           <p className="text-neutral-300 mt-2 text-base">
