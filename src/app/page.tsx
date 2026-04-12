@@ -1,5 +1,6 @@
 import { Header } from "@/components/Landing/Header"
 import { HeroSection } from "@/components/Landing/HeroSection"
+import { ExploreSection } from "@/components/Landing/ExploreSection"
 import { AboutSection } from "@/components/Landing/AboutSection"
 import { CoreValuesSection } from "@/components/Landing/CoreValuesSection"
 import { PlayerSection } from "@/components/Landing/PlayerSection"
@@ -13,6 +14,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <HeroSection />
+      <ExploreSection />
       <AboutSection />
       <CoreValuesSection />
       <PlayerSection />

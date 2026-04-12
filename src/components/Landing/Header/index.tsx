@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiMenu, mdiClose, mdiBellOutline, mdiAccountOutline, mdiLogout, mdiLockReset, mdiTicketOutline } from "@mdi/js"
+import { mdiMenu, mdiClose, mdiBellOutline, mdiAccountOutline, mdiLogout, mdiLockReset, mdiTicketOutline, mdiHomeOutline, mdiMapMarkerOutline, mdiCalendarMonthOutline } from "@mdi/js"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
@@ -20,10 +20,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const navLinks = [
-    { label: "Trang chủ", href: "/" },
-    { label: "Bản đồ sân", href: "/venues" },
-    { label: "Lịch của tôi", href: "/my-bookings" },
-]
+  { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
+  { label: "Bản đồ sân", href: "/venues", icon: mdiMapMarkerOutline },
+  { label: "Lịch của tôi", href: "/my-bookings", icon: mdiCalendarMonthOutline },
+];
 
 export function Header() {
     const [mobileOpen, setMobileOpen] = useState(false)
@@ -53,7 +53,10 @@ export function Header() {
                 <nav className="hidden items-center gap-1 md:flex">
                     {navLinks.map((link) => (
                         <Button key={link.href} variant="ghost2" asChild>
-                            <Link href={link.href}>{link.label}</Link>
+                            <Link href={link.href} className="flex items-center gap-2">
+                                <Icon path={link.icon} size={0.7} />
+                                {link.label}
+                            </Link>
                         </Button>
                     ))}
                 </nav>
@@ -86,32 +89,32 @@ export function Header() {
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">{user.full_name}</p>
+                                            <p className="text-sm font-semibold leading-none">{user.full_name}</p>
                                             <p className="text-sm leading-none text-neutral-400">{user.email}</p>
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
                                         <Link href="/profile" className="cursor-pointer">
-                                            <Icon path={mdiAccountOutline} size={0.8} className="mr-2" />
+                                            <Icon path={mdiAccountOutline} size={0.8} />
                                             <span>Trang cá nhân</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/vouchers" className="cursor-pointer">
-                                            <Icon path={mdiTicketOutline} size={0.8} className="mr-2" />
+                                            <Icon path={mdiTicketOutline} size={0.8} />
                                             <span>Ví Voucher</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         <Link href="/change-password" className="cursor-pointer">
-                                            <Icon path={mdiLockReset} size={0.8} className="mr-2" />
+                                            <Icon path={mdiLockReset} size={0.8} />
                                             <span>Đổi mật khẩu</span>
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
-                                        <Icon path={mdiLogout} size={0.8} className="mr-2" />
+                                        <Icon path={mdiLogout} size={0.8} />
                                         <span>Đăng xuất</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -157,11 +160,14 @@ export function Header() {
                                 <Button
                                     key={link.href}
                                     variant="ghost-badminton"
-                                    className="justify-start hover:text-primary"
+                                    className="justify-start hover:text-primary gap-3 px-4"
                                     asChild
                                     onClick={() => setMobileOpen(false)}
                                 >
-                                    <Link href={link.href}>{link.label}</Link>
+                                    <Link href={link.href}>
+                                        <Icon path={link.icon} size={0.8} />
+                                        {link.label}
+                                    </Link>
                                 </Button>
                             ))}
                             <Button
