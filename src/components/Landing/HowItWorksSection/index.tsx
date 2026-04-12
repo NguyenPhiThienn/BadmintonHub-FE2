@@ -78,7 +78,7 @@ export function HowItWorksSection() {
                     <motion.div custom={0} variants={fadeUp} className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary shadow-lg shadow-secobg-secondary/25">
                         <Icon path={mdiListBoxOutline} size={1} />
                     </motion.div>
-                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-secondary/80">
+                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase  text-secondary/80">
                         Cách thức hoạt động
                     </motion.p>
                     <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-secondary/90 sm:text-4xl lg:text-5xl">
@@ -120,7 +120,7 @@ export function HowItWorksSection() {
                                         <div
                                             className={`flex h-20 w-20 flex-col items-center justify-center rounded-full text-secondary shadow-lg transition-transform duration-300 group-hover:scale-110 bg-accent shadow-accent/40`}
                                         >
-                                            <span className="text-sm font-semibold uppercase tracking-wider">
+                                            <span className="text-sm font-semibold uppercase">
                                                 Bước
                                             </span>
                                             <span className="text-2xl font-semibold leading-none">

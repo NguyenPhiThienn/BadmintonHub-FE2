@@ -80,7 +80,7 @@ export function AboutSection() {
                     <motion.div custom={0} variants={fadeUp} className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-secondary shadow-lg shadow-primary/25">
                         <Icon path={mdiAccountSupervisorCircle} size={1} />
                     </motion.div>
-                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-primary">
+                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase  text-primary">
                         Về chúng tôi
                     </motion.p>
                 </motion.div>

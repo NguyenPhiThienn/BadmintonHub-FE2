@@ -144,7 +144,7 @@ export function CoreValuesSection() {
                     <motion.div custom={0} variants={fadeUp} className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-secondary shadow-lg shadow-primary/25">
                         <Icon path={mdiLightbulbOn} size={1} />
                     </motion.div>
-                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase tracking-widest text-primary">
+                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase  text-primary">
                         Giá trị cốt lõi
                     </motion.p>
                     <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">

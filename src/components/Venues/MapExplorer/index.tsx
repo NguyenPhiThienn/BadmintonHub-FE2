@@ -9,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import VenueListExplorer from "../VenueListExplorer";
 import { VenueCardHorizontal } from "../VenueListExplorer/VenueCardHorizontal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useRouter } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -27,6 +29,8 @@ const MapExplorer = () => {
   const [keyword, setKeyword] = useState("");
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
 
   // API Query
   const { data: venuesData, isLoading } = useVenues({
@@ -86,7 +90,27 @@ const MapExplorer = () => {
   // Handle Marker Clicks
   const handleMarkerClick = (venueId: string) => {
     setSelectedVenueId(venueId);
-    setIsSheetOpen(true);
+    router.push(`/venues/${venueId}`);
+  };
+
+  const handleBookConfirm = () => {
+    setIsBooking(true);
+    // Simulate booking process
+    setTimeout(() => {
+      setIsBooking(false);
+      setIsConfirmOpen(false);
+
+      const selectedVenue = venues.find((v: IVenue) => v._id === selectedVenueId);
+      if (selectedVenue) {
+        const queryParams = new URLSearchParams({
+          venueId: selectedVenue._id,
+          venueName: selectedVenue.name,
+          price: (selectedVenue.price_per_hour || 120000).toString(),
+        }).toString();
+
+        router.push(`/booking?${queryParams}`);
+      }
+    }, 1000);
   };
 
   useEffect(() => {
@@ -175,7 +199,7 @@ const MapExplorer = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Trang chủ</BreadcrumbPage>
+                  <BreadcrumbLink href="/">Trang chủ</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
@@ -323,6 +347,17 @@ const MapExplorer = () => {
           />
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleBookConfirm}
+        title="Xác nhận đặt sân"
+        description={`Bạn có chắc chắn muốn đặt sân "${venues.find((v: IVenue) => v._id === selectedVenueId)?.name}" không?`}
+        confirmText="Đặt ngay"
+        cancelText="Để sau"
+        isPending={isBooking}
+      />
 
       <style jsx global>{`
         .custom-marker-wrapper {

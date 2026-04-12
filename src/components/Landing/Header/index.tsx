@@ -20,9 +20,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const navLinks = [
-  { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
-  { label: "Bản đồ sân", href: "/venues", icon: mdiMapMarkerOutline },
-  { label: "Lịch của tôi", href: "/my-bookings", icon: mdiCalendarMonthOutline },
+    { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
+    { label: "Đặt sân", href: "/venues", icon: mdiMapMarkerOutline },
+    { label: "Lịch của tôi", href: "/my-bookings", icon: mdiCalendarMonthOutline },
 ];
 
 export function Header() {

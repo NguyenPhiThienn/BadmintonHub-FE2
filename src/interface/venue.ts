@@ -1,24 +1,18 @@
 export interface IVenue {
   _id: string;
+  ownerId: string;
   name: string;
   images?: string[];
-  price_per_hour?: number;
+  pricePerHour: number;
   address: string;
   description?: string;
-  open_time?: string;
-  close_time?: string;
-  average_rating?: number;
-  match_score?: number;
+  openTime: string;
+  closeTime: string;
+  averageRating?: number;
+  matchScore?: number;
   reason?: string;
   distance?: string;
-  rating?: number; // fallback for average_rating
-  reviews?: number; // mock
-  features?: string[]; // mock
-  available?: number; // mock
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  status: 'ACTIVE' | 'INACTIVE';
   coordinates?: {
     type: string;
     coordinates: [number, number]; // [lng, lat]
@@ -31,15 +25,49 @@ export interface IVenueResponse {
 }
 
 export interface IAIRecommendationRequest {
-  user_id: string;
+  userId: string;
   preferences?: Record<string, any>;
 }
 
 export interface IAIRecommendationResponse {
   status: number;
   data: {
-    venue_id: string;
-    match_score: number;
+    venueId: string;
+    matchScore: number;
     reason: string;
   }[];
+}
+
+export interface ICourt {
+  _id: string;
+  venueId: string;
+  name: string;
+  type?: string;
+  status: 'AVAILABLE' | 'MAINTENANCE' | 'HIDDEN';
+}
+
+export interface ISlot {
+  startTime: string;
+  endTime: string;
+  status: "AVAILABLE" | "BOOKED" | "LOCKED" | string;
+}
+
+export interface IAvailability {
+  courtId: string;
+  courtName: string;
+  slots: ISlot[];
+}
+
+export interface IDemandAnalytics {
+  peakHours: string[];
+  demandLevel: "low" | "medium" | "high";
+  hourlyData?: { time: string; level: number }[]; // for chart
+}
+
+export interface IPricing {
+  venueId: string;
+  dayOfWeek: number;
+  startTime?: string;
+  endTime?: string;
+  pricePerHour: number;
 }

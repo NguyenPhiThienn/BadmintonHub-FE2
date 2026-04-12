@@ -1,3 +1,5 @@
+"use client";
+
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -74,12 +76,15 @@ const BreadcrumbLink = React.forwardRef<
   }
 
   if (href) {
-    const { target, download, rel, ...linkProps } = props as any;
+    const { target, download, rel, onClick, ...linkProps } = props as any;
     return (
       <Link
         href={href}
         className={linkClassName}
         {...linkProps}
+        onClick={(e) => {
+          if (onClick) onClick(e);
+        }}
         ref={ref as any}
       >
         {badgeContent}
@@ -92,6 +97,9 @@ const BreadcrumbLink = React.forwardRef<
       ref={ref}
       className={linkClassName}
       {...props}
+      onClick={(e) => {
+        if (props.onClick) props.onClick(e);
+      }}
     >
       {badgeContent}
     </a>
