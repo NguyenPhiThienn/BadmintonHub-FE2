@@ -67,10 +67,10 @@ export const ConfirmDialog = ({
             variant="outline"
             onClick={onClose}
             disabled={isPending}
-            className="flex-1 bg-transparent border-neutral-400/50 text-neutral-300 hover:bg-darkBorderV1"
+            className="flex-1"
           >
             <Icon path={mdiClose} size={0.8} />
-            <span className="text-neutral-300">{cancelText}</span>
+            {cancelText}
           </Button>
           <Button className="flex-1" onClick={onConfirm} disabled={isPending}>
             {isPending ? (

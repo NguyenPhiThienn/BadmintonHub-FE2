@@ -250,7 +250,7 @@ export const ScrollSection = () => {
                       <h3 className="text-sm md:text-base font-semibold text-secondary leading-tight truncate">Rơle trung gian Schneider</h3>
 
                       {/* Stars - Now below title */}
-                      <div className="flex gap-0.5">
+                      <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((i) => (
                           <Icon key={i} path={mdiStar} size={0.8} className="text-yellow-300" />
                         ))}

@@ -84,18 +84,18 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             </div>
           </div>
 
-          <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500 font-semibold">
+          <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500 font-semibold">
             <Icon path={mdiMap} size={0.6} />
             <span className="line-clamp-1">{venue.address}</span>
           </div>
 
-          <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500 font-semibold">
+          <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500 font-semibold">
             <Icon path={mdiClock} size={0.6} />
             {venue.open_time} - {venue.close_time}
           </div>
 
           {/* Features tags */}
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div className="mt-4 flex flex-wrap gap-1">
             {mockFeatures.slice(0, 3).map((feature) => (
               <span
                 key={feature}

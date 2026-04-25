@@ -1,6 +1,6 @@
 # Quy định Thiết kế & Phát triển UI
 
-Tài liệu này tóm tắt các quy chuẩn về giao diện (UI) và cách viết code CSS/Component để đảm bảo tính đồng nhất cho dự án Company Management.
+Tài liệu này tóm tắt các quy chuẩn về giao diện (UI) và cách viết code CSS/Component để đảm bảo tính đồng nhất cho dự án BadmintonHub.
 
 ## 1. Quy định về Dialog (Cấu trúc, Header, Footer)
 Các Dialog trong dự án phải tuân thủ cấu trúc và quy chuẩn sau để đảm bảo tính đồng nhất:
@@ -123,17 +123,24 @@ Tuyệt đối không được thêm `className` vào `Input`, `Label` và `Text
 
 ## 8. Quy định về Button
 Các nút bấm cần tuân thủ các quy tắc sau để đảm bảo tính thẩm mỹ và nhất quán:
-- **Icon trong Button**: Luôn sử dụng icon MDI với `size={0.8}`.
-- **Không styling cho Icon**: Tuyệt đối không sử dụng `className` hoặc `style` cho component `Icon` bên trong Button (ví dụ: không dùng `mr-1`, `flex-shrink-0`, v.v.). Spacing sẽ được xử lý tự động bởi component hoặc cấu trúc Button.
-- **Không tùy chỉnh styling cho Button**: Tuyệt đối không được thêm `className` vào `Button`. Spacing và layout sẽ được thiết kế ở container bọc ngoài nếu cần thiết (ví dụ: bọc div có `w-full`).
-- **Kích thước (Size)**: Không sử dụng `size="sm"`. Chỉ sử dụng kích thước mặc định hoặc `size="icon"` cho các nút dạng vuông (square icon button).
-- **Thao tác trong bảng**: Các nút trong cột "Thao tác" của bảng phải sử dụng `size="icon"` và bắt buộc phải có `Tooltip` bao quanh để giải thích chức năng.
+- **Bắt buộc có Icon**: Các Button (trừ Button size="icon") phải có **mdi-icon** với `size={0.8}` đặt phía trước text, icon phải tương ứng với chức năng/nội dung của Button.
+- **Không tùy chỉnh styling cho Button**: Tuyệt đối không được thêm `className` vào `Button` để chỉnh màu sắc, shadow, font-weight, v.v. (đã được handle trong `variant`). Chỉ cho phép sử dụng các class layout như: `w-full`, `flex-shrink-0`, `flex-1`.
+- **Sử dụng Variant**: Luôn sử dụng các `variant` đã được custom (ví dụ: `variant="accent"`, `variant="outline"`, `variant="ghost"`, v.v.).
+- **Không styling cho Icon**: Tuyệt đối không sử dụng `className` hoặc `style` cho component `Icon` bên trong Button. Spacing sẽ được xử lý tự động.
+- **Kích thước (Size)**: Không sử dụng `size="sm"`. Chỉ sử dụng kích thước mặc định hoặc `size="icon"` cho các nút dạng vuông.
+- **Thao tác trong bảng**: Các nút trong cột "Thao tác" của bảng phải sử dụng `size="icon"` và bắt buộc phải có `Tooltip` bao quanh.
 
 ```tsx
-// Nút bình thường
-<Button onClick={handleSave}>
+// Nút bình thường (Bắt buộc có icon size 0.8)
+<Button variant="accent" onClick={handleSave}>
     <Icon path={mdiContentSave} size={0.8} />
     Lưu dữ liệu
+</Button>
+
+// Nút layout w-full
+<Button variant="accent" className="w-full" onClick={handleAction}>
+    <Icon path={mdiEye} size={0.8} />
+    Xem chi tiết
 </Button>
 
 // Nút có trạng thái loading
@@ -145,16 +152,6 @@ Các nút bấm cần tuân thủ các quy tắc sau để đảm bảo tính th
     )}
     Lưu thay đổi
 </Button>
-
-// Nút thao tác trong bảng
-<Tooltip>
-    <TooltipTrigger asChild>
-        <Button size="icon" variant="ghost" onClick={handleEdit}>
-            <Icon path={mdiSquareEditOutline} size={0.8} />
-        </Button>
-    </TooltipTrigger>
-    <TooltipContent>Cập nhật</TooltipContent>
-</Tooltip>
 ```
 
 ## 9. Quy định về Kích thước chữ (Font Size)

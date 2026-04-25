@@ -36,7 +36,7 @@ function getLocalAccessToken() {
 
 const instance = axios.create({
 	timeout: 3 * 60 * 1000,
-	baseURL: process.env.NEXT_PUBLIC_API_URL || "https://companymanagementbe.onrender.com/api/v1",
+	baseURL: process.env.NEXT_PUBLIC_API_URL || "https://BadmintonHubbe.onrender.com/api/v1",
 	headers: {
 		"Content-Type": "application/json",
 		Accept: "application/json",

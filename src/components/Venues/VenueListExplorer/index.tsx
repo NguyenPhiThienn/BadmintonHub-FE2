@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import { Drawer } from "vaul";
 import { IVenue } from "@/interface/venue";
-import { VenueCardHorizontal } from "./VenueCardHorizontal";
+import { VenueCard } from "./VenueCard";
 
 interface VenueListExplorerProps {
   venues: IVenue[];
@@ -81,7 +81,7 @@ const VenueListExplorer = ({
                     onClick={() => onVenueClick(venue._id)}
                     className={`transition-all duration-300 ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""}`}
                   >
-                    <VenueCardHorizontal venue={venue} />
+                    <VenueCard venue={venue} />
                   </div>
                 ))}
               </div>

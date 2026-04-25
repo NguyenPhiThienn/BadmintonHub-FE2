@@ -4,11 +4,10 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useVenues } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
 import { Icon } from "@/components/ui/mdi-icon";
-import { mdiMagnify, mdiChevronLeft, mdiCrosshairsGps, mdiBadminton } from "@mdi/js";
+import { mdiMagnify, mdiChevronLeft, mdiCrosshairsGps, mdiBadminton, mdiRefresh } from "@mdi/js";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import VenueListExplorer from "../VenueListExplorer";
-import { VenueCardHorizontal } from "../VenueListExplorer/VenueCardHorizontal";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useRouter } from "next/navigation";
 import {
@@ -19,6 +18,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { VenueCard } from "../VenueListExplorer/VenueCard";
 
 const MapExplorer = () => {
   const router = useRouter();
@@ -105,7 +105,7 @@ const MapExplorer = () => {
         const queryParams = new URLSearchParams({
           venueId: selectedVenue._id,
           venueName: selectedVenue.name,
-          price: (selectedVenue.price_per_hour || 120000).toString(),
+          price: (selectedVenue.pricePerHour || 120000).toString(),
         }).toString();
 
         router.push(`/booking?${queryParams}`);
@@ -121,8 +121,8 @@ const MapExplorer = () => {
     markersRef.current = [];
 
     venues.forEach((venue: IVenue) => {
-      const vLat = venue.coordinates?.coordinates[1] || venue.location?.lat;
-      const vLng = venue.coordinates?.coordinates[0] || venue.location?.lng;
+      const vLat = venue.coordinates?.coordinates[1];
+      const vLng = venue.coordinates?.coordinates[0];
 
       if (vLat && vLng) {
         const marker = new (window as any).google.maps.OverlayView();
@@ -227,10 +227,7 @@ const MapExplorer = () => {
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-neutral-400 text-sm font-medium">Tìm thấy {venues.length} sân</span>
-            <div className="flex items-center gap-2">
-              {/* Filters could go here */}
-            </div>
+            <span className="text-neutral-400 text-base font-medium">Tìm thấy {venues.length} sân</span>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -240,8 +237,8 @@ const MapExplorer = () => {
                 id={`venue-card-desktop-${venue._id}`}
                 onClick={() => {
                   setSelectedVenueId(venue._id);
-                  const vLat = venue.coordinates?.coordinates[1] || venue.location?.lat;
-                  const vLng = venue.coordinates?.coordinates[0] || venue.location?.lng;
+                  const vLat = venue.coordinates?.coordinates[1];
+                  const vLng = venue.coordinates?.coordinates[0];
                   if (vLat && vLng) {
                     map?.panTo({ lat: vLat, lng: vLng });
                     map?.setZoom(16);
@@ -250,7 +247,7 @@ const MapExplorer = () => {
                 className={`transition-all duration-300 cursor-pointer ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""
                   }`}
               >
-                <VenueCardHorizontal venue={venue} />
+                <VenueCard venue={venue} />
               </div>
             ))}
           </div>
@@ -276,10 +273,12 @@ const MapExplorer = () => {
 
         {isGoogleReady && !map && (
           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-darkBackgroundV1">
-            <p className="text-red-500 font-semibold">Lỗi khởi tạo bản đồ</p>
-            <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
-              Thử lại
-            </Button>
+            <div className="mt-4">
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                <Icon path={mdiRefresh} size={0.8} />
+                Thử lại
+              </Button>
+            </div>
           </div>
         )}
 
@@ -337,8 +336,8 @@ const MapExplorer = () => {
             onVenueClick={(id: string) => {
               setSelectedVenueId(id);
               const v = venues.find((v: IVenue) => v._id === id);
-              const vLat = v?.coordinates?.coordinates[1] || v?.location?.lat;
-              const vLng = v?.coordinates?.coordinates[0] || v?.location?.lng;
+              const vLat = v?.coordinates?.coordinates[1];
+              const vLng = v?.coordinates?.coordinates[0];
               if (vLat && vLng) {
                 map?.panTo({ lat: vLat, lng: vLng });
                 map?.setZoom(16);

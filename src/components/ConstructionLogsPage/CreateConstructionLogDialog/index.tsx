@@ -353,11 +353,11 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                                         onValueChange={(v) => setFormData({ supervisorEvaluation: { isScheduleOnTrack: v === "true" } })}
                                         className="flex gap-4"
                                     >
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="true" id="sot-yes" className="w-5 h-5" />
                                             <Label htmlFor="sot-yes" className="cursor-pointer">Có</Label>
                                         </div>
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="false" id="sot-no" className="w-5 h-5" />
                                             <Label htmlFor="sot-no" className="cursor-pointer">Không</Label>
                                         </div>
@@ -370,11 +370,11 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                                         onValueChange={(v) => setFormData({ supervisorEvaluation: { isSufficientLaborAndEquipment: v === "true" } })}
                                         className="flex gap-4"
                                     >
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="true" id="sle-yes" className="w-5 h-5" />
                                             <Label htmlFor="sle-yes" className="cursor-pointer">Có</Label>
                                         </div>
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="false" id="sle-no" className="w-5 h-5" />
                                             <Label htmlFor="sle-no" className="cursor-pointer">Không</Label>
                                         </div>
@@ -387,11 +387,11 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                                         onValueChange={(v) => setFormData({ supervisorEvaluation: { isConstructionQualityGood: v === "true" } })}
                                         className="flex gap-4"
                                     >
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="true" id="cqg-yes" className="w-5 h-5" />
                                             <Label htmlFor="cqg-yes" className="cursor-pointer">Đảm bảo</Label>
                                         </div>
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <RadioGroupItem value="false" id="cqg-no" className="w-5 h-5" />
                                             <Label htmlFor="cqg-no" className="cursor-pointer">Không đảm bảo</Label>
                                         </div>
@@ -405,7 +405,7 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                                         className="flex gap-4"
                                     >
                                         {(["Tốt", "Bình thường", "Kém"] as const).map((v) => (
-                                            <div key={v} className="flex items-center gap-1.5">
+                                            <div key={v} className="flex items-center gap-1">
                                                 <RadioGroupItem value={v} id={`ls-${v}`} className="w-5 h-5" />
                                                 <Label htmlFor={`ls-${v}`} className="cursor-pointer">{v}</Label>
                                             </div>
@@ -420,7 +420,7 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                                         className="flex gap-4"
                                     >
                                         {(["Tốt", "Bình thường", "Kém"] as const).map((v) => (
-                                            <div key={v} className="flex items-center gap-1.5">
+                                            <div key={v} className="flex items-center gap-1">
                                                 <RadioGroupItem value={v} id={`es-${v}`} className="w-5 h-5" />
                                                 <Label htmlFor={`es-${v}`} className="cursor-pointer">{v}</Label>
                                             </div>

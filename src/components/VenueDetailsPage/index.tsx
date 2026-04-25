@@ -19,12 +19,12 @@ import {
 } from "@mdi/js";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  useVenueDetails, 
-  useVenueCourts, 
-  useDemandAnalytics, 
+import {
+  useVenueDetails,
+  useVenueCourts,
+  useDemandAnalytics,
   useAvailability,
-  useVenuePricing 
+  useVenuePricing
 } from "@/hooks/useVenue";
 import { ICourt, IAvailability, ISlot } from "@/interface/venue";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -32,13 +32,14 @@ import { Pagination, Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  Tooltip, 
-  ResponsiveContainer, 
-  Cell 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  CartesianGrid
 } from "recharts";
 import { cn } from "@/lib/utils";
 import { format, addDays, startOfToday, isSameDay, getDay } from "date-fns";
@@ -58,18 +59,18 @@ interface VenueDetailsPageProps {
 }
 
 // Sub-component for each court's availability grid
-const CourtTimeGrid = ({ 
-  court, 
+const CourtTimeGrid = ({
+  court,
   courtAvailability,
   currentPrice,
-  selectedSlots, 
-  onToggle 
-}: { 
-  court: ICourt, 
+  selectedSlots,
+  onToggle
+}: {
+  court: ICourt,
   courtAvailability?: IAvailability,
   currentPrice: number,
   selectedSlots: { courtId: string, time: string }[],
-  onToggle: (time: string, price: number) => void 
+  onToggle: (time: string, price: number) => void
 }) => {
   const slots = courtAvailability?.slots || [];
 
@@ -133,17 +134,17 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const { data: courtsRes } = useVenueCourts(id);
   const { data: demandRes } = useDemandAnalytics(id);
   const { data: pricingRes } = useVenuePricing(id);
-  
+
   // FETCH ALL AVAILABILITY AT ONCE
-  const { data: availabilityRes, isLoading: isAvailabilityLoading } = useAvailability({ 
-    venueId: id, 
-    date: format(selectedDate, 'yyyy-MM-dd') 
+  const { data: availabilityRes, isLoading: isAvailabilityLoading } = useAvailability({
+    venueId: id,
+    date: format(selectedDate, 'yyyy-MM-dd')
   });
 
   const venue = venueRes?.data;
   const courts = (courtsRes?.data || []) as ICourt[];
   const availabilityData = (availabilityRes?.data || []) as IAvailability[];
-  
+
   // Dynamic Pricing Logic
   const currentPrice = useMemo(() => {
     if (!pricingRes?.data) return venue?.pricePerHour || 0;
@@ -162,7 +163,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
     const hours = ["05", "07", "09", "11", "13", "15", "17", "19", "21", "23"];
     return hours.map(h => ({
       hour: `${h}:00`,
-      level: Math.random() * 100, 
+      level: Math.random() * 100,
       isPeak: demandRes?.data?.peakHours?.includes(`${h}:00`)
     }));
   }, [demandRes]);
@@ -201,8 +202,8 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
         >
           {(venue?.images?.length ? venue.images : ["/images/court-1.jpg", "/images/court-2.jpg", "/images/court-3.jpg"]).map((img: string, i: number) => (
             <SwiperSlide key={i}>
-              <div 
-                className="w-full h-full bg-cover bg-center" 
+              <div
+                className="w-full h-full bg-cover bg-center"
                 style={{ backgroundImage: `url(${img})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -210,19 +211,19 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
             </SwiperSlide>
           ))}
         </Swiper>
-        
+
         <div className="absolute top-0 left-0 right-0 z-10 p-4 flex justify-between items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => router.back()}
             className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50"
           >
             <Icon path={mdiChevronLeft} size={0.8} />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50"
           >
             <Icon path={mdiShareVariantOutline} size={0.8} />
@@ -280,25 +281,45 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
             </Badge>
           </div>
 
-          <div className="h-44 w-full">
+          <div className="h-52 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={demandData}>
-                <XAxis 
-                  dataKey="hour" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#9ca3af', fontSize: 12 }}
+              <BarChart data={demandData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={1} />
+                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                  </linearGradient>
+                  <linearGradient id="barGradientNormal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#404040" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="#1a1a1a" stopOpacity={0.4} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <XAxis
+                  dataKey="hour"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 500 }}
+                  dy={10}
                 />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                  contentStyle={{ backgroundColor: '#191919', border: '1px solid #333', borderRadius: '8px' }}
+                <Tooltip
+                  cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                  contentStyle={{
+                    backgroundColor: '#1a1a1a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
+                    padding: '8px 12px'
+                  }}
+                  itemStyle={{ color: 'hsl(var(--accent))', fontWeight: 'bold', fontSize: '12px' }}
+                  labelStyle={{ color: '#9ca3af', marginBottom: '4px', fontSize: '12px' }}
+                  formatter={(value: number) => [`${value.toFixed(0)}%`, 'Nhu cầu']}
                 />
-                <Bar dataKey="level" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="level" radius={[6, 6, 0, 0]} barSize={32}>
                   {demandData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.isPeak ? 'hsl(var(--accent))' : '#333'} 
-                      fillOpacity={entry.isPeak ? 1 : 0.6}
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.isPeak ? 'url(#barGradientPeak)' : 'url(#barGradientNormal)'}
                     />
                   ))}
                 </Bar>
@@ -392,11 +413,11 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
             availabilityData.map((courtAvail: IAvailability) => (
               <CourtTimeGrid
                 key={courtAvail.courtId}
-                court={{ 
-                  _id: courtAvail.courtId, 
-                  name: courtAvail.courtName, 
+                court={{
+                  _id: courtAvail.courtId,
+                  name: courtAvail.courtName,
                   venueId: id,
-                  status: 'AVAILABLE' 
+                  status: 'AVAILABLE'
                 }}
                 courtAvailability={courtAvail}
                 currentPrice={currentPrice}

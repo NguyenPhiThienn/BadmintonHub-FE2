@@ -54,7 +54,7 @@ export function Header() {
                     {navLinks.map((link) => (
                         <Button key={link.href} variant="ghost2" asChild>
                             <Link href={link.href} className="flex items-center gap-2">
-                                <Icon path={link.icon} size={0.7} />
+                                <Icon path={link.icon} size={0.8} />
                                 {link.label}
                             </Link>
                         </Button>

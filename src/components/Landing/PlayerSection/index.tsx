@@ -165,18 +165,18 @@ export function PlayerSection() {
                                     </div>
                                 </div>
 
-                                <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-400">
+                                <div className="mt-2 flex items-center gap-1 text-sm text-neutral-400">
                                     <Icon path={mdiMap} size={0.8} />
                                     {court.address}
                                 </div>
 
-                                <div className="mt-2 flex items-center gap-1.5 text-sm text-neutral-400">
+                                <div className="mt-2 flex items-center gap-1 text-sm text-neutral-400">
                                     <Icon path={mdiClock} size={0.8} />
                                     {court.time}
                                 </div>
 
                                 {/* Features tags */}
-                                <div className="mt-4 flex flex-wrap gap-1.5">
+                                <div className="mt-4 flex flex-wrap gap-1">
                                     {court.features.map((feature) => (
                                         <span
                                             key={feature}

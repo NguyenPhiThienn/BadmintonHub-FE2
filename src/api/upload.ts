@@ -30,7 +30,7 @@ export const uploadApi = {
 
     return axios
       .post(
-        `${process.env.NEXT_PUBLIC_API_URL || "https://companymanagementbe.onrender.com/api/v1"}/upload/pdf`,
+        `${process.env.NEXT_PUBLIC_API_URL || "https://BadmintonHubbe.onrender.com/api/v1"}/upload/pdf`,
         formData,
         {
           headers: {

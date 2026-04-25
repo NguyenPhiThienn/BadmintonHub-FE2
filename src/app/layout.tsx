@@ -8,7 +8,7 @@ import './font.css'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'CompanyManagement - Hệ thống quản lý doanh nghiệp thông minh',
+  title: 'BadmintonHub - Hệ thống quản lý doanh nghiệp thông minh',
   description: 'Giải pháp quản lý nhân sự, thiết bị, công việc và công ty toàn diện cho doanh nghiệp.',
   icons: {
     icon: [

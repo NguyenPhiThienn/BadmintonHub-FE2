@@ -4,7 +4,7 @@ import { ImageResponse } from 'next/og'
 export const runtime = 'edge'
 
 // Image metadata
-export const alt = 'Company Management Logo'
+export const alt = 'BadmintonHub Logo'
 export const size = {
     width: 32,
     height: 32,
