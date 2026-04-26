@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import {
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
-import { usePendingVenues, useUpdateVenueStatus } from "@/hooks/useVenue";
+import { useAdminVenues, useDeleteVenue, useUpdateVenueStatus } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
 import { mdiChevronRight, mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -28,9 +29,9 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { LegalDocumentPreview } from "./LegalDocumentPreview";
-import { VenueApprovalTable } from "./VenueApprovalTable";
+import { VenueTable } from "./VenueTable";
 
-export default function VenueApprovalPage() {
+export default function VenuePage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [sortOrder, setSortOrder] = useState("desc");
     const [locationFilter, setLocationFilter] = useState("all");
@@ -38,6 +39,8 @@ export default function VenueApprovalPage() {
     const [pageSize] = useState(10);
     const [previewVenue, setPreviewVenue] = useState<IVenue | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [selectedVenue, setSelectedVenue] = useState<IVenue | null>(null);
 
     const { isMobile } = useResponsive();
 
@@ -46,12 +49,13 @@ export default function VenueApprovalPage() {
         isLoading,
         isFetching,
         refetch
-    } = usePendingVenues({
+    } = useAdminVenues({
         page: currentPage,
         limit: pageSize
     });
 
     const { mutate: updateStatus } = useUpdateVenueStatus();
+    const { mutate: deleteVenueMutation, isPending: isDeleting } = useDeleteVenue();
 
     const venues = pendingRes?.data?.venues || [];
     const pagination = pendingRes?.data?.pagination;
@@ -82,6 +86,38 @@ export default function VenueApprovalPage() {
         setIsPreviewOpen(true);
     };
 
+    const handleAction = (venue: IVenue, mode: "view" | "edit") => {
+        if (mode === "view") {
+            window.open(`/admin/venues/${venue._id}`, '_blank');
+        } else {
+            toast.info(`Tính năng cập nhật sân ${venue.name} đang được phát triển.`);
+        }
+    };
+
+    const handleDelete = (id: string) => {
+        const venue = venues.find((v: IVenue) => v._id === id);
+        if (venue) {
+            setSelectedVenue(venue);
+            setIsDeleteDialogOpen(true);
+        }
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedVenue) return;
+        return new Promise((resolve, reject) => {
+            deleteVenueMutation(selectedVenue._id, {
+                onSuccess: () => {
+                    setSelectedVenue(null);
+                    toast.success(`Đã xóa cơ sở sân: ${selectedVenue.name}`);
+                    resolve(true);
+                },
+                onError: (error) => {
+                    reject(error);
+                }
+            });
+        });
+    };
+
     return (
         <TooltipProvider>
             <div className="space-y-4 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
@@ -94,7 +130,7 @@ export default function VenueApprovalPage() {
                             <Icon path={mdiChevronRight} size={0.6} />
                         </BreadcrumbSeparator>
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Phê duyệt cơ sở sân</BreadcrumbPage>
+                            <BreadcrumbPage>Quản lý cơ sở sân</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -151,12 +187,13 @@ export default function VenueApprovalPage() {
                     </div>
 
                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
-                        <VenueApprovalTable
+                        <VenueTable
                             venues={venues}
                             isLoading={isLoading || isFetching}
                             onApprove={handleApprove}
                             onReject={handleReject}
-                            onViewDetails={(v) => window.open(`/admin/venues/${v._id}`, '_blank')}
+                            onAction={handleAction}
+                            onDelete={handleDelete}
                             onViewLegal={handleViewLegal}
                             currentPage={currentPage}
                             pageSize={pageSize}
@@ -180,6 +217,17 @@ export default function VenueApprovalPage() {
                     isOpen={isPreviewOpen}
                     onClose={() => setIsPreviewOpen(false)}
                     venue={previewVenue}
+                />
+
+                <DeleteDialog
+                    isOpen={isDeleteDialogOpen}
+                    isDeleting={isDeleting}
+                    onClose={() => setIsDeleteDialogOpen(false)}
+                    onConfirm={confirmDelete}
+                    title={`Xóa cơ sở sân: ${selectedVenue?.name || ""}`}
+                    description="Bạn có chắc chắn muốn xóa cơ sở sân này không? Hành động này không thể hoàn tác."
+                    confirmText="Xóa cơ sở"
+                    errorMessage="Xóa cơ sở sân thất bại"
                 />
             </div>
         </TooltipProvider>

@@ -1,6 +1,7 @@
 import {
   mdiAccountGroupOutline,
   mdiAutoFix,
+  mdiCalendarClock,
   mdiClipboardCheckOutline,
   mdiCogOutline,
   mdiCommentQuestionOutline,
@@ -31,10 +32,10 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       icon: mdiSoccerField,
     },
     {
-      id: "order-management",
-      name: "Quản lý đơn hàng",
-      path: "/admin/promotions",
-      icon: mdiTagOutline,
+      id: "booking-management",
+      name: "Quản lý đặt sân",
+      path: "/admin/bookings",
+      icon: mdiCalendarClock,
     },
     {
       id: "ai-analytics",

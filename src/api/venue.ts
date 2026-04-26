@@ -1,4 +1,4 @@
-import { sendGet, sendPost, sendPatch } from "./axios";
+import { sendGet, sendPost, sendPatch, sendDelete } from "./axios";
 import { IVenueResponse, IAIRecommendationRequest, IAIRecommendationResponse } from "@/interface/venue";
 
 export const venueApi = {
@@ -24,9 +24,12 @@ export const venueApi = {
     sendGet("/ai/analytics/demand", params),
 
   // Admin specific
-  getPendingVenues: (params?: { page?: number; limit?: number }) =>
-    sendGet("/admin/venues/pending", params),
+  getAdminVenues: (params?: { page?: number; limit?: number; status?: string }) =>
+    sendGet("/admin/venues", params),
 
   updateVenueStatus: (id: string, data: { status: string; reason?: string }) =>
     sendPatch(`/admin/venues/${id}/status`, data),
+
+  deleteVenue: (id: string) =>
+    sendDelete(`/admin/venues/${id}`),
 };

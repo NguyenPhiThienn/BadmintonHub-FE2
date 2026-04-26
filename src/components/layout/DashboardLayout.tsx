@@ -188,7 +188,7 @@ function TabletLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
         </div>
-        <main className="flex-1 overflow-y-auto p-6 bg-darkBackgroundV1 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 bg-darkBackgroundV1 custom-scrollbar">
           {children}
         </main>
       </div>

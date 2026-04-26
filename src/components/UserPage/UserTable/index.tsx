@@ -40,8 +40,8 @@ export const UserTable = memo(({
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[50px]">STT</TableHead>
-                        <TableHead className="w-[80px]">Ảnh</TableHead>
+                        <TableHead className="w-[50px] text-center">STT</TableHead>
+                        <TableHead className="w-[80px] text-center">Ảnh</TableHead>
                         <TableHead>Họ và Tên</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Số điện thoại</TableHead>
@@ -87,7 +87,6 @@ export const UserTable = memo(({
                                 <TableRow
                                     key={id}
                                     className="cursor-pointer hover:bg-darkBorderV1/50 transition-colors"
-                                    onClick={() => onAction(user, "view")}
                                 >
                                     <TableCell className="text-center">{rowNumber}</TableCell>
                                     <TableCell>
@@ -126,7 +125,10 @@ export const UserTable = memo(({
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end space-x-2">
-                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Button
@@ -136,27 +138,55 @@ export const UserTable = memo(({
                                                                 onAction(user, "view");
                                                             }}
                                                         >
-                                                            <Icon path={mdiEyeOutline} size={0.8} />
+                                                            <Icon path={mdiEyeOutline} size={0.8} className="flex-shrink-0" />
                                                         </Button>
                                                     </TooltipTrigger>
-                                                    <TooltipContent>Xem chi tiết</TooltipContent>
+                                                    <TooltipContent>
+                                                        Chi tiết người dùng
+                                                    </TooltipContent>
                                                 </Tooltip>
                                             </motion.div>
-
-                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Button
                                                             size="icon"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                onAction(user, "edit");
+                                                            }}
+                                                        >
+                                                            <Icon path={mdiSquareEditOutline} size={0.8} className="flex-shrink-0" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Cập nhật người dùng
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </motion.div>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            size="icon"
+                                                            variant="destructive"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
                                                                 onDelete(id);
                                                             }}
                                                         >
-                                                            <Icon path={mdiTrashCanOutline} size={0.8} />
+                                                            <Icon path={mdiTrashCanOutline} size={0.8} className="flex-shrink-0" />
                                                         </Button>
                                                     </TooltipTrigger>
-                                                    <TooltipContent>Xóa người dùng</TooltipContent>
+                                                    <TooltipContent>
+                                                        Xóa người dùng
+                                                    </TooltipContent>
                                                 </Tooltip>
                                             </motion.div>
                                         </div>

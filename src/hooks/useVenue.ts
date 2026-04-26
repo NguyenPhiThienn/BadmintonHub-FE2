@@ -60,10 +60,10 @@ export const useAiRecommendations = () => {
 };
 
 // Admin specific
-export const usePendingVenues = (params?: { page?: number; limit?: number }) => {
+export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string }) => {
   return useQuery({
-    queryKey: ["venues-pending", params],
-    queryFn: () => venueApi.getPendingVenues(params),
+    queryKey: ["admin-venues", params],
+    queryFn: () => venueApi.getAdminVenues(params),
   });
 };
 
@@ -73,7 +73,18 @@ export const useUpdateVenueStatus = () => {
     mutationFn: ({ id, data }: { id: string; data: { status: string; reason?: string } }) =>
       venueApi.updateVenueStatus(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["venues-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
+      queryClient.invalidateQueries({ queryKey: ["venues"] });
+    },
+  });
+};
+
+export const useDeleteVenue = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => venueApi.deleteVenue(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
       queryClient.invalidateQueries({ queryKey: ["venues"] });
     },
   });

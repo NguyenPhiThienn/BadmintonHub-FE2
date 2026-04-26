@@ -1,8 +1,8 @@
-import VenueApprovalPage from "@/components/VenueApprovalPage";
+import VenuePage from "@/components/VenuePage";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Phê duyệt cơ sở sân | BadmintonHub",
+    title: "Quản lý cơ sở sân | BadmintonHub",
     description: "Trang dành cho quản trị viên phê duyệt các cơ sở sân mới đăng ký",
 };
 
@@ -12,5 +12,5 @@ export default async function Page({
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     await searchParams;
-    return <VenueApprovalPage />;
+    return <VenuePage />;
 }
