@@ -8,11 +8,14 @@ export const usersApi = {
   getUserById: (id: string): Promise<IProfileResponse> => 
     sendGet(`/users/${id}`),
   
-  updateUser: (id: string, data: { fullName?: string; role?: string }): Promise<any> => 
+  updateUser: (id: string, data: any): Promise<any> => 
     sendPut(`/users/${id}`, data),
   
   deleteUser: (id: string): Promise<any> => 
     sendDelete(`/users/${id}`),
+
+  createUser: (data: any): Promise<any> =>
+    sendPost("/users", data),
 
   resetPassword: (id: string): Promise<any> =>
     sendPost(`/users/${id}/reset-password`, {}),

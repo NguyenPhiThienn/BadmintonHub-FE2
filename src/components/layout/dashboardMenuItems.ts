@@ -25,12 +25,6 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       icon: mdiAccountGroupOutline,
     },
     {
-      id: "venue-approval",
-      name: "Duyệt cơ sở sân",
-      path: "/admin/venues?status=PENDING",
-      icon: mdiClipboardCheckOutline,
-    },
-    {
       id: "venue-management",
       name: "Quản lý cơ sở sân",
       path: "/admin/venues",

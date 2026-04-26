@@ -39,10 +39,14 @@ import {
     mdiClipboardAccount,
     mdiBarcode,
     mdiCalendar,
-    mdiChevronRight
+    mdiChevronRight,
+    mdiEye,
+    mdiEyeOff,
+    mdiLoading
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useEffect, useState } from "react";
+import { formatDateWithTime, formatDateOnly } from "@/lib/format";
 
 interface UserDetailsDialogProps {
     isOpen: boolean;
@@ -62,8 +66,12 @@ export const UserDetailsDialog = ({
     const userData = userDetailsResponse?.data || user;
 
     const [isEditing, setIsEditing] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
+        email: "",
+        phone: "",
+        password: "",
         role: ""
     });
 
@@ -71,15 +79,29 @@ export const UserDetailsDialog = ({
         if (userData) {
             setFormData({
                 fullName: userData.fullName || userData.full_name || "",
+                email: userData.email || "",
+                phone: userData.phone || "",
+                password: "",
                 role: userData.role?.toString() || ""
             });
         }
     }, [userData, isOpen]);
 
     const handleSave = () => {
+        const payload: any = {
+            fullName: formData.fullName,
+            role: formData.role,
+            email: formData.email,
+            phone: formData.phone
+        };
+        
+        if (formData.password.trim()) {
+            payload.password = formData.password.trim();
+        }
+
         updateUser({
             id: userId,
-            data: { fullName: formData.fullName, role: formData.role }
+            data: payload
         }, {
             onSuccess: () => {
                 setIsEditing(false);
@@ -182,7 +204,7 @@ export const UserDetailsDialog = ({
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="neutral">
-                                                                {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString("vi-VN") : "-"}
+                                                                {userData?.createdAt ? formatDateOnly(userData.createdAt) : "-"}
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell className="text-neutral-300 font-semibold w-[160px]">
@@ -193,7 +215,7 @@ export const UserDetailsDialog = ({
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="neutral">
-                                                                <span className="uppercase">{userData?.lastLogin ? new Date(userData.lastLogin).toLocaleString("vi-VN") : "Chưa login"}</span>
+                                                                <span className="uppercase">{userData?.lastLogin ? formatDateWithTime(userData.lastLogin) : "Chưa login"}</span>
                                                             </Badge>
                                                         </TableCell>
                                                     </TableRow>
@@ -234,29 +256,72 @@ export const UserDetailsDialog = ({
                                 <h3 className="text-accent font-semibold whitespace-nowrap">Cập nhật thông tin</h3>
                                 <div className="flex-1 border-b border-dashed border-accent  mr-1" />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="fullName" className="text-neutral-400 text-xs">Họ và tên</Label>
+                                    <Label htmlFor="role">Vai trò hệ thống</Label>
+                                    <Select value={formData.role} onValueChange={(val) => setFormData({ ...formData, role: val })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Chọn vai trò" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="PLAYER">Người chơi</SelectItem>
+                                            <SelectItem value="COURT_OWNER">Chủ sân</SelectItem>
+                                            <SelectItem value="ADMIN">Quản trị viên</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="fullName">Họ và tên <span className="text-red-400 italic text-sm">(*)</span></Label>
                                     <Input
                                         id="fullName"
                                         value={formData.fullName}
                                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                        className="h-9 border-darkBorderV1"
+                                        placeholder="Ví dụ: Nguyễn Văn A"
+                                        required
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-neutral-400 text-xs">Vai trò hệ thống</Label>
-                                    <Select value={formData.role} onValueChange={(val) => setFormData({ ...formData, role: val })}>
-                                        <SelectTrigger className="h-9 border-darkBorderV1">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="PLAYER">PLAYER</SelectItem>
-                                            <SelectItem value="COURT_OWNER">COURT_OWNER</SelectItem>
-                                            <SelectItem value="ADMIN">ADMIN</SelectItem>
-                                            <SelectItem value="PARTNER">PARTNER</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                <div className="grid grid-cols-3 gap-4 col-span-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email <span className="text-red-400 italic text-sm">(*)</span></Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            placeholder="Ví dụ: example@mail.com"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone">Số điện thoại <span className="text-red-400 italic text-sm">(*)</span></Label>
+                                        <Input
+                                            id="phone"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            placeholder="Ví dụ: 0901234567"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="password">Mật khẩu mới (Bỏ trống nếu không đổi)</Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="password"
+                                                type={showPassword ? "text" : "password"}
+                                                value={formData.password}
+                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                placeholder="********"
+                                                className="pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-300 hover:text-accent transition-colors"
+                                            >
+                                                <Icon path={showPassword ? mdiEyeOff : mdiEye} size={0.8} className="flex-shrink-0" />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +341,11 @@ export const UserDetailsDialog = ({
                             onClick={handleSave}
                             disabled={isUpdating}
                         >
-                            <Icon path={mdiContentSaveOutline} size={0.8} />
+                            <Icon 
+                                path={isUpdating ? mdiLoading : mdiContentSaveOutline} 
+                                size={0.8} 
+                                className={isUpdating ? "animate-spin" : ""}
+                            />
                             {isUpdating ? "Đang xử lý..." : "Lưu thay đổi"}
                         </Button>
                     ) : (

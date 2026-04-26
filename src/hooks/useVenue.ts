@@ -1,8 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { venueApi } from "@/api/venue";
 import { IAIRecommendationRequest } from "@/interface/venue";
 
-export const useVenues = (params?: { keyword?: string; lat?: number; lng?: number; limit?: number }) => {
+export const useVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
   return useQuery({
     queryKey: ["venues", params],
     queryFn: () => venueApi.getVenues(params),
@@ -56,5 +56,25 @@ export const useVenuePricing = (venueId: string) => {
 export const useAiRecommendations = () => {
   return useMutation({
     mutationFn: (data: IAIRecommendationRequest) => venueApi.getAiRecommendations(data),
+  });
+};
+
+// Admin specific
+export const usePendingVenues = (params?: { page?: number; limit?: number }) => {
+  return useQuery({
+    queryKey: ["venues-pending", params],
+    queryFn: () => venueApi.getPendingVenues(params),
+  });
+};
+
+export const useUpdateVenueStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { status: string; reason?: string } }) =>
+      venueApi.updateVenueStatus(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["venues-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["venues"] });
+    },
   });
 };

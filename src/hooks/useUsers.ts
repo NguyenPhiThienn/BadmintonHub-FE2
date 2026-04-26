@@ -20,7 +20,7 @@ export const useUserById = (id: string) => {
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { fullName?: string; role?: string } }) => 
+    mutationFn: ({ id, data }: { id: string; data: any }) => 
       usersApi.updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -42,6 +42,20 @@ export const useDeleteUser = () => {
     },
     onError: (error: any) => {
       toast.error(error?.message || "Xóa người dùng thất bại");
+    },
+  });
+};
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => usersApi.createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Thêm người dùng thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Thêm người dùng thất bại");
     },
   });
 };

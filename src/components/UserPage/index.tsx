@@ -22,16 +22,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useDeleteUser, useUsers } from "@/hooks/useUsers";
 import { IUser, UserRole } from "@/interface/auth";
-import { mdiAccountPlusOutline, mdiLockReset, mdiMagnify, mdiRefresh } from "@mdi/js";
+import { UserTable } from "./UserTable";
+import { UserDetailsDialog } from "./UserDetailsDialog";
+import { CreateUserDialog } from "./CreateUserDialog";
+import { mdiAccountPlus, mdiAccountPlusOutline, mdiLockReset, mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { UserTable } from "./UserTable";
-import { UserDetailsDialog } from "./UserDetailsDialog";
 
 export default function UserPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
     const [initialIsEditing, setInitialIsEditing] = useState(false);
@@ -159,11 +161,16 @@ export default function UserPage() {
                             <Button
                                 onClick={handleRefresh}
                                 disabled={isFetching}
-                                title="Reset bộ lọc"
+                                title="Làm mới"
                                 variant="ghost"
                             >
                                 <Icon path={mdiRefresh} size={0.8} className={isFetching ? "animate-spin" : ""} />
                                 {!isMobile && "Làm mới"}
+                            </Button>
+
+                            <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-accent hover:bg-accent/90">
+                                <Icon path={mdiAccountPlus} size={0.8} />
+                                {!isMobile && "Thêm người dùng"}
                             </Button>
                         </div>
                     </div>
@@ -211,6 +218,11 @@ export default function UserPage() {
                         setSelectedUser(null);
                     }}
                     user={selectedUser}
+                />
+
+                <CreateUserDialog
+                    isOpen={isCreateDialogOpen}
+                    onClose={() => setIsCreateDialogOpen(false)}
                 />
             </div>
         </TooltipProvider>

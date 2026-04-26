@@ -114,10 +114,9 @@ export const UserTable = memo(({
                                     </TableCell>
                                     <TableCell>
                                         <Badge
-                                            variant={role === 'admin' ? 'red' : role === 'COURT_OWNER' ? 'blue' : 'green'}
-                                            className="capitalize"
+                                            variant={role === 'admin' || role === 'ADMIN' ? 'red' : role === 'COURT_OWNER' ? 'blue' : 'green'}
                                         >
-                                            {role.toLowerCase()}
+                                            {role === 'admin' || role === 'ADMIN' ? 'Quản trị viên' : role === 'COURT_OWNER' ? 'Chủ sân' : 'Người chơi'}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">

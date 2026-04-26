@@ -325,11 +325,11 @@ export default function EmployeePage() {
                                 <Button
                                     onClick={handleRefresh}
                                     disabled={isFetching}
-                                    title="Reset bộ lọc"
+                                    title="Làm mới"
                                     variant="ghost"
                                 >
                                     <Icon path={mdiRefresh} size={0.8} className={isFetching ? "animate-spin" : ""} />
-                                    Reset bộ lọc
+                                    Làm mới
                                 </Button>
                                 {canRepass && (
                                     <Button

@@ -12,7 +12,14 @@ export interface IVenue {
   matchScore?: number;
   reason?: string;
   distance?: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'REJECTED' | 'SUSPENDED';
+  ownerName?: string;
+  ownerPhone?: string;
+  ownerEmail?: string;
+  legalDocuments?: string[];
+  statusReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
   coordinates?: {
     type: string;
     coordinates: [number, number]; // [lng, lat]

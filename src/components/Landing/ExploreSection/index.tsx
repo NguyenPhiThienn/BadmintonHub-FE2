@@ -31,14 +31,16 @@ export const ExploreSection = () => {
   const [activeFilter, setActiveFilter] = useState("nearby");
   const [recommendedVenues, setRecommendedVenues] = useState<IVenue[]>([]);
 
+  const venues = Array.isArray(venuesRes?.data) ? venuesRes.data : venuesRes?.data?.venues || [];
+
   useEffect(() => {
     if (user?.id) {
       aiMutation.mutate(
         { user_id: user.id as string, preferences: {} },
         {
           onSuccess: (res: IAIRecommendationResponse) => {
-            if (res.data && venuesRes?.data) {
-              const scored = venuesRes.data.slice(0, 5).map((v: IVenue, i: number) => ({
+            if (res.data && venues.length > 0) {
+              const scored = venues.slice(0, 5).map((v: IVenue, i: number) => ({
                 ...v,
                 match_score: res.data[i]?.match_score || 95 + i,
               }));
@@ -163,7 +165,7 @@ export const ExploreSection = () => {
               modules={[FreeMode]}
               className="px-4 md:px-8"
             >
-              {venuesRes?.data?.map((venue: IVenue, i: number) => (
+              {venues.map((venue: IVenue, i: number) => (
                 <SwiperSlide key={venue._id}>
                   <VenueCard venue={venue} index={i} />
                 </SwiperSlide>
