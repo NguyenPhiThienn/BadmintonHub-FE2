@@ -20,36 +20,27 @@ const StatCard = ({ title, value, subValue, icon, color, isCurrency, unit, delay
       whileHover={{ y: -5 }}
       className="h-full"
     >
-      <Card className="bg-darkCardV1/40 border-darkBorderV1 hover:border-accent/40 transition-all group h-full overflow-hidden">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start mb-4">
-            <div className={`p-2.5 rounded-xl bg-${color}/10 text-${color} border border-${color}/20 shadow-lg shadow-${color}/5 group-hover:scale-110 transition-transform duration-300`}>
-              <Icon path={icon} size={1} />
-            </div>
-            {isCurrency && (
-              <div className="text-[10px] font-semibold text-accent/60 bg-accent/5 px-2 py-0.5 rounded-full border border-accent/10">
-                VNĐ
-              </div>
-            )}
+      <Card className="bg-gradient-to-br from-accent/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-accent/40 transition-all group h-full overflow-hidden">
+        <CardContent className="p-3">
+          <div className={`w-fit p-2 rounded-lg bg-${color}/10 text-${color} border border-${color}/20 group-hover:scale-105 transition-transform duration-300 mb-3`}>
+            <Icon path={icon} size={0.8} />
           </div>
 
-          <div className="space-y-1">
-            <p className="text-neutral-400 text-sm font-medium tracking-wide uppercase">{title}</p>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-3xl font-semibold text-neutral-300 tracking-tight">
-                {isCurrency ? (value / 1000000).toFixed(1) + "M" : value?.toLocaleString()}
-                {unit === "%" ? "%" : ""}
-              </h3>
-              {subValue && (
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <div className="w-1 h-1 rounded-full bg-accent/40" />
-                  <p className="text-sm text-neutral-400 font-medium italic">
-                    {subValue}
-                  </p>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center justify-between gap-4 overflow-hidden">
+            <p className="text-neutral-400 text-sm font-medium tracking-wide uppercase truncate">{title}</p>
+            <h3 className="text-xl font-semibold text-neutral-300 tracking-tight whitespace-nowrap">
+              {isCurrency ? (value / 1000000).toFixed(1) + "M" : value?.toLocaleString()}
+              {unit === "%" ? "%" : ""}
+            </h3>
           </div>
+
+          {subValue && (
+            <div className="mt-2">
+              <p className="text-xs text-neutral-400 font-medium italic">
+                {subValue}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
@@ -79,7 +70,6 @@ const StatCardsGrid = ({ summary }: { summary: ISummaryStats | undefined }) => {
         value={summary?.users?.total || 0}
         icon={mdiAccountGroup}
         color="accent"
-        subValue={`Players: ${summary?.users?.players || 0} - Owners: ${summary?.users?.owners || 0}`}
         delay={0.3}
       />
       <StatCard

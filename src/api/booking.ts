@@ -1,11 +1,8 @@
-import { sendGet, sendPost } from "./axios";
+import { sendGet, sendPost, sendPut } from "./axios";
 import {
   IBookingRequest,
-  IBookingResponse,
-  IVoucherCheckRequest,
-  IVoucherCheckResponse,
-  IPaymentRequest,
-  IPaymentResponse
+  IAdminBookingQuery,
+  IUpdateBookingStatusRequest
 } from "@/interface/booking";
 
 export const bookingApi = {
@@ -13,14 +10,25 @@ export const bookingApi = {
     sendPost("/bookings", data),
   getBookingDetails: (id: string) =>
     sendGet(`/bookings/${id}`),
+  getMyBookings: (params: { page?: number; limit?: number }) =>
+    sendGet("/bookings/my-bookings", params),
+  getVenueBookings: (venueId: string, params: { page?: number; limit?: number }) =>
+    sendGet(`/bookings/venue/${venueId}`, params),
+  updateBookingStatus: (id: string, data: IUpdateBookingStatusRequest) =>
+    sendPut(`/bookings/${id}/status`, data),
+};
+
+export const adminBookingApi = {
+  getAllBookings: (params: IAdminBookingQuery) =>
+    sendGet("/admin/bookings", params),
 };
 
 export const promotionApi = {
-  checkVoucher: (params: IVoucherCheckRequest) =>
+  checkVoucher: (params: { code: string; venueId: string }) =>
     sendGet("/promotions/valid", params),
 };
 
 export const paymentApi = {
-  createPaymentUrl: (data: IPaymentRequest) =>
+  createPaymentUrl: (data: { bookingId: string; method: "VNPAY" | "MOMO" | "CASH" }) =>
     sendPost("/payments/create-url", data),
 };

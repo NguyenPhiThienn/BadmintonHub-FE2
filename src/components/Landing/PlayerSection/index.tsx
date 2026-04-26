@@ -141,7 +141,7 @@ export function PlayerSection() {
 
                                 {court.aiSuggested && (
                                     <Badge variant="badminton" className="absolute left-4 top-4 gap-1 shadow-lg bg-primary border-none">
-                                        <Icon path={mdiCreation} size={0.55} />
+                                        <Icon path={mdiCreation} size={0.6} />
                                         Gợi ý AI
                                     </Badge>
                                 )}

@@ -1,16 +1,47 @@
 export interface IBookingDetail {
-  courtId: string;
+  courtId: {
+    _id: string;
+    name?: string;
+  } | string;
   bookingDate: string;
   startTime: string;
   endTime: string;
   price?: number;
 }
 
+export interface IBookingUser {
+  _id: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  avatar?: string;
+}
+
+export interface IBookingVenue {
+  _id: string;
+  name?: string;
+  address?: string;
+}
+
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+
+export interface IBooking {
+  _id: string;
+  playerId: IBookingUser | string;
+  venueId: IBookingVenue | string;
+  details: IBookingDetail[];
+  totalPrice: number;
+  finalPrice?: number;
+  status: BookingStatus;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface IBookingRequest {
   playerId?: string;
   venueId: string;
   promotionId?: string;
-  details: IBookingDetail[];
+  details: Omit<IBookingDetail, 'courtId'>[] & { courtId: string }[];
   totalPrice?: number;
   finalPrice?: number;
 }
@@ -22,7 +53,7 @@ export interface IBookingResponse {
   venueName?: string;
   totalPrice: number;
   finalPrice: number;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: BookingStatus;
   createdAt: string;
 }
 
@@ -44,4 +75,16 @@ export interface IPaymentRequest {
 
 export interface IPaymentResponse {
   paymentUrl?: string;
+}
+
+export interface IAdminBookingQuery {
+  page?: number;
+  limit?: number;
+  status?: BookingStatus;
+  userId?: string;
+  venueId?: string;
+}
+
+export interface IUpdateBookingStatusRequest {
+  status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 }

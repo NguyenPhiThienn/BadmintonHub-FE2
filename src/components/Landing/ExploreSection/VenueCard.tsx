@@ -60,7 +60,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
 
           {isAI && (
             <Badge variant="badminton" className="absolute left-4 top-4 gap-1 shadow-lg bg-primary border-none text-white">
-              <Icon path={mdiCreation} size={0.55} />
+              <Icon path={mdiCreation} size={0.6} />
               Gợi ý AI {venue.matchScore && `(${venue.matchScore}%)`}
             </Badge>
           )}
