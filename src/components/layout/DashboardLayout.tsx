@@ -173,7 +173,7 @@ function TabletLayout({ children }: { children: React.ReactNode }) {
       </Suspense>
       <div className="flex-1 flex mt-[78px] h-[calc(100vh-78px)] overflow-hidden">
         <div className="w-16 border-r border-darkBorderV1 h-full flex flex-col items-center py-4 bg-darkBackgroundV1">
-          <nav className="flex-1 w-full px-2 space-y-3">
+          <nav className="flex-1 w-full px-2 space-y-2">
             {menuItems.map((menu) => (
               <Link key={menu.id} href={menu.path}>
                 <div className={cn(

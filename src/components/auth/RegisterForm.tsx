@@ -17,6 +17,11 @@ import {
   mdiAccountPlus,
   mdiLoading
 } from "@mdi/js";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { useRegister } from "@/hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,14 +37,22 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
   const { mutateAsync: registerUser, isPending } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
 
+  // OTP States
+  const [step, setStep] = useState<"register" | "otp">("register");
+  const [otpInput, setOtpInput] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [formData, setFormData] = useState<any>(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+
   const {
     register,
     handleSubmit,
     control,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      full_name: "",
+      fullName: "",
       email: "",
       phone: "",
       password: "",
@@ -47,36 +60,137 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const generateOTP = () => {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+  };
+
+  const sendOtpEmail = async (email: string, otp: string) => {
+    setIsSendingOtp(true);
     try {
-      const response = await registerUser(data);
-      if (response?.status === 201 || response?.statusCode === 201) {
-        toast.success(response.message || "Đăng ký thành công");
-        router.push("/login");
-      }
-    } catch (error: any) {
-      toast.error(error?.message || "Đăng ký thất bại");
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      if (!response.ok) throw new Error("Failed to send OTP");
+
+      toast.info("Mã OTP đã được gửi đến email của bạn");
+      setStep("otp");
+    } catch (error) {
+      toast.error("Không thể gửi mã OTP. Vui lòng thử lại.");
+    } finally {
+      setIsSendingOtp(false);
     }
   };
+
+  const onSubmit = async (data: any) => {
+    const otp = generateOTP();
+    setGeneratedOtp(otp);
+    setFormData(data);
+    await sendOtpEmail(data.email, otp);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpInput === generatedOtp) {
+      try {
+        const response = await registerUser(formData);
+        if (response?.status === 201 || response?.statusCode === 201) {
+          toast.success(response.message || "Đăng ký thành công");
+          if (onSwitchLogin) {
+            onSwitchLogin();
+          } else {
+            router.push("/login");
+          }
+        }
+      } catch (error: any) {
+        toast.error(error?.message || "Đăng ký thất bại");
+      }
+    } else {
+      toast.error("Mã OTP không chính xác");
+    }
+  };
+
+  if (step === "otp") {
+    return (
+      <form onSubmit={handleVerifyOtp} className="space-y-6">
+        <div className="text-center space-y-2">
+          <h3 className="text-xl font-bold text-neutral-300">Xác thực Email</h3>
+          <p className="text-sm text-neutral-400">
+            Chúng tôi đã gửi mã OTP 4 số đến <span className="text-accent font-semibold">{formData?.email}</span>
+          </p>
+        </div>
+
+        <div className="flex justify-center py-4">
+          <InputOTP
+            maxLength={4}
+            value={otpInput}
+            onChange={(value) => setOtpInput(value)}
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0} className="w-12 h-14 text-accent text-3xl border-darkBorderV1 focus:border-accent" />
+              <InputOTPSlot index={1} className="w-12 h-14 text-accent text-3xl border-darkBorderV1 focus:border-accent" />
+              <InputOTPSlot index={2} className="w-12 h-14 text-accent text-3xl border-darkBorderV1 focus:border-accent" />
+              <InputOTPSlot index={3} className="w-12 h-14 text-accent text-3xl border-darkBorderV1 focus:border-accent" />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+
+        <div className="space-y-2">
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isPending || otpInput.length < 4}
+          >
+            {isPending ? (
+              <Icon path={mdiLoading} size={0.8} className="animate-spin" />
+            ) : "Xác nhận & Đăng ký"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => setStep("register")}
+          >
+            Quay lại
+          </Button>
+
+          <p className="text-center text-xs text-neutral-500">
+            Không nhận được mã?{" "}
+            <button
+              type="button"
+              className="text-accent hover:underline"
+              onClick={() => sendOtpEmail(formData.email, generatedOtp)}
+              disabled={isSendingOtp}
+            >
+              {isSendingOtp ? "Đang gửi..." : "Gửi lại mã"}
+            </button>
+          </p>
+        </div>
+      </form>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
       <div className="space-y-1">
-        <Label htmlFor="full_name">Họ và Tên</Label>
+        <Label htmlFor="fullName">Họ và Tên</Label>
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 z-10">
             <Icon path={mdiAccountOutline} size={0.8} />
           </div>
           <Input
-            id="full_name"
-            {...register("full_name", { required: "Vui lòng nhập họ và tên" })}
+            id="fullName"
+            {...register("fullName", { required: "Vui lòng nhập họ và tên" })}
             placeholder="Nguyễn Văn A"
             className="pl-10"
             autoComplete="off"
           />
         </div>
-        {errors.full_name && (
-          <p className="text-red-500 text-sm italic">{errors.full_name?.message as string}</p>
+        {errors.fullName && (
+          <p className="text-red-500 text-sm italic">{errors.fullName?.message as string}</p>
         )}
       </div>
 
@@ -140,7 +254,6 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
               required: "Vui lòng nhập mật khẩu",
               minLength: { value: 6, message: "Mật khẩu phải ít nhất 6 ký tự" }
             })}
-            placeholder="••••••••"
             className="pl-10 pr-10"
             autoComplete="new-password"
           />
@@ -182,11 +295,11 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
       </div>
 
       <div className="pt-2">
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? (
+        <Button type="submit" disabled={isSendingOtp} className="w-full">
+          {isSendingOtp ? (
             <>
               <Icon path={mdiLoading} size={0.8} className="animate-spin" />
-              Đang đăng ký...
+              Đang xử lý...
             </>
           ) : (
             <>

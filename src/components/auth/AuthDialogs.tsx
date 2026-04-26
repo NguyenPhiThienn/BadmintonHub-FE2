@@ -86,7 +86,7 @@ export const AuthDialogs = ({ mode, setMode }: AuthDialogsProps) => {
         )}
 
         <div className="p-3 md:p-4">
-          <div className="max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar">
+          <div>
             <div className="flex justify-center">
               <Link href="/" className="flex items-center gap-2 py-4">
                 <Image
