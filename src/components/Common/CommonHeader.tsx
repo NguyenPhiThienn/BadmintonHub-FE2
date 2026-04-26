@@ -34,9 +34,7 @@ export default function CommonHeader() {
           >
             <HamburgerMenu size="20" color="#fff" />
           </button>
-          <Link target="_blank" href="https://giaiphaptudongdien.com/" className="flex items-center select-none">
-            <Image quality={100} draggable={false} src="/images/logo2.webp" width={1000} height={1000} alt="Logo" className="h-12 md:w-full md:h-full object-contain rounded pr-2" />
-          </Link>
+          <Image quality={100} draggable={false} src="/images/primary-logo.svg" width={1000} height={1000} alt="Logo" className="h-12 md:w-full md:h-full object-contain rounded pr-2" />
         </div>
         <DropdownNav />
         <div className="flex items-center gap-3 md:gap-4 ml-4">
