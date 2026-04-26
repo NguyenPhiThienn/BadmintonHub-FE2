@@ -77,11 +77,11 @@ export function Header() {
                                     <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                                         <Avatar className="h-10 w-10 border border-border/40">
                                             <AvatarImage
-                                                src={user.avatar_url || `https://api.dicebear.com/9.x/bottts/svg?seed=${user.full_name}`}
-                                                alt={user.full_name}
+                                                src={user.avatarUrl || `https://api.dicebear.com/9.x/bottts/svg?seed=${user.fullName}`}
+                                                alt={user.fullName}
                                             />
                                             <AvatarFallback className="bg-primary/10 text-primary">
-                                                {user.full_name?.charAt(0) || "U"}
+                                                {user.fullName?.charAt(0) || "U"}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
@@ -89,7 +89,7 @@ export function Header() {
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-semibold leading-none">{user.full_name}</p>
+                                            <p className="text-sm font-semibold leading-none">{user.fullName}</p>
                                             <p className="text-sm leading-none text-neutral-400">{user.email}</p>
                                         </div>
                                     </DropdownMenuLabel>
@@ -122,10 +122,10 @@ export function Header() {
                         </div>
                     ) : (
                         <div className="hidden md:flex items-center gap-3">
-                            <Button variant="default" onClick={() => setAuthMode("login")}>
+                            <Button variant="primary" onClick={() => setAuthMode("login")}>
                                 Đăng nhập
                             </Button>
-                            <Button variant="accent" onClick={() => setAuthMode("register")}>
+                            <Button variant="primary" onClick={() => setAuthMode("register")}>
                                 Đăng ký
                             </Button>
                         </div>

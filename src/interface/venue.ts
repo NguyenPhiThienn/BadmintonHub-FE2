@@ -13,6 +13,7 @@ export interface IVenue {
   reason?: string;
   distance?: string;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'REJECTED' | 'SUSPENDED';
+  available?: number;
   ownerName?: string;
   ownerPhone?: string;
   ownerEmail?: string;

@@ -35,8 +35,8 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
 
   // Mock data for missing fields
   const mockFeatures = ["Wi-Fi", "Gửi xe", "Căng tin", "Cho thuê vợt"];
-  const displayPrice = "120.000đ/h";
-  const displayImage = "/images/court-1.jpg";
+  const displayPrice = `${venue.pricePerHour?.toLocaleString("vi-VN")}đ/h`;
+  const displayImage = venue.images?.[0] || "/images/court-1.jpg";
 
   return (
     <motion.div
@@ -61,7 +61,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
           {isAI && (
             <Badge variant="badminton" className="absolute left-4 top-4 gap-1 shadow-lg bg-primary border-none text-white">
               <Icon path={mdiCreation} size={0.55} />
-              Gợi ý AI {venue.match_score && `(${venue.match_score}%)`}
+              Gợi ý AI {venue.matchScore && `(${venue.matchScore}%)`}
             </Badge>
           )}
 
@@ -79,19 +79,19 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             </h3>
             <div className="flex shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5">
               <Icon path={mdiStar} size={0.6} className="text-amber-500" />
-              <span className="text-sm font-semibold text-amber-700">{venue.average_rating || 4.5}</span>
-              <span className="text-xs font-semibold text-amber-700">({venue.reviews || 88})</span>
+              <span className="text-sm font-semibold text-amber-700">{venue.averageRating ? venue.averageRating.toFixed(1) : "4.5"}</span>
+              <span className="text-xs font-semibold text-amber-700">(88)</span>
             </div>
           </div>
 
           <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500 font-semibold">
-            <Icon path={mdiMap} size={0.6} />
+            <Icon path={mdiMap} size={0.6} className="flex-shrink-0" />
             <span className="line-clamp-1">{venue.address}</span>
           </div>
 
           <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500 font-semibold">
             <Icon path={mdiClock} size={0.6} />
-            {venue.open_time} - {venue.close_time}
+            {venue.openTime} - {venue.closeTime}
           </div>
 
           {/* Features tags */}

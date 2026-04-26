@@ -36,13 +36,13 @@ export const ExploreSection = () => {
   useEffect(() => {
     if (user?.id) {
       aiMutation.mutate(
-        { user_id: user.id as string, preferences: {} },
+        { userId: user.id as string, preferences: {} },
         {
           onSuccess: (res: IAIRecommendationResponse) => {
             if (res.data && venues.length > 0) {
               const scored = venues.slice(0, 5).map((v: IVenue, i: number) => ({
                 ...v,
-                match_score: res.data[i]?.match_score || 95 + i,
+                matchScore: res.data[i]?.matchScore || 95 + i,
               }));
               setRecommendedVenues(scored);
             }

@@ -1,7 +1,7 @@
-import StatisticsPage from "@/components/StatisticsPage";
+import AdminDashboard from "@/components/AdminDashboard";
 
 export default function MainPage() {
-	return <StatisticsPage />;
+	return <AdminDashboard />;
 }
 
 
