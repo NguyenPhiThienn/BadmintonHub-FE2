@@ -148,20 +148,15 @@ const SuccessContent = () => {
       >
         <div className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl flex items-start overflow-hidden">
           <div className="w-full">
-            <div className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-darkBorderV1/50">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/20">
-                  <Icon path={mdiTicketOutline} size={0.8} className="text-accent" />
-                </div>
-                <div>
-                  <Label>Mã đơn hàng</Label>
-                  <p className="text-xl font-semibold text-white">#BH{booking._id?.slice(-6).toUpperCase()}</p>
-                </div>
+            <div className="p-4 border-b border-darkBorderV1/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icon path={mdiMap} size={0.8} className="text-accent" />
+                <p className="text-accent text-lg font-semibold">Mã đơn hàng: #BH{booking._id?.slice(-6).toUpperCase()}</p>
               </div>
-              <div className="flex items-center gap-2 bg-accent/10 px-4 py-2 rounded-full border border-accent/20 self-start md:self-center">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-accent font-semibold text-sm">Đã xác nhận</span>
-              </div>
+              <Badge variant="green">
+                <Icon path={mdiCheckCircle} size={0.6} />
+                Đã xác nhận
+              </Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-darkBackgroundV1">
@@ -236,6 +231,29 @@ const SuccessContent = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Map Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+      >
+        <div className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-darkBorderV1/50 flex items-center gap-2">
+            <Icon path={mdiMap} size={0.8} className="text-accent" />
+            <p className="text-accent text-lg font-semibold">Vị trí sân trên bản đồ</p>
+          </div>
+          <div className="h-64 w-full bg-darkBackgroundV1">
+            <iframe
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              src={`https://maps.google.com/maps?q=${booking.venueId?.coordinates?.coordinates[1]},${booking.venueId?.coordinates?.coordinates[0]}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
       </motion.div>
