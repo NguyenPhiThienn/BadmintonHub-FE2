@@ -15,6 +15,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { useResponsive } from "@/hooks/use-mobile";
+import Link from "next/link";
+import Image from "next/image";
 
 interface LoginPageProps {
   formData: any;
@@ -81,7 +83,7 @@ function OtpForm({
   handleVerifyOtp,
   isVerifyingOtp,
   handleBackToLogin,
-  employeeCode,
+  identifier,
   variant = "dark",
 }: {
   otpValue: string;
@@ -89,7 +91,7 @@ function OtpForm({
   handleVerifyOtp: () => void;
   isVerifyingOtp: boolean;
   handleBackToLogin: () => void;
-  employeeCode: string;
+  identifier: string;
   variant?: "dark" | "light";
 }) {
   const isDark = variant === "dark";
@@ -106,7 +108,7 @@ function OtpForm({
             isDark ? "text-primary" : "text-primary"
           )}
         >
-          Mã nhân viên: {employeeCode}
+          Email hoặc Số điện thoại: {identifier}
         </p>
       </div>
 
@@ -180,12 +182,12 @@ export default function LoginPage() {
   const { loginUser: setUserContext, fetchUserProfile } = useUser();
 
   const [formData, setFormData] = useState({
-    employeeCode: "",
+    identifier: "",
     password: "",
   });
 
   const [errors, setErrors] = useState<{
-    employeeCode?: string;
+    identifier?: string;
     password?: string;
     general?: string;
   }>({});
@@ -210,8 +212,8 @@ export default function LoginPage() {
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
-    if (!formData.employeeCode) {
-      newErrors.employeeCode = "Mã nhân viên là bắt buộc";
+    if (!formData.identifier) {
+      newErrors.identifier = "Email hoặc Số điện thoại là bắt buộc";
     }
     if (!formData.password) {
       newErrors.password = "Mật khẩu là bắt buộc";
@@ -227,7 +229,7 @@ export default function LoginPage() {
 
     try {
       const loginResponse = await loginUser({
-        employeeCode: formData.employeeCode,
+        identifier: formData.identifier,
         password: formData.password,
       });
 
@@ -236,7 +238,7 @@ export default function LoginPage() {
         loginResponse?.data?.accessToken
       ) {
         const { accessToken, refreshToken, user } = loginResponse.data;
-        const role = user.role.toLowerCase();
+        const role = user.role?.toLowerCase() || "";
 
         localStorage.setItem("token", accessToken);
         localStorage.setItem("accessToken", accessToken);
@@ -254,9 +256,9 @@ export default function LoginPage() {
 
         toast.success(loginResponse?.message || "Đăng nhập thành công!");
 
-        let redirectPath = "/admin";
-        if (role === "partner") {
-          redirectPath = "/partner/testing-devices";
+        let redirectPath = "/admin/dashboard";
+        if (role === "player") {
+          redirectPath = "/";
         } else if (role !== "admin") {
           redirectPath = "/admin/profile";
         }
@@ -274,29 +276,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    // Check if this employee code requires OTP
-    if (formData.employeeCode === "NV001") {
-      try {
-        const otpResponse = await requestOtp({
-          employeeCode: formData.employeeCode,
-        });
-
-        if (otpResponse?.statusCode === 200) {
-          toast.success(otpResponse?.message || "Mã OTP đã được gửi!");
-          setShowOtpForm(true);
-          setOtpValue("");
-        } else {
-          toast.error("Gửi mã OTP thất bại");
-        }
-      } catch (error: any) {
-        toast.error(error?.message || "Gửi mã OTP thất bại");
-      }
-    } else {
-      await handleLogin();
-    }
+    await handleLogin();
   };
 
   const handleVerifyOtp = async () => {
@@ -307,7 +287,7 @@ export default function LoginPage() {
 
     try {
       const verifyResponse = await verifyOtp({
-        employeeCode: formData.employeeCode,
+        identifier: formData.identifier,
         otpCode: otpValue,
       });
 
@@ -381,10 +361,15 @@ function MobileLoginPage({
         <div className="max-w-md mx-auto w-full space-y-4">
           {/* Header */}
           <div className="text-center space-y-4 md:space-y-4 flex flex-col items-center">
-            <img src="/images/logo.webp" alt="Logo" className="h-24 w-24 rounded-full" draggable={false} />
-            <h2 className="text-xl font-semibold text-secondary uppercase">
-              Đăng nhập hệ thống
-            </h2>
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/images/primary-logo.svg"
+                alt="BadmintonHub Logo"
+                width={500}
+                height={500}
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
             <p className="text-neutral-400 text-sm text-center">
               Đăng nhập vào BadmintonHub với quyền quản trị viên
             </p>
@@ -397,7 +382,7 @@ function MobileLoginPage({
               handleVerifyOtp={handleVerifyOtp}
               isVerifyingOtp={isVerifyingOtp}
               handleBackToLogin={handleBackToLogin}
-              employeeCode={formData.employeeCode}
+              identifier={formData.identifier}
               variant="dark"
             />
           ) : (
@@ -411,9 +396,9 @@ function MobileLoginPage({
 
               <div className="space-y-1">
                 <Label
-                  htmlFor="employeeCode-mobile"
+                  htmlFor="identifier-mobile"
                 >
-                  Mã nhân viên
+                  Email hoặc Số điện thoại
                 </Label>
                 <div className="relative">
                   <Icon
@@ -423,17 +408,17 @@ function MobileLoginPage({
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none"
                   />
                   <Input
-                    id="employeeCode-mobile"
-                    name="employeeCode"
+                    id="identifier-mobile"
+                    name="identifier"
                     type="text"
-                    value={formData.employeeCode}
+                    value={formData.identifier}
                     onChange={handleInputChange}
                     disabled={isPending}
                     className="border-0 border-b border-neutral-400 !bg-transparent rounded-none pl-9 pr-0 focus-visible:ring-0 focus-visible:border-primary !text-neutral-400 placeholder:text-neutral-400 h-10 transition-colors w-full"
                   />
                 </div>
-                {errors.employeeCode && (
-                  <p className="text-red-400 text-sm mt-1">{errors.employeeCode}</p>
+                {errors.identifier && (
+                  <p className="text-red-400 text-sm mt-1">{errors.identifier}</p>
                 )}
               </div>
 
@@ -542,10 +527,15 @@ function TabletLoginPage({
             <div className="max-w-md mx-auto w-full space-y-8">
               {/* Header */}
               <div className="text-center space-y-4 md:space-y-4 flex flex-col items-center">
-                <img src="/images/logo.webp" alt="Logo" className="h-24 w-24" draggable={false} />
-                <h2 className="text-2xl font-semibold text-primary uppercase">
-                  Đăng nhập hệ thống
-                </h2>
+                <Link href="/" className="flex items-center gap-2">
+                  <Image
+                    src="/images/primary-logo.svg"
+                    alt="BadmintonHub Logo"
+                    width={500}
+                    height={500}
+                    className="h-10 w-auto object-contain"
+                  />
+                </Link>
                 <p className="text-neutral-400 text-sm">
                   Đăng nhập vào BadmintonHub với quyền quản trị viên
                 </p>
@@ -558,7 +548,7 @@ function TabletLoginPage({
                   handleVerifyOtp={handleVerifyOtp}
                   isVerifyingOtp={isVerifyingOtp}
                   handleBackToLogin={handleBackToLogin}
-                  employeeCode={formData.employeeCode}
+                  identifier={formData.identifier}
                   variant="dark"
                 />
               ) : (
@@ -572,10 +562,10 @@ function TabletLoginPage({
 
                   <div className="space-y-1">
                     <Label
-                      htmlFor="employeeCode-tablet"
+                      htmlFor="identifier-tablet"
                       className="text-sm text-neutral-400 normal-case"
                     >
-                      Mã nhân viên
+                      Email hoặc Số điện thoại
                     </Label>
                     <div className="relative">
                       <Icon
@@ -585,18 +575,18 @@ function TabletLoginPage({
                         className="absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none"
                       />
                       <Input
-                        id="employeeCode-tablet"
-                        name="employeeCode"
+                        id="identifier-tablet"
+                        name="identifier"
                         type="text"
-                        value={formData.employeeCode}
+                        value={formData.identifier}
                         onChange={handleInputChange}
                         disabled={isPending}
-                        placeholder="Nhập mã nhân viên hoặc SĐT"
+                        placeholder="Nhập Email hoặc Số điện thoại"
                         className="border-0 border-b border-darkBorderV1 !bg-transparent rounded-none pl-9 focus-visible:ring-0 focus-visible:border-primary !text-neutral-400 placeholder:text-neutral-400 w-full"
                       />
                     </div>
-                    {errors.employeeCode && (
-                      <p className="text-red-400 text-sm mt-1">{errors.employeeCode}</p>
+                    {errors.identifier && (
+                      <p className="text-red-400 text-sm mt-1">{errors.identifier}</p>
                     )}
                   </div>
 
@@ -706,10 +696,16 @@ function DesktopLoginPage({
             <div className="max-w-md mx-auto w-full space-y-4 md:space-y-4">
               {/* Header */}
               <div className="text-center space-y-2 flex flex-col items-center">
-                <img src="/images/logo.webp" alt="" className="h-28 w-28 rounded-full" draggable={false} />
-                <h2 className="text-2xl font-semibold text-secondary uppercase">
-                  Đăng nhập hệ thống
-                </h2>
+                <Link href="/" className="flex items-center gap-2">
+                  <Image
+                    src="/images/primary-logo.svg"
+                    alt="BadmintonHub Logo"
+                    width={500}
+                    height={500}
+                    className="h-10 w-auto object-contain"
+                  />
+                </Link>
+
                 <p className="text-neutral-400 text-base">
                   Đăng nhập vào BadmintonHub với quyền quản trị viên
                 </p>
@@ -722,7 +718,7 @@ function DesktopLoginPage({
                   handleVerifyOtp={handleVerifyOtp}
                   isVerifyingOtp={isVerifyingOtp}
                   handleBackToLogin={handleBackToLogin}
-                  employeeCode={formData.employeeCode}
+                  identifier={formData.identifier}
                   variant="light"
                 />
               ) : (
@@ -734,11 +730,11 @@ function DesktopLoginPage({
                     </div>
                   )}
 
-                  <div>
+                  <div className="space-y-1">
                     <Label
-                      htmlFor="employeeCode"
+                      htmlFor="identifier"
                     >
-                      Mã nhân viên
+                      Email hoặc Số điện thoại
                     </Label>
                     <div className="relative">
                       <Icon
@@ -748,23 +744,23 @@ function DesktopLoginPage({
                         className="absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none"
                       />
                       <Input
-                        id="employeeCode"
-                        name="employeeCode"
+                        id="identifier"
+                        name="identifier"
                         type="text"
-                        value={formData.employeeCode}
+                        value={formData.identifier}
                         onChange={handleInputChange}
                         disabled={isPending}
-                        placeholder="Nhập mã nhân viên hoặc SĐT"
+                        placeholder="Nhập Email hoặc Số điện thoại"
                         className="border-0 border-b-2 border-gray-500 bg-darkBackgroundV1 rounded-none pl-9 pr-0 focus-visible:ring-0 focus-visible:border-[#41C651] text-neutral-400 placeholder:text-gray-500 w-full"
                       />
                     </div>
-                    {errors.employeeCode && (
-                      <p className="text-red-400 text-sm mt-1">{errors.employeeCode}</p>
+                    {errors.identifier && (
+                      <p className="text-red-400 text-sm mt-1">{errors.identifier}</p>
                     )}
                   </div>
 
 
-                  <div>
+                  <div className="space-y-1">
                     <Label
                       htmlFor="password"
                     >

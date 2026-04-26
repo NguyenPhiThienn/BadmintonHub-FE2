@@ -84,13 +84,13 @@ export const useUpdateMe = () => {
 
 export const useRequestOtp = () => {
   return useMutation({
-    mutationFn: (data: { employeeCode: string }) => authApi.requestOtp(data),
+    mutationFn: (data: { identifier: string }) => authApi.requestOtp(data),
   });
 };
 
 export const useVerifyOtp = () => {
   return useMutation({
-    mutationFn: (data: { employeeCode: string; otpCode: string }) => authApi.verifyOtp(data),
+    mutationFn: (data: { identifier: string; otpCode: string }) => authApi.verifyOtp(data),
   });
 };
 

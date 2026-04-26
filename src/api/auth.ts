@@ -10,8 +10,8 @@ export const authApi = {
   getMe: (): Promise<IProfileResponse> => sendGet("/auth/me"),
   updateMe: (data: any): Promise<IProfileResponse> => sendPut("/auth/me", data),
   changePassword: (data: any) => sendPut("/auth/change-password", data),
-  requestOtp: (data: { employeeCode: string }) => sendPost("/auth/request-otp", data),
-  verifyOtp: (data: { employeeCode: string; otpCode: string }) => sendPost("/auth/verify-otp", data),
+  requestOtp: (data: { identifier: string }) => sendPost("/auth/request-otp", data),
+  verifyOtp: (data: { identifier: string; otpCode: string }) => sendPost("/auth/verify-otp", data),
 
   // Partner Auth
   loginPartner: (data: any): Promise<IAuthResponse> => sendPost("/auth/partner/login", data),
