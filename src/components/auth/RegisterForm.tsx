@@ -114,7 +114,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
 
   if (step === "otp") {
     return (
-      <form onSubmit={handleVerifyOtp} className="space-y-6">
+      <form onSubmit={handleVerifyOtp} className="space-y-4">
         <div className="text-center space-y-2">
           <h3 className="text-xl font-bold text-neutral-300">Xác thực Email</h3>
           <p className="text-sm text-neutral-400">

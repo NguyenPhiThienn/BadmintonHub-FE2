@@ -30,6 +30,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { LegalDocumentPreview } from "./LegalDocumentPreview";
 import { VenueTable } from "./VenueTable";
+import { VenueDetailsDialog } from "./VenueDetailsDialog";
 
 export default function VenuePage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -40,6 +41,7 @@ export default function VenuePage() {
     const [previewVenue, setPreviewVenue] = useState<IVenue | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
     const [selectedVenue, setSelectedVenue] = useState<IVenue | null>(null);
 
     const { isMobile } = useResponsive();
@@ -87,8 +89,9 @@ export default function VenuePage() {
     };
 
     const handleAction = (venue: IVenue, mode: "view" | "edit") => {
+        setSelectedVenue(venue);
         if (mode === "view") {
-            window.open(`/admin/venues/${venue._id}`, '_blank');
+            setIsDetailsDialogOpen(true);
         } else {
             toast.info(`Tính năng cập nhật sân ${venue.name} đang được phát triển.`);
         }
@@ -217,6 +220,15 @@ export default function VenuePage() {
                     isOpen={isPreviewOpen}
                     onClose={() => setIsPreviewOpen(false)}
                     venue={previewVenue}
+                />
+
+                <VenueDetailsDialog
+                    isOpen={isDetailsDialogOpen}
+                    onClose={() => {
+                        setIsDetailsDialogOpen(false);
+                        setSelectedVenue(null);
+                    }}
+                    venue={selectedVenue}
                 />
 
                 <DeleteDialog

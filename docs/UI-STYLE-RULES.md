@@ -207,7 +207,7 @@ Hiện tại giao diện đang sử dụng Dark Mode (không sử dụng light m
 ## 15. Quy định về Đơn vị Spacing (Gap, Padding, Margin, Space)
 Để đảm bảo nhịp điệu thị giác (visual rhythm) đồng nhất, dự án chỉ sử dụng các đơn vị chia hết cho 4 cho các thuộc tính spacing. Cụ thể:
 - **ĐƠN VỊ DUY NHẤT**: Chỉ sử dụng `gap-4`, `p-4`, `m-4`, `space-x-4`, `space-y-4` (và các biến thể `gap-2`, `p-2` nếu cần không gian hẹp).
-- **CẤM TUYỆT ĐỐI**: Không sử dụng các đơn vị như `gap-6`, `p-6`, `space-y-6`, `m-10`, v.v... Nếu cần không gian lớn hơn, hãy sử dụng `gap-8` hoặc `gap-12`. Ưu tiên hàng đầu luôn là **4**.
+- **CẤM TUYỆT ĐỐI**: Không sử dụng các đơn vị như `gap-6`, `p-6`, `space-y-4`, `m-10`, v.v... Nếu cần không gian lớn hơn, hãy sử dụng `gap-8` hoặc `gap-12`. Ưu tiên hàng đầu luôn là **4**.
 
 ## 16. Quy định về Ô tìm kiếm (Search Input with Icon)
 Tất cả các ô nhập dữ liệu tìm kiếm (Search Input) trong toàn bộ dự án phải tuân thủ đúng cấu trúc `relative` với Icon nằm tuyệt đối (`absolute`) phía bên trái để đảm bảo tính đồng nhất:

@@ -138,7 +138,7 @@ const BookingPage = () => {
           <div className="lg:col-span-8 space-y-8">
             {/* Venue Info Card */}
             <section className="bg-darkCardV1 border border-darkBorderV1 rounded-3xl overflow-hidden shadow-2xl shadow-black/50">
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-4">
                 <div className="flex items-start justify-between">
                   <div className="flex gap-6">
                     <div className="w-20 h-20 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
@@ -223,7 +223,7 @@ const BookingPage = () => {
           </div>
 
           {/* Right Column: Sticky Payment Summary */}
-          <div className="lg:col-span-4 sticky top-28 space-y-6">
+          <div className="lg:col-span-4 sticky top-28 space-y-4">
             <section className="bg-darkCardV1 border border-darkBorderV1 rounded-3xl p-8 shadow-2xl">
               <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <div className="w-1.5 h-6 bg-accent rounded-full" />

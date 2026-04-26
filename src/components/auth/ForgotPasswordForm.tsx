@@ -41,7 +41,7 @@ export const ForgotPasswordForm = ({ onSwitchLogin, isDialog }: ForgotPasswordFo
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Địa chỉ Email</Label>
         <div className="relative">
@@ -51,7 +51,7 @@ export const ForgotPasswordForm = ({ onSwitchLogin, isDialog }: ForgotPasswordFo
           <Input
             id="email"
             type="email"
-            {...register("email", { 
+            {...register("email", {
               required: "Vui lòng nhập email",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -83,7 +83,7 @@ export const ForgotPasswordForm = ({ onSwitchLogin, isDialog }: ForgotPasswordFo
 
       <div className="text-center">
         {isDialog ? (
-          <button 
+          <button
             type="button"
             onClick={onSwitchLogin}
             className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-accent transition-colors"
@@ -92,8 +92,8 @@ export const ForgotPasswordForm = ({ onSwitchLogin, isDialog }: ForgotPasswordFo
             Quay lại đăng nhập
           </button>
         ) : (
-          <Link 
-            href="/login" 
+          <Link
+            href="/login"
             className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-accent transition-colors"
           >
             <Icon path={mdiArrowLeft} size={0.6} />

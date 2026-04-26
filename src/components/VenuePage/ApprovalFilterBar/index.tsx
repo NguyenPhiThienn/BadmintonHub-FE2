@@ -78,9 +78,9 @@ export const ApprovalFilterBar = ({
                     className="h-10 w-10 text-neutral-400 hover:text-accent hover:bg-accent/10"
                     onClick={onRefresh}
                 >
-                    <Icon 
-                        path={mdiRefresh} 
-                        size={0.8} 
+                    <Icon
+                        path={mdiRefresh}
+                        size={0.8}
                         className={isRefreshing ? "animate-spin" : ""}
                     />
                 </Button>
@@ -89,7 +89,7 @@ export const ApprovalFilterBar = ({
                     variant="outline"
                     className="h-10 gap-2 border-darkBorderV1 text-neutral-400"
                 >
-                    <Icon path={mdiTuneVariant} size={0.7} />
+                    <Icon path={mdiTuneVariant} size={0.8} />
                     {!isRefreshing && <span className="text-sm">Bộ lọc nâng cao</span>}
                 </Button>
             </div>

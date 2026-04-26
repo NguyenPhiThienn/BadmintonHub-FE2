@@ -159,53 +159,49 @@ export const EmployeeTable = memo(({
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </motion.div>
-                                            {canUpdate && (
-                                                <motion.div
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                >
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                size="icon"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    onAction(employee, "edit");
-                                                                }}
-                                                            >
-                                                                <Icon path={mdiSquareEditOutline} size={0.8} className="flex-shrink-0" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            Cập nhật nhân viên
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </motion.div>
-                                            )}
-                                            {canDelete && (
-                                                <motion.div
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                >
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="destructive"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    onDelete(employee._id);
-                                                                }}
-                                                            >
-                                                                <Icon path={mdiTrashCanOutline} size={0.8} className="flex-shrink-0" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            Xóa nhân viên
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </motion.div>
-                                            )}
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            size="icon"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onAction(employee, "edit");
+                                                            }}
+                                                        >
+                                                            <Icon path={mdiSquareEditOutline} size={0.8} className="flex-shrink-0" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Cập nhật nhân viên
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </motion.div>
+                                            <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            size="icon"
+                                                            variant="destructive"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onDelete(employee._id);
+                                                            }}
+                                                        >
+                                                            <Icon path={mdiTrashCanOutline} size={0.8} className="flex-shrink-0" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Xóa nhân viên
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </motion.div>
                                         </div>
                                     </TableCell>
                                 </TableRow>

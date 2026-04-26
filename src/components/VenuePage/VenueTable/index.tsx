@@ -91,6 +91,7 @@ export const VenueTable = memo(({
                                 <TableRow
                                     key={venue._id}
                                     className="cursor-pointer hover:bg-darkBorderV1/50 transition-colors"
+                                    onClick={() => onAction(venue, "view")}
                                 >
                                     <TableCell className="text-center">{rowNumber}</TableCell>
                                     <TableCell className="font-medium text-accent hover:underline cursor-pointer" onClick={() => onAction(venue, "view")}>
@@ -156,27 +157,6 @@ export const VenueTable = memo(({
                                                     </motion.div>
                                                 </>
                                             )}
-
-                                            <motion.div
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                            >
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            size="icon"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                onViewLegal(venue);
-                                                            }}
-                                                        >
-                                                            <Icon path={mdiFileDocumentOutline} size={0.8} />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>Xem tài liệu pháp lý</TooltipContent>
-                                                </Tooltip>
-                                            </motion.div>
-
                                             <motion.div
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}

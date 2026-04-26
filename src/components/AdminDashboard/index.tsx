@@ -209,7 +209,7 @@ export default function AdminDashboardPage() {
   const chartData = chartRes?.data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <header>
         <h1 className="text-3xl font-bold text-white tracking-tight">Bảng điều khiển tổng quan</h1>
         <p className="text-neutral-400 mt-1">Dữ liệu được cập nhật mới nhất theo thời gian thực.</p>

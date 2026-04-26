@@ -94,7 +94,7 @@ export const UserDetailsDialog = ({
             email: formData.email,
             phone: formData.phone
         };
-        
+
         if (formData.password.trim()) {
             payload.password = formData.password.trim();
         }
@@ -148,17 +148,6 @@ export const UserDetailsDialog = ({
                                             <Table>
                                                 <TableBody>
                                                     <TableRow>
-                                                        <TableCell className="text-neutral-300 font-semibold w-[160px]">
-                                                            <div className="flex items-center gap-2">
-                                                                <Icon path={mdiBarcode} size={0.6} className="flex-shrink-0" />
-                                                                <span className="text-nowrap">Mã định danh</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="green">
-                                                                {userData?._id || userData?.id}
-                                                            </Badge>
-                                                        </TableCell>
                                                         <TableCell className="text-neutral-300 font-semibold w-[160px]">
                                                             <div className="flex items-center gap-2">
                                                                 <Icon path={mdiAccount} size={0.6} className="flex-shrink-0" />
@@ -341,9 +330,9 @@ export const UserDetailsDialog = ({
                             onClick={handleSave}
                             disabled={isUpdating}
                         >
-                            <Icon 
-                                path={isUpdating ? mdiLoading : mdiContentSaveOutline} 
-                                size={0.8} 
+                            <Icon
+                                path={isUpdating ? mdiLoading : mdiContentSaveOutline}
+                                size={0.8}
                                 className={isUpdating ? "animate-spin" : ""}
                             />
                             {isUpdating ? "Đang xử lý..." : "Lưu thay đổi"}

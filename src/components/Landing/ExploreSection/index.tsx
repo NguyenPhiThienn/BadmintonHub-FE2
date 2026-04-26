@@ -94,7 +94,7 @@ export const ExploreSection = () => {
 
       {/* AI Recommendations */}
       {recommendedVenues.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <motion.div
             className="flex items-center justify-between max-w-7xl mx-auto"
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
@@ -133,7 +133,7 @@ export const ExploreSection = () => {
       )}
 
       {/* General Venue List */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         <motion.div
           className="flex items-center justify-between max-w-7xl mx-auto"
           initial="hidden" animate="visible" variants={fadeUp} custom={5}

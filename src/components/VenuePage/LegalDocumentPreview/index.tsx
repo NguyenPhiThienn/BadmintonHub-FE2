@@ -34,7 +34,7 @@ export const LegalDocumentPreview = ({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-6 py-4 max-h-[75vh] overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-4 py-4 max-h-[75vh] overflow-y-auto custom-scrollbar pr-2">
                     {documents.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-neutral-400 gap-4">
                             <Icon path={mdiFileDocumentOutline} size={2} className="opacity-20" />
@@ -48,9 +48,9 @@ export const LegalDocumentPreview = ({
                                     <div key={index} className="space-y-2 group">
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium text-neutral-300">Tài liệu #{index + 1}</span>
-                                            <a 
-                                                href={doc} 
-                                                target="_blank" 
+                                            <a
+                                                href={doc}
+                                                target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-xs text-accent hover:underline"
                                             >
@@ -61,9 +61,9 @@ export const LegalDocumentPreview = ({
                                             {isPdf ? (
                                                 <iframe src={doc} className="w-full h-full border-none" title={`Document ${index + 1}`} />
                                             ) : (
-                                                <img 
-                                                    src={doc} 
-                                                    alt={`Legal Document ${index + 1}`} 
+                                                <img
+                                                    src={doc}
+                                                    alt={`Legal Document ${index + 1}`}
                                                     className="w-full h-full object-contain"
                                                 />
                                             )}
@@ -88,7 +88,7 @@ export const LegalDocumentPreview = ({
 
                 <div className="flex justify-end pt-4 border-t border-darkBorderV1">
                     <Button variant="outline" onClick={onClose}>
-                        <Icon path={mdiClose} size={0.7} />
+                        <Icon path={mdiClose} size={0.8} />
                         Đóng
                     </Button>
                 </div>
