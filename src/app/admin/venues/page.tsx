@@ -6,10 +6,11 @@ export const metadata: Metadata = {
     description: "Trang dành cho quản trị viên phê duyệt các cơ sở sân mới đăng ký",
 };
 
-export default function Page({
+export default async function Page({
     searchParams,
 }: {
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+    await searchParams;
     return <VenueApprovalPage />;
 }
