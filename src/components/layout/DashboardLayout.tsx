@@ -120,7 +120,7 @@ function DesktopLayout({ children }: { children: React.ReactNode }) {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -5 }}
                             transition={{ duration: 0.2 }}
-                            className="fixed ml-16 bg-darkCardV1 border border-darkBorderV1 text-accent text-xs font-bold py-2 px-3 rounded-md z-[1000] whitespace-nowrap shadow-xl"
+                            className="fixed ml-16 bg-darkCardV1 border border-darkBorderV1 text-accent text-xs font-semibold py-2 px-3 rounded-md z-[1000] whitespace-nowrap shadow-xl"
                             style={{ top: 'auto' }}
                           >
                             {menu.name}

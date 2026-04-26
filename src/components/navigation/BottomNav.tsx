@@ -41,15 +41,15 @@ export const BottomNav = () => {
               {isActive && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-accent rounded-b-full shadow-[0_0_10px_2px_rgba(65,198,81,0.5)]"></div>
               )}
-              <Icon 
-                path={item.icon} 
-                size={0.8} 
+              <Icon
+                path={item.icon}
+                size={0.8}
                 className={cn(
                   "transition-transform",
                   isActive && "scale-110"
-                )} 
+                )}
               />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-sm font-medium">{item.label}</span>
             </Link>
           );
         })}

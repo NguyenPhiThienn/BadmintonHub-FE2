@@ -41,7 +41,7 @@ export const LegalDocumentPreview = ({
                             <p className="italic">Chủ sở hữu chưa tải lên tài liệu pháp lý nào.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {documents.map((doc, index) => {
                                 const isPdf = doc.toLowerCase().endsWith('.pdf');
                                 return (
@@ -75,7 +75,7 @@ export const LegalDocumentPreview = ({
                     )}
 
                     <div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl space-y-2">
-                        <h4 className="text-sm font-bold text-orange-400 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-orange-400 flex items-center gap-2">
                             Lưu ý phê duyệt:
                         </h4>
                         <ul className="text-xs text-neutral-400 space-y-1 list-disc ml-4">

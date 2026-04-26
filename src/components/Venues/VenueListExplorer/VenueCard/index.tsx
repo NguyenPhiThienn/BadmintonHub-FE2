@@ -65,11 +65,11 @@ export const VenueCard = ({ venue, onClick, userLocation }: VenueCardHorizontalP
                 return <Icon key={star} path={mdiStarOutline} size={0.8} className="text-neutral-600" />;
               }
             })}
-            <span className="text-sm font-bold text-amber-400 ml-1">({Number(venue.averageRating || 4.5).toFixed(1)})</span>
+            <span className="text-sm font-semibold text-amber-400 ml-1">({Number(venue.averageRating || 4.5).toFixed(1)})</span>
           </div>
           <div className="flex items-center gap-1">
             <Icon path={mdiTagOutline} size={0.8} className="text-accent" />
-            <div className="text-accent font-bold text-lg leading-tight">
+            <div className="text-accent font-semibold text-lg leading-tight">
               {(venue.pricePerHour || 120000).toLocaleString()}đ<span className="text-sm">/h</span>
             </div>
           </div>
@@ -88,7 +88,7 @@ export const VenueCard = ({ venue, onClick, userLocation }: VenueCardHorizontalP
       <div className="flex flex-col gap-1 border-t border-darkBorderV1 pt-3">
         <div className="flex items-center gap-1">
           <Icon path={mdiMapMarker} size={0.8} className="flex-shrink-0 text-accent" />
-          <span className="text-neutral-300 text-sm font-bold">Địa chỉ: </span>
+          <span className="text-neutral-300 text-sm font-semibold">Địa chỉ: </span>
         </div>
         <span className="text-neutral-300 text-sm">{venue.address}</span>
 

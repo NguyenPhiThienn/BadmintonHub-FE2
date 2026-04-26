@@ -116,7 +116,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
     return (
       <form onSubmit={handleVerifyOtp} className="space-y-4">
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-bold text-neutral-300">Xác thực Email</h3>
+          <h3 className="text-xl font-semibold text-neutral-300">Xác thực Email</h3>
           <p className="text-sm text-neutral-400">
             Chúng tôi đã gửi mã OTP 4 số đến <span className="text-accent font-semibold">{formData?.email}</span>
           </p>

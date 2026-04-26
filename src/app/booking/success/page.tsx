@@ -226,7 +226,7 @@ const SuccessContent = () => {
               </div>
               <div className="flex items-center gap-1">
                 <Icon path={mdiTagOutline} size={0.8} className="text-accent" />
-                <div className="text-accent font-bold text-2xl leading-tight">
+                <div className="text-accent font-semibold text-2xl leading-tight">
                   {(booking.finalPrice || 0).toLocaleString()}đ
                 </div>
               </div>

@@ -1,31 +1,21 @@
-export interface IStatCardData {
-  value: number;
-  currency?: string;
-  unit?: string;
-  growth: number;
-  trend: "up" | "down";
-  sparkline: number[];
-}
-
 export interface ISummaryStats {
-  totalRevenue: IStatCardData;
-  totalBookings: IStatCardData;
-  newUsers: IStatCardData;
-  occupancyRate: IStatCardData;
+  revenue: number;
+  bookings: number;
+  users: {
+    total: number;
+    players: number;
+    owners: number;
+  };
+  venues: number;
+  occupancyRate: number;
 }
 
-export interface IChartDataset {
-  label: string;
-  data: number[];
-  borderColor: string;
-  backgroundColor: string;
-  borderDash?: number[];
+export interface IChartItem {
+  _id: string;
+  value: number;
 }
 
-export interface IChartData {
-  labels: string[];
-  datasets: IChartDataset[];
-}
+export type IChartData = IChartItem[];
 
 export interface IAdminDashboardResponse<T> {
   statusCode: number;
