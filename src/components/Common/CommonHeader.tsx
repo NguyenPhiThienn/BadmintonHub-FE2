@@ -41,10 +41,10 @@ export default function CommonHeader() {
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex flex-col items-end">
               <span className="text-sm text-neutral-300 font-semibold truncate max-w-[200px]">
-                👋 Xin chào, {profile?.role === "partner" ? (profile?.employeeName || "Đối tác") : (profile?.employee?.position || "Quản trị viên")}
+                👋 Xin chào, {profile?.role === "COURT_OWNER" ? (profile?.employeeName || "Chủ sân") : (profile?.employee?.position || "Quản trị viên")}
               </span>
               <span className="text-xs font-semibold text-accent text-right max-w-[220px] truncate">
-                {profile?.role === "partner" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Admin")}
+                {profile?.role === "COURT_OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
               </span>
             </div>
 

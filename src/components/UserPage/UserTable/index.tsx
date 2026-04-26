@@ -87,6 +87,7 @@ export const UserTable = memo(({
                                 <TableRow
                                     key={id}
                                     className="cursor-pointer hover:bg-darkBorderV1/50 transition-colors"
+                                    onClick={() => onAction(user, "view")}
                                 >
                                     <TableCell className="text-center">{rowNumber}</TableCell>
                                     <TableCell>
