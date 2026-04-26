@@ -201,7 +201,7 @@ export function ConstructionLogsDetailsDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     {isDetailsLoading ? (
                         <div className="space-y-4">
                             <Skeleton className="h-8 w-1/3" />
@@ -214,7 +214,7 @@ export function ConstructionLogsDetailsDialog({
                     ) : !isEditing ? (
                         <div className="space-y-4">
                             {/* Section: Thong tin du an & cong trinh */}
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin dự án &amp; công trình</h3>
                                     <div className="flex-1 border-b border-dashed border-accent" />
@@ -282,7 +282,7 @@ export function ConstructionLogsDetailsDialog({
                             </div>
 
                             {/* Section: Nhat ky thi cong xay dung cong trinh */}
-                            <div className="space-y-3 w">
+                            <div className="space-y-4 w">
                                 <div className="flex items-center gap-3">
                                     <h3 className="text-accent font-semibold whitespace-nowrap">Nhật ký thi công xây dựng công trình</h3>
                                     <div className="flex-1 border-b border-dashed border-accent" />
@@ -758,7 +758,7 @@ export function ConstructionLogsDetailsDialog({
                                 </div>
 
                                 {/* MỤC 13 */}
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     <Label>MỤC 13. Đánh giá của giám sát A</Label>
                                     <div className="flex items-center justify-between gap-4">
                                         <Label>MỤC 13.1. Tiến độ công việc có đáp ứng tiến độ thỏa thuận</Label>

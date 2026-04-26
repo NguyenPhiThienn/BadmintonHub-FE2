@@ -99,7 +99,7 @@ Trước khi hoàn thành một file responsive, tự hỏi:
 
 ### Mobile (chỉ styling lại, dùng cùng data)
 ```tsx
-<div className="bg-darkCardV1 p-3 md:p-4 rounded-xl border border-darkBorderV1 space-y-3 md:space-y-4">
+<div className="bg-darkCardV1 p-3 md:p-4 rounded-xl border border-darkBorderV1 space-y-4 md:space-y-4">
   <div className="flex justify-between items-start">
     <h3 className="font-semibold text-primary">{item.name}</h3>
     {/* Tái sử dụng Badge component — không tạo mới */}

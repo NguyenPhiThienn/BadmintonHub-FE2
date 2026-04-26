@@ -138,7 +138,7 @@ export const TestingStructure = ({ deviceType }: TestingStructureProps) => {
                     ) : (
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext items={localCategories.map(cat => cat._id)} strategy={verticalListSortingStrategy}>
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     {localCategories.map((cat: ITestCategory, index: number) => (
                                         <CategoryTreeView key={cat._id} category={cat} deviceTypeId={deviceType._id} indexString={`${index + 1}`} />
                                     ))}

@@ -191,7 +191,7 @@ export const CategoryDialog = ({ isOpen, onClose, deviceTypeId, parentId, catego
 
                             {contentType === "DROPDOWN" && (
                                 <div className="bg-darkBackgroundV1 border border-dashed border-darkBorderV1 rounded-md p-4">
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <div className="text-sm font-semibold text-accent mb-2">Cấu hình Danh sách Lựa chọn:</div>
                                         <div className="space-y-2">
                                             {dropdownFields.map((field, index) => (
@@ -233,7 +233,7 @@ export const CategoryDialog = ({ isOpen, onClose, deviceTypeId, parentId, catego
 
                             {contentType === "TABLE" && (
                                 <div className="bg-darkBackgroundV1 border border-dashed border-darkBorderV1 rounded-md p-4">
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <div className="text-sm font-semibold text-accent mb-2">Cấu hình Cột của Bảng:</div>
                                         <div className="space-y-2 relative overflow-x-auto pb-2">
                                             {tableFields.map((field, index) => (
@@ -275,7 +275,7 @@ export const CategoryDialog = ({ isOpen, onClose, deviceTypeId, parentId, catego
 
                             {contentType === "MERGE_TABLE" && (
                                 <div className="bg-darkBackgroundV1 border border-dashed border-darkBorderV1 rounded-md p-4">
-                                    <div className="space-y-3">
+                                    <div className="space-y-4">
                                         <div className="text-sm font-semibold text-accent mb-2">Cấu hình Bảng (Gộp ô):</div>
                                         <Controller
                                             name="mergeTableConfig"

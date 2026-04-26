@@ -116,7 +116,7 @@ export default function EmployeePage() {
 
     return (
         <TooltipProvider>
-            <div className="space-y-3 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
+            <div className="space-y-4 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -136,7 +136,7 @@ export default function EmployeePage() {
                 >
                     {/* Section Thanh tìm kiếm và bộ lọc */}
                     {isMobile ? (
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <div className="flex items-center gap-3">
                                 <Button
                                     variant="ghost"

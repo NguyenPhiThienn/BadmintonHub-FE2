@@ -86,9 +86,9 @@ export function CreatePartnerDialog({ isOpen, onClose }: CreatePartnerDialogProp
                         <span>Thêm công ty mới</span>
                     </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-                    <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
-                        <div className="space-y-3 md:space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
+                    <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                        <div className="space-y-4 md:space-y-4">
                             <div className="space-y-1">
                                 <Label htmlFor="partnerName">Tên công ty</Label>
                                 <Input

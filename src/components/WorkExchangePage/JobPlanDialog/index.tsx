@@ -107,8 +107,8 @@ export const JobPlanDialog = ({ isOpen, onClose, plan }: JobPlanDialogProps) => 
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
-                    <form id="job-plan-form" onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                    <form id="job-plan-form" onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
                         <div className="space-y-1">
                             <Label htmlFor="planName">Tên phương án <span className="text-red-500">*</span></Label>
                             <Input

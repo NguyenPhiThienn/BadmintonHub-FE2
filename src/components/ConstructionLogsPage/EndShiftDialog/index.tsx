@@ -60,11 +60,11 @@ export function EndShiftDialog({ isOpen, onClose, log }: EndShiftDialogProps) {
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     <p className="text-sm text-neutral-300">
                         {log.projectName} - {log.location}
                     </p>
-                    <div className="space-y-3 md:space-y-4">
+                    <div className="space-y-4 md:space-y-4">
                         <div className="space-y-2">
                             <Label>Giờ kết thúc</Label>
                             <DatePicker

@@ -68,7 +68,7 @@ function MetricCard({
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-3 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1 animate-pulse">
+    <div className="space-y-4 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1 animate-pulse">
       <div className="flex justify-between items-center">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
@@ -124,7 +124,7 @@ function DashboardSkeleton() {
           <Skeleton className="h-6 w-56" />
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 md:space-y-4">
+          <div className="space-y-4 md:space-y-4">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-14 w-full rounded-lg" />
             ))}
@@ -182,7 +182,7 @@ export default function StatisticsPage() {
     notifications.filter((n: any) => n.priority === "high" || n.type === "borrow_conflict").length;
 
   return (
-    <div className="space-y-3 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1">
+    <div className="space-y-4 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-semibold text-neutral-300">

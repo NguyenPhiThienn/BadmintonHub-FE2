@@ -178,9 +178,9 @@ export const EquipmentDetailsDialog = ({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     {isLoadingEquipment ? (
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             {[...Array(6)].map((_, i) => (
                                 <Skeleton key={i} className="h-12 w-full rounded-lg" />
                             ))}
@@ -207,7 +207,7 @@ export const EquipmentDetailsDialog = ({
                             </TabsList>
 
                             <TabsContent value="info">
-                                <div className="space-y-3 md:space-y-4">
+                                <div className="space-y-4 md:space-y-4">
                                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
                                         <Table>
                                             <TableBody>
@@ -301,8 +301,8 @@ export const EquipmentDetailsDialog = ({
                             </TabsContent>
 
                             <TabsContent value="history">
-                                <div className="space-y-3 md:space-y-4">
-                                    <div className="space-y-3 md:space-y-4">
+                                <div className="space-y-4 md:space-y-4">
+                                    <div className="space-y-4 md:space-y-4">
                                         <div className="flex items-center gap-3 md:gap-4 flex-1">
                                             <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin kiểm định hiện tại</h3>
                                             <div className="flex-1 border-b border-dashed border-accent mr-1" />
@@ -432,7 +432,7 @@ export const EquipmentDetailsDialog = ({
                                             )}
                                         </div>
                                     </div>
-                                    <div className="space-y-3 md:space-y-4">
+                                    <div className="space-y-4 md:space-y-4">
                                         <div className="flex items-center gap-3 md:gap-4">
                                             <h3 className="text-accent font-semibold whitespace-nowrap">Lịch sử kiểm định</h3>
                                             <div className="flex-1 border-b border-dashed border-accent mr-1" />

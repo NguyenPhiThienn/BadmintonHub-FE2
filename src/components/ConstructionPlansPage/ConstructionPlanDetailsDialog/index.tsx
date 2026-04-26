@@ -165,14 +165,14 @@ export function ConstructionPlanDetailsDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     {isLoading ? (
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <Skeleton className="h-[100px] w-full" />
                             <Skeleton className="h-[200px] w-full" />
                         </div>
                     ) : isEditing ? (
-                        <form id="edit-plan-form" onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                        <form id="edit-plan-form" onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
                             <div className="space-y-1">
                                 <Label htmlFor="partnerId">Công ty <span className="text-destructive">*</span></Label>
                                 <Select
@@ -273,8 +273,8 @@ export function ConstructionPlanDetailsDialog({
                             </div>
                         </form>
                     ) : (
-                        <div className="space-y-3 md:space-y-4">
-                            <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
+                            <div className="space-y-4 md:space-y-4">
                                 <div className="flex items-center gap-3 md:gap-4">
                                     <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin cơ bản</h3>
                                     <div className="flex-1 border-b border-dashed border-accent mr-1" />
@@ -318,7 +318,7 @@ export function ConstructionPlanDetailsDialog({
                                 </Card>
                             </div>
 
-                            <div className="space-y-3 md:space-y-4">
+                            <div className="space-y-4 md:space-y-4">
                                 <div className="flex items-center gap-3 md:gap-4">
                                     <h3 className="text-accent font-semibold whitespace-nowrap">Thời gian & Tệp đính kèm</h3>
                                     <div className="flex-1 border-b border-dashed border-accent mr-1" />

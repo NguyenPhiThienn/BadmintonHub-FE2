@@ -7,18 +7,19 @@ export interface IBookingDetail {
 }
 
 export interface IBookingRequest {
-  playerId: string;
+  playerId?: string;
   venueId: string;
   promotionId?: string;
   details: IBookingDetail[];
-  totalPrice: number;
-  finalPrice: number;
+  totalPrice?: number;
+  finalPrice?: number;
 }
 
 export interface IBookingResponse {
   _id: string;
   playerId: string;
   venueId: string;
+  venueName?: string;
   totalPrice: number;
   finalPrice: number;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';

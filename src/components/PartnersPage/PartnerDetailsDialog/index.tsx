@@ -207,16 +207,16 @@ export function PartnerDetailsDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     {isLoading ? (
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <Skeleton className="h-10 w-full" />
                             <Skeleton className="h-20 w-full" />
                             <Skeleton className="h-40 w-full" />
                         </div>
                     ) : isEditing ? (
-                        <form id="edit-partner-form" onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-                            <div className="space-y-3 md:space-y-4">
+                        <form id="edit-partner-form" onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
+                            <div className="space-y-4 md:space-y-4">
                                 <div className="space-y-1">
                                     <Label htmlFor="partnerName">Tên công ty</Label>
                                     <Input
@@ -277,7 +277,7 @@ export function PartnerDetailsDialog({
                             </div>
                         </form>
                     ) : (
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
                                 <Table>
                                     <TableBody>

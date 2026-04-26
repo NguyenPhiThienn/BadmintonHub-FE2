@@ -23,3 +23,11 @@ export const useCreatePaymentUrl = () => {
     mutationFn: (data: IPaymentRequest) => paymentApi.createPaymentUrl(data),
   });
 };
+
+export const useBookingDetails = (id: string) => {
+  return useQuery({
+    queryKey: ["booking", id],
+    queryFn: () => bookingApi.getBookingDetails(id),
+    enabled: !!id,
+  });
+};

@@ -10,12 +10,11 @@ import {
   mdiMapMarker,
   mdiClockOutline,
   mdiCalendar,
-  mdiCheckCircle,
+  mdiSoccerField,
   mdiInformationOutline,
   mdiChartBar,
   mdiChevronRight,
   mdiBadminton,
-  mdiSoccerField
 } from "@mdi/js";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +41,9 @@ import {
   CartesianGrid
 } from "recharts";
 import { cn } from "@/lib/utils";
-import { format, addDays, startOfToday, isSameDay, getDay } from "date-fns";
+import { format, addDays, addHours, startOfToday, isSameDay, getDay } from "date-fns";
+import { useCreateBooking } from "@/hooks/useBooking";
+import { toast } from "react-toastify";
 import { vi } from "date-fns/locale";
 
 import {
@@ -134,6 +135,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const { data: courtsRes } = useVenueCourts(id);
   const { data: demandRes } = useDemandAnalytics(id);
   const { data: pricingRes } = useVenuePricing(id);
+  const { mutate: createBooking, isPending: isBookingLoading } = useCreateBooking();
 
   // FETCH ALL AVAILABILITY AT ONCE
   const { data: availabilityRes, isLoading: isAvailabilityLoading } = useAvailability({
@@ -179,6 +181,38 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
 
   const totalPrice = selectedSlots.reduce((acc, s) => acc + s.price, 0);
 
+  const handleBooking = () => {
+    if (selectedSlots.length === 0) return;
+
+    const payload = {
+      venueId: id,
+      details: selectedSlots.map(slot => {
+        const startTimeStr = `2000-01-01T${slot.time}`;
+        const endTime = format(addHours(new Date(startTimeStr), 1), 'HH:mm');
+
+        return {
+          courtId: slot.courtId,
+          bookingDate: format(selectedDate, 'yyyy-MM-dd'),
+          startTime: slot.time,
+          endTime: endTime
+        };
+      })
+    };
+
+    createBooking(payload, {
+      onSuccess: (res: any) => {
+        toast.success("Đặt sân thành công!");
+        setSelectedSlots([]);
+        if (res?.data?._id) {
+          router.push(`/booking/success?bookingId=${res.data._id}`);
+        }
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || "Đặt sân thất bại. Vui lòng thử lại.");
+      }
+    });
+  };
+
   // Clear selections when date changes
   useEffect(() => {
     setSelectedSlots([]);
@@ -187,6 +221,17 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   if (isVenueLoading) return (
     <div className="h-screen bg-darkBackgroundV1 flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
+  if (!venue) return (
+    <div className="h-screen bg-darkBackgroundV1 flex flex-col items-center justify-center gap-4 text-neutral-400">
+      <Icon path={mdiInformationOutline} size={2} className="text-neutral-500" />
+      <p className="text-lg font-medium">Không tìm thấy thông tin sân này.</p>
+      <Button onClick={() => router.push("/venues")} variant="outline">
+        <Icon path={mdiChevronLeft} size={0.8} />
+        Quay lại danh sách
+      </Button>
     </div>
   );
 
@@ -236,36 +281,37 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
       </div>
 
       <main className="mx-auto px-8 mt-8 space-y-8">
-        {/* Breadcrumb Section */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Trang chủ</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/venues">Cơ sở sân</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{venue?.name || "Chi tiết sân"}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <div className="flex items-center justify-between">
+          {/* Breadcrumb Section */}
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Trang chủ</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/venues">Cơ sở sân</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{venue?.name || "Chi tiết sân"}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        {/* 2. Basic Info */}
-        <section className="flex flex-wrap items-center gap-4">
-          <Badge variant="yellow">
-            <span className="text-nowrap">Đánh giá:</span>
-            {venue?.averageRating || 4.8}
-            <Icon path={mdiStar} size={0.6} className="text-yellow-500" />
-          </Badge>
-          <Badge variant="green">
-            <Icon path={mdiMapMarker} size={0.6} className="text-accent" />
-            <span>{venue?.address}</span>
-          </Badge>
-        </section>
-
+          {/* 2. Basic Info */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="yellow">
+              <span className="text-nowrap">Đánh giá:</span>
+              {Number(venue?.averageRating || 4.5).toFixed(1)}
+              <Icon path={mdiStar} size={0.6} className="text-yellow-500" />
+            </Badge>
+            <Badge variant="green">
+              <Icon path={mdiMapMarker} size={0.6} className="text-accent" />
+              <span>{venue?.address}</span>
+            </Badge>
+          </div>
+        </div>
         {/* 3. AI Demand Analytics */}
         <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -299,7 +345,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
                   dataKey="hour"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#6b7280', fontSize: 11, fontWeight: 500 }}
+                  tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
                   dy={10}
                 />
                 <Tooltip
@@ -315,7 +361,13 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
                   labelStyle={{ color: '#9ca3af', marginBottom: '4px', fontSize: '12px' }}
                   formatter={(value: number) => [`${value.toFixed(0)}%`, 'Nhu cầu']}
                 />
-                <Bar dataKey="level" radius={[6, 6, 0, 0]} barSize={32}>
+                <Bar
+                  dataKey="level"
+                  radius={[12, 12, 0, 0]}
+                  barSize={80}
+                  animationDuration={1500}
+                  animationEasing="ease-out"
+                >
                   {demandData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -333,7 +385,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
         </section>
 
         {/* 4. Sticky Date Picker */}
-        <section className="sticky top-0 z-20 bg-darkBackgroundV1/90 backdrop-blur-md py-4 space-y-4">
+        <section className="sticky top-0 z-20 bg-darkBackgroundV1/90 backdrop-blur-md space-y-4">
           <div className="flex items-center gap-4">
             <h3 className="text-accent font-semibold whitespace-nowrap">Chọn ngày chơi</h3>
             <div className="flex-1 border-b border-dashed border-accent mr-1" />
@@ -437,7 +489,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
       {/* 6. Sticky Footer */}
       <footer className="fixed bottom-0 left-0 right-0 z-30 bg-darkBackgroundV2/80 backdrop-blur-xl border-t border-darkBorderV1 p-4 flex items-center justify-between gap-4 shadow-2xl">
         <div className="space-y-1">
-          <span className="text-neutral-400 text-sm font-medium">
+          <span className="text-neutral-400 text-base font-medium">
             {selectedSlots.length} slot đã chọn
           </span>
           <div className="flex items-baseline gap-1">
@@ -448,25 +500,15 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           </div>
         </div>
         <Button
-          disabled={selectedSlots.length === 0}
-          onClick={() => {
-            const firstSlot = selectedSlots[0];
-            const query = new URLSearchParams({
-              venueId: id,
-              venueName: venue?.name || "",
-              courtName: availabilityData.find(a => a.courtId === firstSlot.courtId)?.courtName || "",
-              courtId: firstSlot.courtId,
-              date: format(selectedDate, 'yyyy-MM-dd'),
-              startTime: firstSlot.time,
-              endTime: format(addDays(new Date(`2000-01-01T${firstSlot.time}`), 1 / 24), 'HH:mm'),
-              price: totalPrice.toString()
-            }).toString();
-            router.push(`/booking?${query}`);
-          }}
-          className="h-12 px-8 rounded-xl text-sm font-semibold bg-accent hover:bg-accent/90 text-white flex items-center gap-2"
+          disabled={selectedSlots.length === 0 || isBookingLoading}
+          onClick={handleBooking}
         >
-          <Icon path={mdiCheckCircle} size={0.8} />
-          ĐẶT SÂN NGAY
+          {isBookingLoading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <Icon path={mdiSoccerField} size={0.8} />
+          )}
+          {isBookingLoading ? "Đang xử lý..." : "Đặt sân ngay"}
         </Button>
       </footer>
     </div>

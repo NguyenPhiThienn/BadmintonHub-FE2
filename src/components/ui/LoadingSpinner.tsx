@@ -49,7 +49,7 @@ export function LoadingSpinnerWithText({
 }: LoadingSpinnerProps & { text?: string }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center space-y-3 md:space-y-4 ${className}`}
+      className={`flex flex-col items-center justify-center space-y-4 md:space-y-4 ${className}`}
     >
       <LoadingSpinner size={size} />
       <p className="text-neutral-300 font-semibold animate-pulse">{text}</p>

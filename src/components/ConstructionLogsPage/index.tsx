@@ -134,7 +134,7 @@ export default function ConstructionLogsPage() {
     const [isEditingDetails, setIsEditingDetails] = useState(false);
 
     return (
-        <div className="space-y-3 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
+        <div className="space-y-4 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>

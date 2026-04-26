@@ -136,7 +136,7 @@ function OtpForm({
         />
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <Button
           type="button"
           onClick={handleVerifyOtp}
@@ -380,13 +380,13 @@ function MobileLoginPage({
       <div className="w-full max-w-sm bg-darkBorderV1/50 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative z-10 p-4">
         <div className="max-w-md mx-auto w-full space-y-4">
           {/* Header */}
-          <div className="text-center space-y-3 md:space-y-4 flex flex-col items-center">
+          <div className="text-center space-y-4 md:space-y-4 flex flex-col items-center">
             <img src="/images/logo.webp" alt="Logo" className="h-24 w-24 rounded-full" draggable={false} />
             <h2 className="text-xl font-semibold text-secondary uppercase">
               Đăng nhập hệ thống
             </h2>
             <p className="text-neutral-400 text-sm text-center">
-              CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN ELECTRIC AUTOMATION SOLUTION
+              Đăng nhập vào BadmintonHub với quyền quản trị viên
             </p>
           </div>
 
@@ -541,13 +541,13 @@ function TabletLoginPage({
           <div className="p-10">
             <div className="max-w-md mx-auto w-full space-y-8">
               {/* Header */}
-              <div className="text-center space-y-3 md:space-y-4 flex flex-col items-center">
+              <div className="text-center space-y-4 md:space-y-4 flex flex-col items-center">
                 <img src="/images/logo.webp" alt="Logo" className="h-24 w-24" draggable={false} />
                 <h2 className="text-2xl font-semibold text-primary uppercase">
                   Đăng nhập hệ thống
                 </h2>
                 <p className="text-neutral-400 text-sm">
-                  CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN ELECTRIC AUTOMATION SOLUTION
+                  Đăng nhập vào BadmintonHub với quyền quản trị viên
                 </p>
               </div>
 
@@ -703,7 +703,7 @@ function DesktopLoginPage({
 
           {/* Right Form */}
           <div className="p-8 flex flex-col justify-center bg-darkCardV1">
-            <div className="max-w-md mx-auto w-full space-y-3 md:space-y-4">
+            <div className="max-w-md mx-auto w-full space-y-4 md:space-y-4">
               {/* Header */}
               <div className="text-center space-y-2 flex flex-col items-center">
                 <img src="/images/logo.webp" alt="" className="h-28 w-28 rounded-full" draggable={false} />
@@ -711,7 +711,7 @@ function DesktopLoginPage({
                   Đăng nhập hệ thống
                 </h2>
                 <p className="text-neutral-400 text-base">
-                  CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN ELECTRIC AUTOMATION SOLUTION
+                  Đăng nhập vào BadmintonHub với quyền quản trị viên
                 </p>
               </div>
 
@@ -727,7 +727,7 @@ function DesktopLoginPage({
                 />
               ) : (
                 /* Form */
-                <form className="space-y-3 md:space-y-4" onSubmit={handleSubmit}>
+                <form className="space-y-4 md:space-y-4" onSubmit={handleSubmit}>
                   {errors.general && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
                       {errors.general}

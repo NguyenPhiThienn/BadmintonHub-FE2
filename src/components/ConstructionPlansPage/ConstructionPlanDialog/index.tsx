@@ -174,7 +174,7 @@ export function ConstructionPlanDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     <form id="plan-form" onSubmit={handleSubmit} className="space-y-4 py-2">
                         {!isEditing && (
                             <div className="space-y-2">

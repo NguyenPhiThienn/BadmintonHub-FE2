@@ -175,8 +175,8 @@ export function CreateConstructionPlanDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
-                    <form id="create-plan-form" onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                    <form id="create-plan-form" onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
                         <div className="space-y-1">
                             <Label htmlFor="partnerId">Công ty <span className="text-destructive">*</span></Label>
                             <Select

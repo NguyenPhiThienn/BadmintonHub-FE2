@@ -172,7 +172,7 @@ export function ResetPasswordDialog({
                         </Card>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         <div className="flex items-center gap-3 md:gap-4">
                             <h3 className="text-primary font-semibold whitespace-nowrap">Thiết lập mật khẩu mới</h3>
                             <div className="flex-1 border-b border-dashed border-primary mr-1" />

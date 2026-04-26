@@ -130,7 +130,7 @@ export default function EquipmentPage() {
 
     return (
         <TooltipProvider>
-            <div className="space-y-3 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
+            <div className="space-y-4 md:space-y-4 bg-darkCardV1  p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -150,7 +150,7 @@ export default function EquipmentPage() {
                 >
                     <div className="flex flex-col gap-3 md:gap-4">
                         {isMobile ? (
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <div className="flex gap-3">
                                     <Button
                                         onClick={handleRefresh}
@@ -209,13 +209,13 @@ export default function EquipmentPage() {
                         ) : isTablet ? (
                             <div className="flex flex-col gap-3 mb-2">
                                 <div className="relative w-full">
-                                     <Input
-                                         placeholder="Tìm kiếm dụng cụ (tên, mã, Hãng sản xuất)..."
-                                         value={searchQuery}
-                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                         onClear={() => setSearchQuery("")}
-                                         className="pl-8 py-2 w-full"
-                                     />
+                                    <Input
+                                        placeholder="Tìm kiếm dụng cụ (tên, mã, Hãng sản xuất)..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onClear={() => setSearchQuery("")}
+                                        className="pl-8 py-2 w-full"
+                                    />
                                     <Icon path={mdiMagnify} size={0.8} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-300" />
                                 </div>
                                 <div className="flex items-center justify-between gap-3 md:gap-4">

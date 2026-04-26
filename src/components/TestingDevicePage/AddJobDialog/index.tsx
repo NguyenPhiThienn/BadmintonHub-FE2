@@ -265,7 +265,7 @@ export const AddJobDialog = ({ isOpen, onClose, device }: AddJobDialogProps) => 
                         <span>Thêm mới công việc thí nghiệm</span>
                     </DialogTitle>
                 </DialogHeader>
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList>
                             <TabsTrigger value="info">
@@ -700,7 +700,7 @@ const TestCategorySection = ({ category, results, onChange }: TestCategorySectio
                 </div>
             </div>
 
-            <div className={cn("space-y-3 relative", categoryResult.isSkipped && "pointer-events-none")}>
+            <div className={cn("space-y-4 relative", categoryResult.isSkipped && "pointer-events-none")}>
                 {!categoryResult.isSkipped ? (
                     <>
                         <ResultInputControl
@@ -710,7 +710,7 @@ const TestCategorySection = ({ category, results, onChange }: TestCategorySectio
                         />
                         {/* Nested children if any */}
                         {category.children && category.children.length > 0 && (
-                            <div className="ml-3 pl-3 border-l border-darkBorderV1 space-y-3">
+                            <div className="ml-3 pl-3 border-l border-darkBorderV1 space-y-4">
                                 {category.children.map(child => (
                                     <TestCategorySection
                                         key={child._id}
@@ -866,7 +866,7 @@ const DynamicTableControl = ({ config, value, onChange }: { config: any, value: 
     };
 
     return (
-        <div className="space-y-3 md:space-y-4 pt-2">
+        <div className="space-y-4 md:space-y-4 pt-2">
             <div className="overflow-x-auto border border-darkBorderV1">
                 <table className="w-full text-sm text-center border-collapse">
                     <thead>

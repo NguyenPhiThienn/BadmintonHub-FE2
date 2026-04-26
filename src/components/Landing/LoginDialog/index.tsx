@@ -122,7 +122,7 @@ function OtpForm({
                 />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
                 <Button
                     type="button"
                     onClick={handleVerifyOtp}
@@ -332,7 +332,7 @@ export function LoginDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 <style>{`.grecaptcha-badge { visibility: hidden !important; opacity: 0 !important; }`}</style>
                 <div id="recaptcha-container"></div>
                 <div className="p-4 py-6 flex flex-col justify-center bg-white rounded-3xl overflow-hidden">
-                    <div className="w-full space-y-3 md:space-y-4">
+                    <div className="w-full space-y-4 md:space-y-4">
                         {/* Header */}
                         <div className="text-center space-y-2 flex flex-col items-center">
                             <img src="/images/logo.webp" alt="" className="h-28 w-28 rounded-full" draggable={false} />
@@ -340,7 +340,7 @@ export function LoginDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                                 Đăng nhập hệ thống
                             </DialogTitle>
                             <DialogDescription className="text-gray-500 text-base text-center">
-                                CÔNG TY TNHH GIẢI PHÁP TỰ ĐỘNG ĐIỆN ELECTRIC AUTOMATION SOLUTION
+                                Đăng nhập vào BadmintonHub với quyền quản trị viên
                             </DialogDescription>
                         </div>
 

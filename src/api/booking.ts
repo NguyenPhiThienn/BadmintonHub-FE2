@@ -1,16 +1,18 @@
 import { sendGet, sendPost } from "./axios";
-import { 
-  IBookingRequest, 
-  IBookingResponse, 
-  IVoucherCheckRequest, 
-  IVoucherCheckResponse, 
-  IPaymentRequest, 
-  IPaymentResponse 
+import {
+  IBookingRequest,
+  IBookingResponse,
+  IVoucherCheckRequest,
+  IVoucherCheckResponse,
+  IPaymentRequest,
+  IPaymentResponse
 } from "@/interface/booking";
 
 export const bookingApi = {
   createBooking: (data: IBookingRequest) =>
     sendPost("/bookings", data),
+  getBookingDetails: (id: string) =>
+    sendGet(`/bookings/${id}`),
 };
 
 export const promotionApi = {

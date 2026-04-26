@@ -106,7 +106,7 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     <form id="create-log-form" onSubmit={handleSubmit} className="space-y-4">
 
                         {/* Section 1: Thông tin dự án */}
@@ -344,7 +344,7 @@ export function CreateConstructionLogDialog({ isOpen, onClose }: CreateConstruct
                             </div>
 
                             {/* MỤC 13 */}
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <Label>MỤC 13. Đánh giá của giám sát A</Label>
                                 <div className="flex items-center justify-between gap-4">
                                     <Label>MỤC 13.1. Tiến độ công việc có đáp ứng tiến độ thỏa thuận</Label>

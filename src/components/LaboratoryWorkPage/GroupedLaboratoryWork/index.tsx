@@ -74,7 +74,7 @@ export const GroupedLaboratoryWork = ({
                         <AccordionContent className="pb-0 pt-2">
                             <div className="relative">
                                 {/* Level 2: Years - Child Style */}
-                                <div className="relative ml-[17px] border-l-2 border-darkBorderV1 pl-6 py-2 space-y-3">
+                                <div className="relative ml-[17px] border-l-2 border-darkBorderV1 pl-6 py-2 space-y-4">
                                     {partner.years.map((yearGroup) => (
                                         <div key={yearGroup.year} className="relative">
                                             {/* Horizontal Connector to Year */}
@@ -90,7 +90,7 @@ export const GroupedLaboratoryWork = ({
                                             </div>
 
                                             {/* Level 3: Bays - Child Style */}
-                                            <div className="relative ml-[17px] border-l-2 border-darkBorderV1 pl-6 py-2 space-y-3">
+                                            <div className="relative ml-[17px] border-l-2 border-darkBorderV1 pl-6 py-2 space-y-4">
                                                 {yearGroup.bays.map((bay) => (
                                                     <div key={bay.bayId} className="relative">
                                                         {/* Horizontal Connector to Bay */}

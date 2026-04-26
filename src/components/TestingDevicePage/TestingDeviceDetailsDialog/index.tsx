@@ -282,7 +282,7 @@ export const TestingDeviceDetailsDialog = ({
                         <span>Hồ sơ thiết bị: {device?.operatingName || "Chưa cập nhật"}</span>
                     </DialogTitle>
                 </DialogHeader>
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                     <Tabs defaultValue="info" className="w-full">
                         <TabsList>
                             <TabsTrigger value="info">

@@ -115,10 +115,10 @@ export const EquipmentEditDialog = ({
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
-                    <form id="equipment-edit-form" onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                    <form id="equipment-edit-form" onSubmit={handleSubmit} className="space-y-4 md:space-y-4">
                         {/* Section 1: Basic Info */}
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <div className="flex items-center gap-3 md:gap-4">
                                 <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin cơ bản</h3>
                                 <div className="flex-1 border-b border-dashed border-accent mr-1" />
@@ -203,7 +203,7 @@ export const EquipmentEditDialog = ({
                         </div>
 
                         {/* Section 2: Equipment History / Inspection */}
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-4">
                             <div className="flex items-center gap-3 md:gap-4">
                                 <h3 className="text-accent font-semibold whitespace-nowrap">Lý lịch thiết bị</h3>
                                 <div className="flex-1 border-b border-dashed border-accent mr-1" />

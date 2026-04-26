@@ -28,7 +28,7 @@ Các Dialog trong dự án phải tuân thủ cấu trúc và quy chuẩn sau đ
             </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
+        <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
            {/* Nội dung Dialog đặt tại đây */}
         </div>
 

@@ -24,7 +24,7 @@ interface AuthDialogsProps {
 
 const authModeConfigs: Record<Exclude<AuthMode, null>, { title: string; icon: string }> = {
   login: {
-    title: "Đăng nhập hệ thống",
+    title: "Đăng nhập",
     icon: mdiLogin,
   },
   register: {
@@ -50,6 +50,7 @@ export const AuthDialogs = ({ mode, setMode }: AuthDialogsProps) => {
           <LoginForm
             onSwitchRegister={() => setMode("register")}
             onSwitchForgot={() => setMode("forgot-password")}
+            onSuccess={handleClose}
             isDialog={true}
           />
         );

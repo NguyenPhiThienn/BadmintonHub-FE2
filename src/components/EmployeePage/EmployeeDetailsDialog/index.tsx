@@ -423,11 +423,11 @@ export const EmployeeDetailsDialog = ({
                         </DialogTitle>
                     </DialogHeader>
 
-                    <div className="space-y-3 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
+                    <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar p-3 md:p-4">
                         {!isEditing ? (
-                            <div className="space-y-3 md:space-y-4">
+                            <div className="space-y-4 md:space-y-4">
                                 {isDetailsLoading ? (
-                                    <div className="space-y-3 md:space-y-4">
+                                    <div className="space-y-4 md:space-y-4">
                                         {[...Array(5)].map((_, i) => (
                                             <div key={i} className="space-y-2">
                                                 <Skeleton className="h-4 w-28" />
@@ -565,7 +565,7 @@ export const EmployeeDetailsDialog = ({
                                             </Card>
                                         </div>
                                         {isAdmin && (
-                                            <div className="space-y-3 md:space-y-4 mt-4">
+                                            <div className="space-y-4 md:space-y-4 mt-4">
                                                 <div className="flex items-center gap-3 md:gap-4">
                                                     <h3 className="text-accent font-semibold whitespace-nowrap">Chữ ký điện tử</h3>
                                                     <div className="flex-1 border-b border-dashed border-accent  mr-1" />
@@ -592,7 +592,7 @@ export const EmployeeDetailsDialog = ({
                                             </div>
                                         )}
                                         {isAdmin && (
-                                            <div className="space-y-3 md:space-y-4 mt-4">
+                                            <div className="space-y-4 md:space-y-4 mt-4">
                                                 <div className="flex items-center gap-3 md:gap-4">
                                                     <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin quyền hạn</h3>
                                                     <div className="flex-1 border-b border-dashed border-accent  mr-1" />
@@ -625,7 +625,7 @@ export const EmployeeDetailsDialog = ({
                                                             )}
 
                                                             {mod.subMenu && (
-                                                                <div className="ml-4 space-y-3 mt-2 border-l border-darkBorderV1/50 pl-4">
+                                                                <div className="ml-4 space-y-4 mt-2 border-l border-darkBorderV1/50 pl-4">
                                                                     {mod.subMenu.map((sub) => (
                                                                         <div key={sub.id} className="space-y-1.5">
                                                                             <div className="flex items-center gap-2 select-none pointer-events-none">

@@ -17,9 +17,10 @@ interface LoginFormProps {
   onSwitchRegister?: () => void;
   onSwitchForgot?: () => void;
   isDialog?: boolean;
+  onSuccess?: () => void;
 }
 
-export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog }: LoginFormProps) => {
+export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog, onSuccess }: LoginFormProps) => {
   const router = useRouter();
   const { mutateAsync: login, isPending } = useLogin();
   const { loginUser: setUserContext, fetchUserProfile } = useUser();
@@ -51,6 +52,7 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog }: LoginF
 
         toast.success(response.message || "Đăng nhập thành công");
         router.push("/");
+        if (onSuccess) onSuccess();
       }
     } catch (error: any) {
       toast.error(error?.message || "Đăng nhập thất bại");
@@ -58,7 +60,7 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog }: LoginF
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" autoComplete="off">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
       <div className="space-y-1">
         <Label htmlFor="identifier">Email hoặc Số điện thoại</Label>
         <div className="relative">
@@ -68,7 +70,7 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog }: LoginF
           <Input
             id="identifier"
             {...register("identifier", { required: "Vui lòng nhập email hoặc số điện thoại" })}
-            placeholder="example@gmail.com"
+            placeholder="Ví dụ: example@gmail.com"
             className="pl-10"
             autoComplete="off"
           />
@@ -106,7 +108,6 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog }: LoginF
             id="password"
             type={showPassword ? "text" : "password"}
             {...register("password", { required: "Vui lòng nhập mật khẩu" })}
-            placeholder="••••••••"
             className="pl-10 pr-10"
             autoComplete="new-password"
           />

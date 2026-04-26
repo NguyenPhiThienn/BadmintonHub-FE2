@@ -61,42 +61,48 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
 	(response) => {
 		if (response.data && typeof response.data.statusCode === "number" && response.data.statusCode >= 400) {
-			return Promise.reject({
+			const errorData = {
 				response: {
 					...response,
 					status: response.data.statusCode,
 					data: response.data
 				},
-				message: response.data.message
-			});
+				message: response.data.message || "An error occurred"
+			};
+
+			if (response.data.statusCode === 401 && !response.config.url?.includes("login")) {
+				handleUnauthorized();
+			}
+
+			return Promise.reject(errorData);
 		}
 		return response;
 	},
 	async (error) => {
-		if (error.response?.status === 401) {
-			const errorMessage = error.response?.data?.message || "";
-			if (errorMessage.includes("No token") || errorMessage.includes("token") || errorMessage.includes("unauthorized")) {
-				if (typeof window !== "undefined") {
-					const token = getLocalAccessToken();
-					if (!token) {
-						localStorage.removeItem("accessToken");
-						localStorage.removeItem("token");
-						localStorage.removeItem("userProfile");
-						cookies.remove("accessToken");
-						if (window.location.pathname !== '/admin/login') {
-							window.location.href = '/admin/login';
-						}
-					}
-				}
-			}
+		if (error.response?.status === 401 && !error.config?.url?.includes("login")) {
+			handleUnauthorized();
 		}
-
 		return Promise.reject(error);
 	}
 );
+
+function handleUnauthorized() {
+	if (typeof window !== "undefined") {
+		logout();
+		if (window.location.pathname !== "/") {
+			window.location.href = "/";
+		} else {
+			window.location.reload();
+		}
+	}
+}
+
 export function logout() {
 	cookies.remove("accessToken");
-	localStorage?.clear();
+	localStorage.removeItem("accessToken");
+	localStorage.removeItem("token");
+	localStorage.removeItem("user");
+	localStorage.removeItem("userProfile");
 }
 
 export const sendGet = async (url: string, params?: any): Promise<any> => {
