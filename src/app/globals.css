@@ -334,15 +334,15 @@ button[type="button"].absolute:focus {
 
 @keyframes skeleton-pulse {
   0% {
-    background-color: #303030;
+    background-color: #56675b;
   }
 
   50% {
-    background-color: #5A5A5A;
+    background-color: #6c8072;
   }
 
   100% {
-    background-color: #303030;
+    background-color: #56675b;
   }
 }
 

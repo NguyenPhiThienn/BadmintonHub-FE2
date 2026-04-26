@@ -388,7 +388,6 @@ export default function EmployeePage() {
                     title={`Xóa nhân viên: ${selectedEmployee?.fullName || ""}`}
                     description="Bạn có chắc chắn muốn xóa nhân viên này không? Hệ thống sẽ chuyển trạng thái sang ngưng hoạt động."
                     confirmText="Xóa nhân viên"
-                    successMessage="Xóa nhân viên thành công"
                     errorMessage="Xóa nhân viên thất bại"
                 />
 

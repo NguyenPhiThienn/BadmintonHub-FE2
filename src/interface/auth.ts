@@ -7,14 +7,14 @@ export type DriverStatus = 'PENDING' | 'APPROVED' | 'LOCKED' | 'REJECTED';
 
 export interface IUser {
   id: string;
-  _id?: string; // MongoDB ID
-  full_name: string;
+  _id?: string;
+  fullName: string;
   email: string;
   phone: string;
   role: UserRole | string;
-  avatar_url?: string;
+  avatarUrl?: string;
   username?: string;
-  fullName?: string;
+  full_name?: string;
   avatar?: string;
   phoneNumber?: string;
   employeeId?: string;

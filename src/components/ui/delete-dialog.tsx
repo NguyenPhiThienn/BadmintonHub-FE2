@@ -23,7 +23,6 @@ interface DeleteDialogProps {
   title: string;
   description: string;
   confirmText: string;
-  successMessage: string;
   errorMessage: string;
   warningMessage?: string;
 }
@@ -36,13 +35,11 @@ export const DeleteDialog = ({
   title,
   description,
   confirmText,
-  successMessage,
   errorMessage,
 }: DeleteDialogProps) => {
   const handleConfirm = async () => {
     try {
       await onConfirm();
-      toast.success(successMessage);
       onClose();
     } catch (error: any) {
       toast.error(error?.response?.data?.message || errorMessage);
