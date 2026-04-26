@@ -87,14 +87,14 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog, onSucces
             <button
               type="button"
               onClick={onSwitchForgot}
-              className="text-sm text-accent hover:underline"
+              className="text-accent font-semibold hover:underline text-sm"
             >
               Quên mật khẩu?
             </button>
           ) : (
             <Link
               href="/forgot-password"
-              className="text-sm text-accent hover:underline"
+              className="text-accent font-semibold hover:underline text-sm"
             >
               Quên mật khẩu?
             </Link>

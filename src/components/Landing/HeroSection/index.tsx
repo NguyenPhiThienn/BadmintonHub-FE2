@@ -96,7 +96,7 @@ export function HeroSection() {
                         <motion.p
                             custom={2}
                             variants={fadeUp}
-                            className="mt-6 max-w-xl text-lg leading-relaxed text-secondary/80 lg:text-xl"
+                            className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-400 lg:text-xl"
                         >
                             Giải pháp toàn diện để tìm sân và đặt chỗ nhanh chóng.
                             Tích hợp công nghệ AI giúp bạn tối ưu hóa trải nghiệm và kết nối đam mê cầu lông.

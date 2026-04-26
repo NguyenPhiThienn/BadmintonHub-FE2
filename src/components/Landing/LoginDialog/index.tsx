@@ -150,7 +150,7 @@ function OtpForm({
                     )}
                 >
                     <Icon path={mdiKeyboardBackspace} size={0.8} className="flex-shrink-0" />
-                    Quay lại đăng nhập
+                    <span className="font-semibold text-sm">Quay lại đăng nhập</span>
                 </button>
             </div>
         </div>
