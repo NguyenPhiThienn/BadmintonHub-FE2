@@ -1,5 +1,5 @@
-import { sendGet, sendPost, sendPatch, sendDelete } from "./axios";
-import { IVenueResponse, IAIRecommendationRequest, IAIRecommendationResponse } from "@/interface/venue";
+import { IAIRecommendationRequest } from "@/interface/venue";
+import { sendDelete, sendGet, sendPatch, sendPost, sendPut } from "./axios";
 
 export const venueApi = {
   getVenues: (params?: { 
@@ -50,4 +50,10 @@ export const venueApi = {
 
   deleteVenue: (id: string) =>
     sendDelete(`/admin/venues/${id}`),
+
+  createVenue: (data: any) =>
+    sendPost("/venues", data),
+
+  updateVenue: (id: string, data: any) =>
+    sendPut(`/venues/${id}`, data),
 };

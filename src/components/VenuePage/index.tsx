@@ -21,9 +21,9 @@ import {
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
-import { useAdminVenues, useDeleteVenue, useUpdateVenueStatus } from "@/hooks/useVenue";
+import { useAdminVenues, useDeleteVenue, useUpdateVenueStatus, useCreateVenue, useUpdateVenue } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
-import { mdiChevronRight, mdiMagnify, mdiRefresh } from "@mdi/js";
+import { mdiChevronRight, mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -31,6 +31,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { LegalDocumentPreview } from "./LegalDocumentPreview";
 import { VenueDetailsDialog } from "./VenueDetailsDialog";
+import { VenueDialog } from "./VenueDialog";
 import { VenueTable } from "./VenueTable";
 
 export default function VenuePage() {
@@ -48,6 +49,8 @@ export default function VenuePage() {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+    const [isVenueDialogOpen, setIsVenueDialogOpen] = useState(false);
+    const [venueDialogMode, setVenueDialogMode] = useState<"create" | "edit">("create");
     const [selectedVenue, setSelectedVenue] = useState<IVenue | null>(null);
 
     const { isMobile } = useResponsive();
@@ -99,6 +102,8 @@ export default function VenuePage() {
 
     const { mutate: updateStatus } = useUpdateVenueStatus();
     const { mutate: deleteVenueMutation, isPending: isDeleting } = useDeleteVenue();
+    const { mutate: createVenue, isPending: isCreating } = useCreateVenue();
+    const { mutate: updateVenue, isPending: isUpdating } = useUpdateVenue();
 
     const venues = pendingRes?.data?.venues || [];
     const pagination = pendingRes?.data?.pagination;
@@ -134,7 +139,38 @@ export default function VenuePage() {
         if (mode === "view") {
             setIsDetailsDialogOpen(true);
         } else {
-            toast.info(`Tính năng cập nhật sân ${venue.name} đang được phát triển.`);
+            setVenueDialogMode("edit");
+            setIsVenueDialogOpen(true);
+        }
+    };
+
+    const handleCreateVenue = () => {
+        setSelectedVenue(null);
+        setVenueDialogMode("create");
+        setIsVenueDialogOpen(true);
+    };
+
+    const handleVenueSubmit = async (data: any) => {
+        if (venueDialogMode === "create") {
+            createVenue(data, {
+                onSuccess: () => {
+                    toast.success("Tạo cơ sở sân mới thành công!");
+                    setIsVenueDialogOpen(false);
+                },
+                onError: (error: any) => {
+                    toast.error(error?.response?.data?.message || "Tạo cơ sở sân thất bại.");
+                }
+            });
+        } else if (selectedVenue) {
+            updateVenue({ id: selectedVenue._id, data }, {
+                onSuccess: () => {
+                    toast.success("Cập nhật cơ sở sân thành công!");
+                    setIsVenueDialogOpen(false);
+                },
+                onError: (error: any) => {
+                    toast.error(error?.response?.data?.message || "Cập nhật cơ sở sân thất bại.");
+                }
+            });
         }
     };
 
@@ -165,19 +201,26 @@ export default function VenuePage() {
     return (
         <TooltipProvider>
             <div className="space-y-4 md:space-y-4 bg-darkCardV1 p-3 md:p-4 rounded-2xl border border-darkBorderV1 min-h-[80vh]">
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className="text-neutral-500">Dashboard</BreadcrumbPage>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator>
-                            <Icon path={mdiChevronRight} size={0.6} />
-                        </BreadcrumbSeparator>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Quản lý cơ sở sân</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
+                <div className="flex items-center justify-between">
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage className="text-neutral-500">Dashboard</BreadcrumbPage>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator>
+                                <Icon path={mdiChevronRight} size={0.6} />
+                            </BreadcrumbSeparator>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>Quản lý cơ sở sân</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+
+                    <Button variant="accent" className="gap-2" onClick={handleCreateVenue}>
+                        <Icon path={mdiPlus} size={0.8} />
+                        Thêm cơ sở sân mới
+                    </Button>
+                </div>
 
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -270,6 +313,18 @@ export default function VenuePage() {
                         setSelectedVenue(null);
                     }}
                     venue={selectedVenue}
+                />
+
+                <VenueDialog
+                    isOpen={isVenueDialogOpen}
+                    onClose={() => {
+                        setIsVenueDialogOpen(false);
+                        setSelectedVenue(null);
+                    }}
+                    onSubmit={handleVenueSubmit}
+                    initialData={selectedVenue}
+                    mode={venueDialogMode}
+                    isSubmitting={isCreating || isUpdating}
                 />
 
                 <DeleteDialog

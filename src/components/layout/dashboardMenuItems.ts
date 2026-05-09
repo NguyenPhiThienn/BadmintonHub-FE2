@@ -2,7 +2,6 @@ import { MenuItem } from "@/interface/types";
 import {
   mdiAccountGroupOutline,
   mdiCalendarClock,
-  mdiCommentQuestionOutline,
   mdiSoccerField,
   mdiViewDashboardOutline
 } from "@mdi/js";
@@ -32,12 +31,6 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       name: "Quản lý đặt sân",
       path: "/admin/bookings",
       icon: mdiCalendarClock,
-    },
-    {
-      id: "support-center",
-      name: "Trung tâm hỗ trợ",
-      path: "/admin/support",
-      icon: mdiCommentQuestionOutline,
     },
   ];
 

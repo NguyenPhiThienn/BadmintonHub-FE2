@@ -13,8 +13,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { IVenue } from "@/interface/venue";
 import {
     mdiCheck,
+    mdiClockOutline,
     mdiClose,
+    mdiCurrencyUsd,
     mdiEyeOutline,
+    mdiMapMarkerOutline,
     mdiPlaylistRemove,
     mdiSquareEditOutline,
     mdiTrashCanOutline

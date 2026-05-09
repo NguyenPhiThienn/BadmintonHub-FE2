@@ -26,6 +26,7 @@ export interface IVenue {
     type: string;
     coordinates: [number, number]; // [lng, lat]
   };
+  courts?: ICourt[];
 }
 
 export interface IVenueResponse {

@@ -107,3 +107,26 @@ export const useDeleteVenue = () => {
     },
   });
 };
+
+export const useCreateVenue = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => venueApi.createVenue(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
+      queryClient.invalidateQueries({ queryKey: ["venues"] });
+    },
+  });
+};
+
+export const useUpdateVenue = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => venueApi.updateVenue(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
+      queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["venue", id] });
+    },
+  });
+};
