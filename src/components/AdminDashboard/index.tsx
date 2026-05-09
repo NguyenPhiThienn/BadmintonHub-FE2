@@ -1,15 +1,15 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useChartData, useSummaryStats } from "@/hooks/useAdmin";
-import { mdiTrendingDown, mdiTrendingUp, mdiMapMarkerRadius, mdiCalendarCheck, mdiAccountGroup, mdiFinance, mdiPlaylistRemove } from "@mdi/js";
+import { IChartData, ISummaryStats } from "@/interface/admin";
+import { mdiAccountGroup, mdiCalendarCheck, mdiFinance, mdiMapMarkerRadius } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { motion } from "framer-motion";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { IChartData, ISummaryStats } from "@/interface/admin";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const StatCard = ({ title, value, subValue, icon, color, isCurrency, unit, delay = 0 }: any) => {
   return (
@@ -27,7 +27,7 @@ const StatCard = ({ title, value, subValue, icon, color, isCurrency, unit, delay
           </div>
 
           <div className="flex items-center justify-between gap-4 overflow-hidden">
-            <p className="text-neutral-400 text-sm font-medium tracking-wide uppercase truncate">{title}</p>
+            <p className="text-neutral-400 text-sm font-medium uppercase truncate">{title}</p>
             <h3 className="text-xl font-semibold text-neutral-300 tracking-tight whitespace-nowrap">
               {isCurrency ? (value / 1000000).toFixed(1) + "M" : value?.toLocaleString()}
               {unit === "%" ? "%" : ""}
@@ -196,7 +196,7 @@ const ActiveUsersMap = () => {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <h4 className="text-4xl font-semibold text-accent">152</h4>
-              <p className="text-xs text-neutral-500 uppercase tracking-widest font-semibold">Online Now</p>
+              <p className="text-xs text-neutral-500 uppercase font-semibold">Online Now</p>
             </div>
           </div>
         </div>

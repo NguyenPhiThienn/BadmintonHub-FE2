@@ -52,7 +52,7 @@ const badgeVariants = cva(
         outline2:
           '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground border-accent/40 bg-accent/15 text-accent/90',
         badminton:
-          'bg-primary text-secondary border-none'
+          'bg-primary text-secondary border border-secondary/20'
       },
     },
     defaultVariants: {

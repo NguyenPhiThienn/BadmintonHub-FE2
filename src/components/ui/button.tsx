@@ -11,7 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-accent hover:bg-accent/80 text-muted font-semibold bg-green-500 hover:bg-green-600",
+          "bg-accent hover:bg-accent/80 text-white font-semibold bg-green-500 hover:bg-green-600",
         destructive: "bg-red-500 text-white hover:bg-red-600",
         outline:
           "border border-accent bg-green-950 text-accent font-semibold hover:bg-green-900 hover:text-accent text-green-400 border-green-500/30 bg-green-500/5 hover:bg-green-500/10 hover:border-green-500/50",

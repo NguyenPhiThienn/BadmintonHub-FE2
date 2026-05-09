@@ -42,12 +42,7 @@ export interface IAIRecommendationRequest {
 
 export interface IAIRecommendationResponse {
   status: number;
-  data: {
-    venueId: string;
-    matchScore: number;
-    reason: string;
-    detailedAnalysis?: string;
-  }[];
+  data: IVenue[];
 }
 
 export interface ICourt {
