@@ -22,7 +22,6 @@ export const ExploreSection = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { data: venuesRes, isLoading } = useVenues({ limit: 12, search: debouncedSearch });
   const aiMutation = useAiRecommendations();
-  const [activeFilter, setActiveFilter] = useState("nearby");
   const [recommendedVenues, setRecommendedVenues] = useState<IVenue[]>([]);
 
   useEffect(() => {
@@ -32,12 +31,6 @@ export const ExploreSection = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [search]);
-
-  const handleSearch = (val: string) => {
-    if (val.trim()) {
-      router.push(`/venues?search=${encodeURIComponent(val)}`);
-    }
-  };
 
   const venues = Array.isArray(venuesRes?.data) ? venuesRes.data : venuesRes?.data?.venues || [];
 
@@ -85,19 +78,19 @@ export const ExploreSection = () => {
           className="flex items-center justify-between max-w-7xl mx-auto"
           initial="hidden" animate="visible" variants={fadeUp} custom={5}
         >
-          <h2 className={`text-xl font-semibold flex items-center gap-2 ${recommendedVenues.length > 0 || aiMutation.isPending ? "text-secondary" : "text-white"}`}>
+          <h2 className={`text-xl font-semibold flex items-center gap-2 ${recommendedVenues.length > 0 || aiMutation.isPending ? "text-secondary" : "text-neutral-300"}`}>
             {aiMutation.isPending ? (
               <>
                 <Icon path={mdiLoading} size={1} className="animate-spin" />
-                AI ĐANG PHÂN TÍCH...
+                AI đang phân tích...
               </>
             ) : recommendedVenues.length > 0 ? (
               <>
                 <Icon path={mdiFire} size={1} />
-                DANH SÁCH SÂN ĐƯỢC GỢI Ý TỪ AI
+                Danh sách sân được gợi ý từ AI
               </>
             ) : (
-              "DANH SÁCH SÂN QUANH ĐÂY"
+              "Danh sách sân quoanh đây"
             )}
           </h2>
           <span className="text-base text-neutral-400 cursor-pointer hover:underline">

@@ -6,7 +6,7 @@ import { Icon } from "@/components/ui/mdi-icon";
 import { useAiBookingRecommendation } from "@/hooks/useVenue";
 import { IAvailability, ICourt, ISlot } from "@/interface/venue";
 import { cn } from "@/lib/utils";
-import { mdiBadminton, mdiChevronLeft, mdiChevronRight, mdiInformationOutline, mdiShimmer, mdiSoccerField } from "@mdi/js";
+import { mdiBadminton, mdiCash, mdiChevronLeft, mdiChevronRight, mdiCreditCardOutline, mdiInformationOutline, mdiShimmer, mdiSoccerField } from "@mdi/js";
 import { format, isSameDay, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useState } from "react";
@@ -24,6 +24,8 @@ interface BookingSectionProps {
   selectedSlots: { courtId: string, time: string, price: number }[];
   onToggleSlot: (courtId: string, time: string, price: number) => void;
   venueId: string;
+  paymentMethod: "VNPAY" | "CASH";
+  setPaymentMethod: (method: "VNPAY" | "CASH") => void;
 }
 
 const CourtTimeGrid = ({
@@ -99,7 +101,9 @@ export const BookingSection = ({
   currentPrice,
   selectedSlots,
   onToggleSlot,
-  venueId
+  venueId,
+  paymentMethod,
+  setPaymentMethod
 }: BookingSectionProps) => {
   const { data: aiRecRes } = useAiBookingRecommendation(venueId);
   const [showAiRec, setShowAiRec] = useState(true);
@@ -113,11 +117,11 @@ export const BookingSection = ({
 
   return (
     <div className="space-y-4">
-      {aiRec && showAiRec && (
-        <div className="bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 rounded-2xl p-4 relative overflow-hidden group">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <div className="space-y-1 w-full">
-              <div className="flex items-start justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {aiRec && showAiRec && (
+          <div className="bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 rounded-2xl p-4 relative overflow-hidden group">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+              <div className="space-y-4 w-full">
                 <h4 className="text-accent font-semibold text-sm flex items-center gap-2">
                   <Icon path={mdiShimmer} size={0.8} />
                   ĐỀ XUẤT CHO BẠN
@@ -125,160 +129,197 @@ export const BookingSection = ({
                     Tối ưu nhất
                   </Badge>
                 </h4>
-                <div className="flex items-center gap-4 shrink-0">
+                <div className="text-neutral-300 text-base font-medium flex flex-wrap items-center gap-1.5">
+                  Khung giờ từ
+                  <Badge variant="amber" className="px-3 py-1 text-sm">
+                    {aiRec.startTime} - {aiRec.endTime}
+                  </Badge>
+                  vào ngày
+                  <Badge variant="amber" className="px-3 py-1 text-sm">
+                    {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
+                  </Badge>
+                  là lựa chọn hoàn hảo nhất!
+                </div>
+                <p className="text-neutral-300 text-base">
+                  {aiRec.reason}
+                </p>
+                {aiRec.benefits && aiRec.benefits.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {aiRec.benefits.map((benefit: string, idx: number) => (
+                      <Badge variant="green">
+                        <div key={idx} className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                        {benefit}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <div className="flex w-full items-center gap-4 mt-4">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => setShowAiRec(false)}
-                    className="text-neutral-500 hover:text-white"
+                    className="flex-1"
                   >
                     Bỏ qua
                   </Button>
                   <Button
                     variant="accent"
                     onClick={handleApplyAiRec}
-                    className="font-bold px-6 py-2 h-auto"
+                    className="flex-1"
                   >
                     <Icon path={mdiShimmer} size={0.8} />
                     Áp dụng lịch đề xuất
                   </Button>
                 </div>
               </div>
-              <div className="text-neutral-300 text-base font-medium flex flex-wrap items-center gap-1.5">
-                Khung giờ từ
-                <Badge variant="amber" className="px-3 py-1 text-sm">
-                  {aiRec.startTime} - {aiRec.endTime}
-                </Badge>
-                vào ngày
-                <Badge variant="amber" className="px-3 py-1 text-sm">
-                  {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
-                </Badge>
-                là lựa chọn hoàn hảo nhất!
+            </div>
+          </div>
+        )}
+        <div className="space-y-4">
+          {/* Date Selection */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-4 w-full justify-between">
+              <div className="flex-1 flex items-center gap-3 md:gap-4">
+                <h3 className="text-accent font-semibold whitespace-nowrap">Chọn ngày chơi</h3>
+                <div className="flex-1 border-b border-dashed border-accent mr-1" />
               </div>
-              <p className="text-neutral-300 text-base">
-                {aiRec.reason}
-              </p>
-              {aiRec.benefits && aiRec.benefits.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {aiRec.benefits.map((benefit: string, idx: number) => (
-                    <Badge variant="green">
-                      <div key={idx} className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                      {benefit}
-                    </Badge>
-                  ))}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => dateSwiper?.slidePrev()}
+                  className={cn(
+                    "rounded-full h-8 w-8",
+                    !dateSwiper && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Icon path={mdiChevronLeft} size={0.8} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => dateSwiper?.slideNext()}
+                  className={cn(
+                    "rounded-full h-8 w-8",
+                    !dateSwiper && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Icon path={mdiChevronRight} size={0.8} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="w-full relative px-4">
+              <Swiper
+                onSwiper={(swiper) => setDateSwiper(swiper)}
+                slidesPerView="auto"
+                spaceBetween={16}
+                className="w-full"
+              >
+                {dates.map((date, i) => {
+                  const isSelected = isSameDay(date, selectedDate);
+                  return (
+                    <SwiperSlide key={i} style={{ width: 'auto' }}>
+                      <button
+                        onClick={() => onDateChange(date)}
+                        className={cn(
+                          "flex flex-col items-center justify-center px-4 h-20 rounded-xl border transition-all shrink-0 min-w-[100px]",
+                          isSelected
+                            ? "bg-accent border-accent text-white shadow-lg shadow-accent/20"
+                            : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
+                        )}
+                      >
+                        <span className="text-xs font-semibold mb-1 uppercase">
+                          {format(date, 'EEE', { locale: vi })}
+                        </span>
+                        <span className="text-sm font-semibold">
+                          {format(date, 'dd/MM')}
+                        </span>
+                      </button>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+            </div>
+          </section>
+
+          {/* Court Selection */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex-1 flex items-center gap-3 md:gap-4">
+                <h3 className="text-accent font-semibold whitespace-nowrap">Chọn sân & khung giờ</h3>
+                <div className="flex-1 border-b border-dashed border-accent mr-1" />
+              </div>
+            </div>
+
+            {isAvailabilityLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-4 text-neutral-400 bg-darkCardV1 rounded-2xl border border-darkBorderV1">
+                <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm font-medium">Đang tải lịch sân...</p>
+              </div>
+            ) : availabilityData.length > 0 ? (
+              <div className="space-y-8">
+                {availabilityData.map((courtAvail: IAvailability) => (
+                  <CourtTimeGrid
+                    key={courtAvail.courtId}
+                    court={{
+                      _id: courtAvail.courtId,
+                      name: courtAvail.courtName,
+                      venueId: venueId,
+                      status: 'AVAILABLE'
+                    }}
+                    courtAvailability={courtAvail}
+                    currentPrice={currentPrice}
+                    selectedSlots={selectedSlots}
+                    onToggle={(time, price) => onToggleSlot(courtAvail.courtId, time, price)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 flex flex-col items-center justify-center gap-4 text-neutral-400 border border-dashed border-darkBorderV1 rounded-2xl bg-darkCardV1/50">
+                <Icon path={mdiInformationOutline} size={0.8} />
+                <p className="text-sm font-medium">Không có lịch sân khả dụng cho ngày này.</p>
+              </div>
+            )}
+          </section>
+
+          {/* Payment Section */}
+          {selectedSlots.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-1 flex items-center gap-3 md:gap-4">
+                  <h3 className="text-accent font-semibold whitespace-nowrap">Chọn phương thức thanh toán</h3>
+                  <div className="flex-1 border-b border-dashed border-accent mr-1" />
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Date Selection */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-4 w-full justify-between">
-            <div className="flex-1 flex items-center gap-3 md:gap-4">
-              <h3 className="text-accent font-semibold whitespace-nowrap">Chọn ngày chơi</h3>
-              <div className="flex-1 border-b border-dashed border-accent mr-1" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => dateSwiper?.slidePrev()}
-                className={cn(
-                  "rounded-full h-8 w-8",
-                  !dateSwiper && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                <Icon path={mdiChevronLeft} size={0.8} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => dateSwiper?.slideNext()}
-                className={cn(
-                  "rounded-full h-8 w-8",
-                  !dateSwiper && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                <Icon path={mdiChevronRight} size={0.8} />
-              </Button>
-            </div>
-          </div>
-
-          <div className="w-full relative px-4">
-            <Swiper
-              onSwiper={(swiper) => setDateSwiper(swiper)}
-              slidesPerView="auto"
-              spaceBetween={16}
-              className="w-full"
-            >
-              {dates.map((date, i) => {
-                const isSelected = isSameDay(date, selectedDate);
-                return (
-                  <SwiperSlide key={i} style={{ width: 'auto' }}>
-                    <button
-                      onClick={() => onDateChange(date)}
-                      className={cn(
-                        "flex flex-col items-center justify-center px-4 h-20 rounded-xl border transition-all shrink-0 min-w-[100px]",
-                        isSelected
-                          ? "bg-accent border-accent text-white shadow-lg shadow-accent/20"
-                          : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
-                      )}
-                    >
-                      <span className="text-xs font-semibold mb-1 uppercase">
-                        {format(date, 'EEE', { locale: vi })}
-                      </span>
-                      <span className="text-sm font-semibold">
-                        {format(date, 'dd/MM')}
-                      </span>
-                    </button>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          </div>
-        </section>
-
-        {/* Court Selection */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 flex items-center gap-3 md:gap-4">
-              <h3 className="text-accent font-semibold whitespace-nowrap">Chọn sân & khung giờ</h3>
-              <div className="flex-1 border-b border-dashed border-accent mr-1" />
-            </div>
-          </div>
-
-          {isAvailabilityLoading ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-4 text-neutral-400 bg-darkCardV1 rounded-2xl border border-darkBorderV1">
-              <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium">Đang tải lịch sân...</p>
-            </div>
-          ) : availabilityData.length > 0 ? (
-            <div className="space-y-8">
-              {availabilityData.map((courtAvail: IAvailability) => (
-                <CourtTimeGrid
-                  key={courtAvail.courtId}
-                  court={{
-                    _id: courtAvail.courtId,
-                    name: courtAvail.courtName,
-                    venueId: venueId,
-                    status: 'AVAILABLE'
-                  }}
-                  courtAvailability={courtAvail}
-                  currentPrice={currentPrice}
-                  selectedSlots={selectedSlots}
-                  onToggle={(time, price) => onToggleSlot(courtAvail.courtId, time, price)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="py-12 flex flex-col items-center justify-center gap-4 text-neutral-400 border border-dashed border-darkBorderV1 rounded-2xl bg-darkCardV1/50">
-              <Icon path={mdiInformationOutline} size={0.8} />
-              <p className="text-sm font-medium">Không có lịch sân khả dụng cho ngày này.</p>
-            </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => setPaymentMethod("CASH")}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
+                    paymentMethod === "CASH"
+                      ? "bg-accent/10 border-accent text-accent"
+                      : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
+                  )}
+                >
+                  <Icon path={mdiCash} size={1} />
+                  <span className="font-semibold text-base">Thanh toán bằng tiền mặt</span>
+                </button>
+                <button
+                  onClick={() => setPaymentMethod("VNPAY")}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
+                    paymentMethod === "VNPAY"
+                      ? "bg-accent/10 border-accent text-accent"
+                      : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
+                  )}
+                >
+                  <Icon path={mdiCreditCardOutline} size={1} />
+                  <span className="font-semibold text-base">Thanh toán bằng VNPay</span>
+                </button>
+              </div>
+            </section>
           )}
-        </section>
+        </div>
       </div>
     </div>
   );

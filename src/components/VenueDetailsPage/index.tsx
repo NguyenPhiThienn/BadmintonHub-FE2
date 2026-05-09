@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
-import { useCreateBooking } from "@/hooks/useBooking";
+import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
 import {
   useAvailability,
   useVenueDetails,
@@ -36,11 +36,13 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   // States
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [selectedSlots, setSelectedSlots] = useState<{ courtId: string, time: string, price: number }[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<"VNPAY" | "CASH">("CASH");
 
   // API Hooks
   const { data: venueRes, isLoading: isVenueLoading } = useVenueDetails(id);
   const { data: pricingRes } = useVenuePricing(id);
   const { mutate: createBooking, isPending: isBookingLoading } = useCreateBooking();
+  const { mutate: createPaymentUrl, isPending: isPaymentLoading } = useCreatePaymentUrl();
 
   // FETCH ALL AVAILABILITY AT ONCE
   const { data: availabilityRes, isLoading: isAvailabilityLoading } = useAvailability({
@@ -88,10 +90,22 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
 
     createBooking(payload, {
       onSuccess: (res: any) => {
-        toast.success("Đặt sân thành công!");
-        setSelectedSlots([]);
         if (res?.data?._id) {
-          router.push(`/booking/success?bookingId=${res.data._id}`);
+          const bookingId = res.data._id;
+          createPaymentUrl({ bookingId, method: paymentMethod }, {
+            onSuccess: (paymentRes: any) => {
+              if (paymentMethod === "VNPAY" && paymentRes?.data?.paymentUrl) {
+                window.location.href = paymentRes.data.paymentUrl;
+              } else {
+                toast.success("Đặt sân thành công!");
+                setSelectedSlots([]);
+                router.push(`/booking/success?bookingId=${bookingId}`);
+              }
+            },
+            onError: (err: any) => {
+              toast.error(err?.message || "Lỗi tạo thanh toán. Vui lòng thử lại.");
+            }
+          });
         }
       },
       onError: (err: any) => {
@@ -137,14 +151,17 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           selectedSlots={selectedSlots}
           onToggleSlot={toggleSlot}
           venueId={id}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
         />
+
         <ReviewSection />
       </main>
       <VenueFooter
         selectedSlotsCount={selectedSlots.length}
         totalPrice={totalPrice}
         onBooking={handleBooking}
-        isBookingLoading={isBookingLoading}
+        isBookingLoading={isBookingLoading || isPaymentLoading}
       />
     </div>
   );
