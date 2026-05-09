@@ -37,7 +37,7 @@ const SuccessContent = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <LoadingSpinner />
-        <p className="text-neutral-400 font-medium text-sm">Đang tải thông tin đơn hàng...</p>
+        <p className="text-neutral-400 font-medium text-base">Đang tải thông tin đơn hàng...</p>
       </div>
     );
   }
@@ -178,14 +178,21 @@ const SuccessContent = () => {
                   <Label>Người đặt</Label>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Badge variant="green">
-                    <Icon path={mdiAccountSupervisorCircle} size={0.6} />
-                    {booking.playerId?.fullName}
-                  </Badge>
-                  <Badge variant="neutral">
-                    <Icon path={mdiPhone} size={0.6} />
-                    {booking.playerId?.phone}
-                  </Badge>
+                  {
+                    booking.playerId?.fullName ? <Badge variant="green">
+                      <Icon path={mdiAccountSupervisorCircle} size={0.6} />
+                      {booking.playerId?.fullName}
+                    </Badge> : <span className="text-neutral-400 italic">Khách ẩn danh</span>
+                  }
+
+                  {
+                    booking.playerId?.phone ?
+                      <Badge variant="neutral">
+                        <Icon path={mdiPhone} size={0.6} />
+                        {booking.playerId?.phone}
+                      </Badge> :
+                      <span className="text-neutral-400 italic">Chưa thiết lập số điện thoại</span>
+                  }
                 </div>
               </div>
             </div>
@@ -199,8 +206,8 @@ const SuccessContent = () => {
                 {booking.details?.map((detail: any, index: number) => (
                   <div key={index} className="flex justify-between items-center bg-darkBackgroundV1 p-4 rounded-xl border border-darkBorderV1">
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-lg bg-accent/5 flex items-center justify-center border border-accent/10">
-                        <Icon path={mdiSoccerField} size={0.8} className="text-accent" />
+                      <div className="h-12 w-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/10">
+                        <Icon path={mdiSoccerField} size={1} className="text-accent" />
                       </div>
                       <div>
                         <p className="text-neutral-300 font-semibold">{detail.courtId?.name}</p>
@@ -237,7 +244,7 @@ const SuccessContent = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
       >
-        <div className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl overflow-hidden">
+        <div className="bg-accent/5 border border-dashed border-accent/40 rounded-xl overflow-hidden">
           <div className="p-4 border-b border-darkBorderV1/50 flex items-center gap-2">
             <Icon path={mdiMap} size={0.8} className="text-accent" />
             <p className="text-accent text-lg font-semibold">Vị trí sân trên bản đồ</p>
@@ -262,7 +269,7 @@ const SuccessContent = () => {
         className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl p-4 flex gap-4 items-start"
       >
         <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/10">
-          <Icon path={mdiQrcodeScan} size={0.8} className="text-accent" />
+          <Icon path={mdiQrcodeScan} size={1} className="text-accent" />
         </div>
         <div className="space-y-4">
           <h3 className="text-white text-lg font-semibold">Hướng dẫn nhận sân</h3>

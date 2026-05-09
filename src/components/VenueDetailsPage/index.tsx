@@ -84,7 +84,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
         courtId: slot.courtId,
         bookingDate: format(selectedDate, 'yyyy-MM-dd'),
         startTime: slot.time,
-        endTime: `${parseInt(slot.time.split(':')[0]) + 1}:00`
+        endTime: `${(parseInt(slot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`
       }))
     };
 

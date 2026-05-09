@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAiBookingRecommendation } from "@/hooks/useVenue";
 import { IAvailability, ICourt, ISlot } from "@/interface/venue";
 import { cn } from "@/lib/utils";
@@ -105,7 +106,7 @@ export const BookingSection = ({
   paymentMethod,
   setPaymentMethod
 }: BookingSectionProps) => {
-  const { data: aiRecRes } = useAiBookingRecommendation(venueId);
+  const { data: aiRecRes, isLoading: isAiLoading } = useAiBookingRecommendation(venueId);
   const [showAiRec, setShowAiRec] = useState(true);
   const aiRec = aiRecRes?.data;
 
@@ -118,6 +119,23 @@ export const BookingSection = ({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {isAiLoading && (
+          <div className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
+            <div className="flex items-center gap-2">
+              <Skeleton className="w-5 h-5 rounded-full" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <div className="space-y-3">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-16 w-full rounded-xl" />
+            </div>
+            <div className="flex gap-4 pt-2">
+              <Skeleton className="h-10 flex-1 rounded-lg" />
+              <Skeleton className="h-10 flex-1 rounded-lg" />
+            </div>
+          </div>
+        )}
+
         {aiRec && showAiRec && (
           <div className="bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 rounded-2xl p-4 relative overflow-hidden group">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
