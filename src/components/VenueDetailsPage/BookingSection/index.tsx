@@ -115,52 +115,58 @@ export const BookingSection = ({
     <div className="space-y-4">
       {aiRec && showAiRec && (
         <div className="bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 rounded-2xl p-4 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Icon path={mdiShimmer} size={4} />
-          </div>
-
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <div className="flex items-start gap-3">
-              <div className="mt-1 bg-accent/20 p-2 rounded-lg">
-                <Icon path={mdiShimmer} size={0.8} className="text-accent" />
-              </div>
-              <div className="space-y-1">
+            <div className="space-y-1 w-full">
+              <div className="flex items-start justify-between">
                 <h4 className="text-accent font-semibold text-sm flex items-center gap-2">
-                  AI ĐỀ XUẤT CHO BẠN
+                  <Icon path={mdiShimmer} size={0.8} />
+                  ĐỀ XUẤT CHO BẠN
                   <Badge variant="green">
                     Tối ưu nhất
                   </Badge>
                 </h4>
-                <div className="text-neutral-300 text-base font-medium flex items-center gap-1">
-                  Ngày
-                  <Badge variant="amber">
-                    {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
-                  </Badge>
-                  lúc
-                  <Badge variant="amber">
-                    {aiRec.startTime}
-                  </Badge>
-                  là thời điểm tuyệt vời để ra sân!
+                <div className="flex items-center gap-4 shrink-0">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowAiRec(false)}
+                    className="text-neutral-500 hover:text-white"
+                  >
+                    Bỏ qua
+                  </Button>
+                  <Button
+                    variant="accent"
+                    onClick={handleApplyAiRec}
+                    className="font-bold px-6 py-2 h-auto"
+                  >
+                    <Icon path={mdiShimmer} size={0.8} />
+                    Áp dụng lịch đề xuất
+                  </Button>
                 </div>
-                <p className="text-neutral-400 text-base italic line-clamp-1">
-                  "{aiRec.reason}"
-                </p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                onClick={() => setShowAiRec(false)}
-              >
-                Bỏ qua
-              </Button>
-              <Button
-                onClick={handleApplyAiRec}
-              >
-                <Icon path={mdiShimmer} size={0.8} />
-                Chọn và xem khung giờ
-              </Button>
+              <div className="text-neutral-300 text-base font-medium flex flex-wrap items-center gap-1.5">
+                Khung giờ từ
+                <Badge variant="amber" className="px-3 py-1 text-sm">
+                  {aiRec.startTime} - {aiRec.endTime}
+                </Badge>
+                vào ngày
+                <Badge variant="amber" className="px-3 py-1 text-sm">
+                  {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
+                </Badge>
+                là lựa chọn hoàn hảo nhất!
+              </div>
+              <p className="text-neutral-300 text-base">
+                {aiRec.reason}
+              </p>
+              {aiRec.benefits && aiRec.benefits.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {aiRec.benefits.map((benefit: string, idx: number) => (
+                    <Badge variant="green">
+                      <div key={idx} className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                      {benefit}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
