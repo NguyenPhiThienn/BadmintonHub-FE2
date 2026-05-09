@@ -9,7 +9,9 @@ import { useBookingDetails } from "@/hooks/useBooking";
 import {
   mdiAccountSupervisorCircle,
   mdiCalendarMonth,
+  mdiCash,
   mdiCheckCircle,
+  mdiCreditCardOutline,
   mdiCurrencyUsd,
   mdiHome,
   mdiMap,
@@ -149,10 +151,36 @@ const SuccessContent = () => {
                 <Icon path={mdiMap} size={0.8} className="text-accent" />
                 <p className="text-accent text-lg font-semibold">Mã đơn hàng: #BH{booking._id?.slice(-6).toUpperCase()}</p>
               </div>
-              <Badge variant="green">
-                <Icon path={mdiCheckCircle} size={0.6} />
-                Đã xác nhận
-              </Badge>
+              <div className="flex items-end gap-2">
+                {booking.status === 'CONFIRMED' ? (
+                  <Badge variant="green">
+                    <Icon path={mdiCheckCircle} size={0.6} />
+                    Đã xác nhận
+                  </Badge>
+                ) : booking.status === 'PENDING' ? (
+                  <Badge variant="amber">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Chờ thanh toán
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive">
+                    <Icon path={mdiPlaylistRemove} size={0.6} />
+                    {booking.status}
+                  </Badge>
+                )}
+
+                {booking.payment?.method === 'VNPAY' ? (
+                  <Badge variant="neutral" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+                    <Icon path={mdiCreditCardOutline} size={0.6} />
+                    Thanh toán bằng VNPay
+                  </Badge>
+                ) : (
+                  <Badge variant="neutral" className="bg-orange-500/10 text-orange-400 border-orange-500/20">
+                    <Icon path={mdiCash} size={0.6} />
+                    Thanh toán bằng tiền mặt
+                  </Badge>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-darkBackgroundV1">
@@ -211,9 +239,15 @@ const SuccessContent = () => {
                       </div>
                       <div>
                         <p className="text-neutral-300 font-semibold">{detail.courtId?.name}</p>
-                        <Badge variant="neutral">
-                          {new Date(detail.bookingDate).toLocaleDateString('vi-VN')} | {detail.startTime} - {detail.endTime}
-                        </Badge>
+                        <div className="flex gap-1">
+                          <Badge variant="neutral">
+                            {new Date(detail.bookingDate).toLocaleDateString('vi-VN')}
+                          </Badge>
+                          <Badge variant="neutral">
+                            {detail.startTime} - {detail.endTime}
+                          </Badge>
+                        </div>
+
                       </div>
                     </div>
                     <p className="text-accent font-semibold">{detail.price?.toLocaleString()}đ</p>
