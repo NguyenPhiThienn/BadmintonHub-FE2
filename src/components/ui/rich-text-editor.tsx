@@ -22,7 +22,6 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     useEffect(() => {
         if (!containerRef.current) return;
 
-        // Clear existing content to avoid double toolbar in React 18 Strict Mode
         containerRef.current.innerHTML = "";
         const editorDiv = document.createElement("div");
         containerRef.current.appendChild(editorDiv);
@@ -64,17 +63,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         };
     }, []);
 
-    // Handle external value changes
     useEffect(() => {
         if (quillRef.current && value !== quillRef.current.root.innerHTML) {
-            // Only update if it's not the first render to avoid double setting
-            // or if the value is significantly different (e.g. from outside)
             if (isFirstRender.current) {
                 isFirstRender.current = false;
                 return;
             }
 
-            // To prevent cursor jumping, we only set if necessary
             const currentHTML = quillRef.current.root.innerHTML;
             if (value !== currentHTML && !(value === "" && currentHTML === "<p><br></p>")) {
                 quillRef.current.clipboard.dangerouslyPasteHTML(value || "");
@@ -89,7 +84,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                     border-top-left-radius: 0.5rem;
                     border-top-right-radius: 0.5rem;
                     background-color: #233738 !important;
-                    border-color: #333 !important;
+                    border-color: #233738 !important;
                 }
                 /* Apply requested color to the snow theme toolbar */
                 .rich-text-editor-container .ql-snow.ql-toolbar {
@@ -99,7 +94,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                     border-bottom-left-radius: 0.5rem;
                     border-bottom-right-radius: 0.5rem;
                     background-color: transparent;
-                    border-color: #333 !important;
+                    border-color: #233738 !important;
                     min-height: 130px;
                     max-height: 130px;
                     overflow-y: auto;
@@ -112,7 +107,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                     background: transparent;
                 }
                 .rich-text-editor-container .ql-container::-webkit-scrollbar-thumb {
-                    background: #333;
+                    background: #233738;
                     border-radius: 10px;
                 }
                 .rich-text-editor-container .ql-container::-webkit-scrollbar-thumb:hover {
@@ -154,7 +149,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                 }
                 .rich-text-editor-container .ql-snow .ql-picker-options {
                     background-color: #233738 !important;
-                    border-color: #333 !important;
+                    border-color: #233738 !important;
                     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
                 }
                 .rich-text-editor-container .ql-snow .ql-picker-item {

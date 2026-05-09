@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Icon } from "@/components/ui/mdi-icon"
 import { useUser } from "@/context/useUserContext"
-import { mdiAccountOutline, mdiBellOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, mdiLockReset, mdiLogout, mdiMapMarkerOutline, mdiMenu, mdiTicketOutline } from "@mdi/js"
+import { mdiAccountOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, mdiLogout, mdiMapMarkerOutline, mdiMenu } from "@mdi/js"
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
@@ -64,59 +64,44 @@ export function Header() {
                 {/* CTA + Mobile toggle */}
                 <div className="flex items-center gap-3">
                     {user ? (
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost-badminton" size="icon" asChild className="relative">
-                                <Link href="/notifications">
-                                    <Icon path={mdiBellOutline} size={0.8} />
-                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-background"></span>
-                                </Link>
-                            </Button>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                                        <Avatar className="h-10 w-10 border border-border/40">
-                                            <AvatarImage
-                                                src={user.avatarUrl || `https://api.dicebear.com/9.x/bottts/svg?seed=${user.fullName}`}
-                                                alt={user.fullName}
-                                            />
-                                        </Avatar>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="end" forceMount>
-                                    <DropdownMenuLabel className="font-normal">
-                                        <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-semibold leading-none text-wrap">{user.fullName}</p>
-                                            <p className="text-sm leading-none text-neutral-400 line-clamp-1">{user.email}</p>
-                                        </div>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/profile" className="cursor-pointer">
-                                            <Icon path={mdiAccountOutline} size={0.8} />
-                                            <span>Trang cá nhân</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/vouchers" className="cursor-pointer">
-                                            <Icon path={mdiTicketOutline} size={0.8} />
-                                            <span>Ví Voucher</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/change-password" className="cursor-pointer">
-                                            <Icon path={mdiLockReset} size={0.8} />
-                                            <span>Đổi mật khẩu</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
-                                        <Icon path={mdiLogout} size={0.8} />
-                                        <span>Đăng xuất</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Avatar className="h-10 w-10 border border-primary rounded-full cursor-pointer ">
+                                    <AvatarImage
+                                        // src={user.avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
+                                        src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
+                                        alt={user.fullName}
+                                        className="bg-darkBorderV1"
+                                    />
+                                </Avatar>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end" forceMount>
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col space-y-1">
+                                        <p className="text-sm font-semibold leading-none text-wrap">{user.fullName}</p>
+                                        <p className="text-sm leading-none text-neutral-400 line-clamp-1">{user.email}</p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/profile" className="cursor-pointer">
+                                        <Icon path={mdiAccountOutline} size={0.8} />
+                                        <span>Trang cá nhân</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/my-bookings" className="cursor-pointer text-secondary">
+                                        <Icon path={mdiCalendarMonthOutline} size={0.8} />
+                                        <span>Quản lý đặt sân</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
+                                    <Icon path={mdiLogout} size={0.8} />
+                                    <span>Đăng xuất</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     ) : (
                         <div className="hidden md:flex items-center gap-3">
                             <Button variant="primary" onClick={() => setAuthMode("login")}>

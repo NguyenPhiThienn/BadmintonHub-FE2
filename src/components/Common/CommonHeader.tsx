@@ -13,7 +13,6 @@ import { mdiAccountTie, mdiLogout, mdiOfficeBuildingMarker } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { HamburgerMenu } from "iconsax-reactjs";
 import Image from "next/image";
-import Link from "next/link";
 import { DropdownNav } from "./DropdownNav";
 
 export default function CommonHeader() {
@@ -52,7 +51,7 @@ export default function CommonHeader() {
               <DropdownMenuTrigger asChild>
                 <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden border border-accent/70 shadow-[0_0_15px_rgba(68,215,182,0.2)] p-0.5 cursor-pointer transition-transform hover:scale-105 active:scale-95">
                   <img
-                    src={profile?.employee?.avatar || `https://api.dicebear.com/9.x/bottts/svg?seed=${profile?.username || "Sophie"}`}
+                    src={profile?.employee?.avatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${profile?.username || "Sophie"}`}
                     alt="Avatar"
                     className="w-full h-full object-cover rounded-full"
                   />
