@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import { Input } from "@/components/ui/input";
 import { Icon } from "@/components/ui/mdi-icon";
 import { mdiMagnify, mdiTuneVariant } from "@mdi/js";
-import { Input } from "@/components/ui/input";
+import React from "react";
 
 interface SearchBarProps {
   value: string;
@@ -28,9 +28,8 @@ export const SearchBar = ({ value, onChange, onSearch }: SearchBarProps) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="pl-12 pr-12 h-14 bg-darkCardV1/50 border-darkBorderV1 focus:border-accent focus:ring-accent/20 rounded-2xl text-lg transition-all"
       />
-      <button 
+      <button
         onClick={() => onSearch(value)}
         className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-accent p-1 transition-colors"
       >

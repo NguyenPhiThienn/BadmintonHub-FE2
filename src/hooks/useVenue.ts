@@ -2,7 +2,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { venueApi } from "@/api/venue";
 import { IAIRecommendationRequest } from "@/interface/venue";
 
-export const useVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
+export const useVenues = (params?: { 
+  page?: number; 
+  limit?: number; 
+  status?: string; 
+  search?: string;
+  sortBy?: string;
+  lat?: number;
+  lng?: number;
+  minPrice?: number;
+  maxPrice?: number;
+}) => {
   return useQuery({
     queryKey: ["venues", params],
     queryFn: () => venueApi.getVenues(params),

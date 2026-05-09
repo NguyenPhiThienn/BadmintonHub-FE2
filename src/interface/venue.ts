@@ -11,6 +11,7 @@ export interface IVenue {
   averageRating?: number;
   matchScore?: number;
   reason?: string;
+  detailedAnalysis?: string;
   distance?: string;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'REJECTED' | 'SUSPENDED';
   available?: number;
@@ -35,6 +36,8 @@ export interface IVenueResponse {
 export interface IAIRecommendationRequest {
   userId: string;
   preferences?: Record<string, any>;
+  lat?: number;
+  lng?: number;
 }
 
 export interface IAIRecommendationResponse {
@@ -43,6 +46,7 @@ export interface IAIRecommendationResponse {
     venueId: string;
     matchScore: number;
     reason: string;
+    detailedAnalysis?: string;
   }[];
 }
 

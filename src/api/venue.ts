@@ -2,7 +2,17 @@ import { sendGet, sendPost, sendPatch, sendDelete } from "./axios";
 import { IVenueResponse, IAIRecommendationRequest, IAIRecommendationResponse } from "@/interface/venue";
 
 export const venueApi = {
-  getVenues: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+  getVenues: (params?: { 
+    page?: number; 
+    limit?: number; 
+    status?: string; 
+    search?: string;
+    sortBy?: string;
+    lat?: number;
+    lng?: number;
+    minPrice?: number;
+    maxPrice?: number;
+  }) =>
     sendGet("/venues", params),
 
   getVenueById: (id: string) =>

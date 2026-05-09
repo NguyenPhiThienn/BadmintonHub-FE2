@@ -1,15 +1,5 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useVenues } from "@/hooks/useVenue";
-import { IVenue } from "@/interface/venue";
-import { Icon } from "@/components/ui/mdi-icon";
-import { mdiMagnify, mdiChevronLeft, mdiCrosshairsGps, mdiBadminton, mdiRefresh } from "@mdi/js";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import VenueListExplorer from "../VenueListExplorer";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { useRouter } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,28 +8,72 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Input } from "@/components/ui/input";
+import { Icon } from "@/components/ui/mdi-icon";
+import { useVenues } from "@/hooks/useVenue";
+import { IVenue } from "@/interface/venue";
+import { mdiBadminton, mdiChevronLeft, mdiCrosshairsGps, mdiFire, mdiMagnify, mdiMapMarkerRadius, mdiRefresh, mdiTagOutline } from "@mdi/js";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import VenueListExplorer from "../VenueListExplorer";
 import { VenueCard } from "../VenueListExplorer/VenueCard";
 
 const MapExplorer = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [map, setMap] = useState<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const [center, setCenter] = useState({ lat: 10.762622, lng: 106.660172 }); // Default: Ho Chi Minh City
   const [zoom, setZoom] = useState(14);
-  const [keyword, setKeyword] = useState("");
+  const [search, setSearch] = useState(searchParams?.get("search") || "");
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
+  const [limit, setLimit] = useState(10);
+  const [sortBy, setSortBy] = useState<string | null>(searchParams?.get("sortBy") || null);
+  const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
 
-  // API Query
   const { data: venuesData, isLoading } = useVenues({
-    keyword: keyword,
-    limit: 50
+    search: search,
+    limit: limit,
+    sortBy: sortBy || undefined,
+    lat: userLocation?.lat,
+    lng: userLocation?.lng,
   });
 
-  const venues = venuesData?.data || [];
+  const venues = venuesData?.data?.venues || [];
+  const pagination = venuesData?.data?.pagination;
+  const hasMore = pagination ? venues.length < pagination.total : false;
   const markersRef = useRef<any[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    if (search) {
+      params.set("search", search);
+    } else {
+      params.delete("search");
+    }
+    const queryString = params.toString();
+    router.push(`${window.location.pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+  }, [search, router, searchParams]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    if (sortBy) {
+      params.set("sortBy", sortBy);
+    } else {
+      params.delete("sortBy");
+    }
+    const queryString = params.toString();
+    router.push(`${window.location.pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+  }, [sortBy, router, searchParams]);
+
+  useEffect(() => {
+    setLimit(10);
+  }, [search, sortBy]);
 
   const [isGoogleReady, setIsGoogleReady] = useState(false);
 
@@ -190,6 +224,45 @@ const MapExplorer = () => {
     }
   };
 
+  const handleLoadMore = () => {
+    setLimit(prev => prev + 10);
+  };
+
+  const handleSortChange = (newSortBy: string) => {
+    if (sortBy === newSortBy) {
+      setSortBy(null);
+      return;
+    }
+
+    if (newSortBy === 'nearest') {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+            setSortBy(newSortBy);
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            alert("Vui lòng cho phép truy cập vị trí để sử dụng tính năng này.");
+          }
+        );
+      } else {
+        alert("Trình duyệt của bạn không hỗ trợ định vị.");
+      }
+    } else {
+      setSortBy(newSortBy);
+    }
+  };
+
+  const filterButtons = [
+    { id: 'nearest', label: 'Gần nhất', icon: mdiMapMarkerRadius },
+    { id: 'price_asc', label: 'Giá rẻ nhất', icon: mdiTagOutline },
+    { id: 'rating_desc', label: 'Đánh giá cao', icon: mdiFire },
+  ];
+
   return (
     <div className="flex h-screen w-full bg-darkBackgroundV1 overflow-hidden">
       {/* Desktop Sidebar */}
@@ -212,9 +285,9 @@ const MapExplorer = () => {
           <div className="relative w-full">
             <Input
               placeholder="Tìm tên sân, khu vực..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onClear={() => setKeyword("")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onClear={() => setSearch("")}
               className="pl-9 py-2 w-full"
             />
             <Icon
@@ -222,6 +295,20 @@ const MapExplorer = () => {
               size={0.8}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
             />
+          </div>
+
+          <div className="flex items-center gap-2 mt-4 overflow-x-auto no-scrollbar pb-1">
+            {filterButtons.map((btn) => (
+              <Button
+                size="sm"
+                variant={sortBy === btn.id ? "default" : "outline"}
+                key={btn.id}
+                onClick={() => handleSortChange(btn.id)}
+                className="rounded-full"
+              >
+                {btn.label}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -251,6 +338,18 @@ const MapExplorer = () => {
               </div>
             ))}
           </div>
+
+          {hasMore && (
+            <div className="mt-6 flex justify-center pb-4">
+              <Button
+                variant="outline"
+                onClick={() => setLimit(prev => prev + 10)}
+                className="w-full bg-darkCardV2 border-darkBorderV1 text-neutral-300 hover:text-white hover:bg-accent/20"
+              >
+                Hiển thị thêm
+              </Button>
+            </div>
+          )}
 
           {venues.length === 0 && !isLoading && (
             <div className="flex flex-col items-center justify-center py-20 text-neutral-500 text-center">
@@ -297,9 +396,9 @@ const MapExplorer = () => {
           <div className="relative flex-1">
             <Input
               placeholder="Tìm kiếm..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onClear={() => setKeyword("")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onClear={() => setSearch("")}
               className="pl-9 py-2 w-full"
             />
             <Icon
@@ -308,6 +407,23 @@ const MapExplorer = () => {
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
             />
           </div>
+        </div>
+
+        {/* Mobile Filter Chips */}
+        <div className="absolute top-20 left-4 right-4 z-10 flex md:hidden items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+          {filterButtons.map((btn) => (
+            <button
+              key={btn.id}
+              onClick={() => handleSortChange(btn.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium whitespace-nowrap backdrop-blur-md shadow-lg transition-all ${sortBy === btn.id
+                ? "bg-accent border-accent text-white"
+                : "bg-darkCardV1/80 border-darkBorderV1 text-neutral-200 hover:bg-darkCardV1"
+                }`}
+            >
+              <Icon path={btn.icon} size={0.6} />
+              {btn.label}
+            </button>
+          ))}
         </div>
 
         {/* Map */}
@@ -333,6 +449,8 @@ const MapExplorer = () => {
             isOpen={isSheetOpen}
             onOpenChange={setIsSheetOpen}
             selectedVenueId={selectedVenueId}
+            hasMore={hasMore}
+            onLoadMore={handleLoadMore}
             onVenueClick={(id: string) => {
               setSelectedVenueId(id);
               const v = venues.find((v: IVenue) => v._id === id);

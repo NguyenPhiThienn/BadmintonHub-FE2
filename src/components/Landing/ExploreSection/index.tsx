@@ -1,23 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion, Variants } from "framer-motion";
-import { SearchBar } from "./SearchBar";
-import { FilterChip } from "./FilterChip";
-import { VenueCard } from "./VenueCard";
-import { useVenues, useAiRecommendations } from "@/hooks/useVenue";
-import { useUser } from "@/context/useUserContext";
 import { Icon } from "@/components/ui/mdi-icon";
-import { mdiFlashOutline, mdiMapMarkerRadiusOutline, mdiFire, mdiFilterVariant } from "@mdi/js";
-import { IVenue, IAIRecommendationResponse } from "@/interface/venue";
+import { useUser } from "@/context/useUserContext";
+import { useAiRecommendations, useVenues } from "@/hooks/useVenue";
+import { IAIRecommendationResponse, IVenue } from "@/interface/venue";
+import { mdiFilterVariant, mdiFire, mdiFlashOutline, mdiMapMarkerRadiusOutline } from "@mdi/js";
+import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FilterChip } from "./FilterChip";
+import { SearchBar } from "./SearchBar";
+import { VenueCard } from "./VenueCard";
 
 // Swiper imports
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, FreeMode, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
+import { Autoplay, FreeMode, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const filters = [
   { label: "Gần bạn", icon: <Icon path={mdiMapMarkerRadiusOutline} size={0.6} />, id: "nearby" },
@@ -31,127 +31,26 @@ export const ExploreSection = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { data: venuesRes, isLoading } = useVenues({ limit: 12, search: debouncedSearch });
-  const aiMutation = useAiRecommendations();
-  const [activeFilter, setActiveFilter] = useState("nearby");
-  const [recommendedVenues, setRecommendedVenues] = useState<IVenue[]>([]);
+import { AIRecommendationSection } from "./AIRecommendationSection";
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const handleSearch = (val: string) => {
-    if (val.trim()) {
-      router.push(`/venues?search=${encodeURIComponent(val)}`);
-    }
-  };
-
+// ... inside ExploreSection component ...
   const venues = Array.isArray(venuesRes?.data) ? venuesRes.data : venuesRes?.data?.venues || [];
 
-  useEffect(() => {
-    if (user?.id) {
-      aiMutation.mutate(
-        { userId: user.id as string, preferences: {} },
-        {
-          onSuccess: (res: IAIRecommendationResponse) => {
-            if (res.data && venues.length > 0) {
-              const scored = venues.slice(0, 5).map((v: IVenue, i: number) => ({
-                ...v,
-                matchScore: res.data[i]?.matchScore || 95 + i,
-              }));
-              setRecommendedVenues(scored);
-            }
-          },
-        }
-      );
-    }
-  }, [user?.id, venuesRes]);
-
   const fadeUp: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    }),
-  };
-
+// ...
   return (
     <section className="relative py-12 px-4 md:px-8 space-y-4 bg-darkBackgroundV1">
       {/* Search & Filter Header */}
       <div className="max-w-7xl mx-auto space-y-4">
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-          <SearchBar 
-            value={search} 
-            onChange={setSearch} 
-            onSearch={handleSearch} 
-          />
-        </motion.div>
-
-        <motion.div
-          className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={1}
-        >
-          {filters.map((filter) => (
-            <FilterChip
-              key={filter.id}
-              label={filter.label}
-              icon={filter.icon}
-              active={activeFilter === filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-            />
-          ))}
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-darkBorderV1 text-neutral-400 text-sm hover:text-accent transition-colors">
-            <Icon path={mdiFilterVariant} size={0.6} />
-            <span>Lọc thêm</span>
-          </button>
-        </motion.div>
+        {/* ... SearchBar and FilterChips ... */}
       </div>
 
-      {/* AI Recommendations */}
-      {recommendedVenues.length > 0 && (
-        <div className="space-y-4">
-          <motion.div
-            className="flex items-center justify-between max-w-7xl mx-auto"
-            initial="hidden" animate="visible" variants={fadeUp} custom={2}
-          >
-            <h2 className="text-xl font-semibold text-neutral-300 flex items-center gap-2">
-              DÀNH RIÊNG CHO BẠN
-            </h2>
-            <span className="text-base text-accent cursor-pointer hover:underline">Xem tất cả</span>
-          </motion.div>
+      {/* New AI Recommendation Section */}
+      <AIRecommendationSection allVenues={venues} />
 
-          <div className="w-full">
-            <Swiper
-              slidesPerView={1.2}
-              spaceBetween={20}
-              freeMode={true}
-              autoplay={{
-                delay: 3500,
-                disableOnInteraction: false,
-              }}
-              breakpoints={{
-                640: { slidesPerView: 2.2 },
-                1024: { slidesPerView: 3.2 },
-                1280: { slidesPerView: 4 },
-              }}
-              modules={[FreeMode, Autoplay, Pagination]}
-              className="px-4 md:px-8 !pb-10"
-            >
-              {recommendedVenues.map((venue: IVenue, i: number) => (
-                <SwiperSlide key={`ai-${venue._id}`}>
-                  <VenueCard venue={venue} isAI index={i} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </div>
-      )}
+      {/* General Venue List */}
+      <div className="space-y-4">
+// ...
 
       {/* General Venue List */}
       <div className="space-y-4">

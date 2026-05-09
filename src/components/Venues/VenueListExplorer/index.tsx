@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import { Drawer } from "vaul";
 import { IVenue } from "@/interface/venue";
+import { useEffect, useRef } from "react";
+import { Drawer } from "vaul";
 import { VenueCard } from "./VenueCard";
 
 interface VenueListExplorerProps {
@@ -11,6 +11,8 @@ interface VenueListExplorerProps {
   onOpenChange: (open: boolean) => void;
   selectedVenueId: string | null;
   onVenueClick: (id: string) => void;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 const VenueListExplorer = ({
@@ -18,7 +20,9 @@ const VenueListExplorer = ({
   isOpen,
   onOpenChange,
   selectedVenueId,
-  onVenueClick
+  onVenueClick,
+  hasMore,
+  onLoadMore
 }: VenueListExplorerProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +89,17 @@ const VenueListExplorer = ({
                   </div>
                 ))}
               </div>
+
+              {hasMore && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={onLoadMore}
+                    className="w-full py-3 bg-darkCardV2 border border-darkBorderV1 rounded-xl text-neutral-300 font-medium active:bg-accent/20 transition-colors"
+                  >
+                    Hiển thị thêm
+                  </button>
+                </div>
+              )}
 
               {venues.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-neutral-500">

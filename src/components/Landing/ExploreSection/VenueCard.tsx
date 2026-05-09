@@ -1,21 +1,20 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { IVenue } from "@/interface/venue";
-import { Icon } from "@/components/ui/mdi-icon";
-import {
-  mdiMap,
-  mdiClock,
-  mdiStar,
-  mdiCheckCircle,
-  mdiCreation,
-  mdiChevronRightCircleOutline
-} from "@mdi/js";
-import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/mdi-icon";
+import { IVenue } from "@/interface/venue";
+import {
+  mdiCheckCircle,
+  mdiChevronRightCircleOutline,
+  mdiClock,
+  mdiCreation,
+  mdiMap,
+  mdiStar
+} from "@mdi/js";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
 interface VenueCardProps {
   venue: IVenue;
@@ -93,6 +92,19 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             <Icon path={mdiClock} size={0.6} />
             {venue.openTime} - {venue.closeTime}
           </div>
+
+          {/* AI Analysis */}
+          {isAI && venue.detailedAnalysis && (
+            <div className="mt-4 rounded-xl bg-primary/5 p-3 border border-primary/10">
+              <div className="flex items-center gap-1.5 text-primary text-xs font-bold mb-1 uppercase tracking-wider">
+                <Icon path={mdiCreation} size={0.6} />
+                Phân tích từ AI
+              </div>
+              <p className="text-xs text-neutral-600 leading-relaxed italic">
+                "{venue.detailedAnalysis}"
+              </p>
+            </div>
+          )}
 
           {/* Features tags */}
           <div className="mt-4 flex flex-wrap gap-1">

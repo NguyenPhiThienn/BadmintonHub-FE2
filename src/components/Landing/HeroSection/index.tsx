@@ -1,11 +1,11 @@
 "use client"
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiArrowRight, mdiPlay, mdiTrendingUp } from "@mdi/js"
+import { mdiPlay, mdiSoccerField, mdiTrendingUp } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 import Link from "next/link"
 
 const fadeUp: Variants = {
@@ -108,9 +108,9 @@ export function HeroSection() {
                             className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
                         >
                             <Button size="xl" asChild>
-                                <Link href="#cta">
-                                    Bắt đầu miễn phí
-                                    <Icon path={mdiArrowRight} size={0.8} />
+                                <Link href="/venues">
+                                    Đặt sân ngay
+                                    <Icon path={mdiSoccerField} size={0.8} />
                                 </Link>
                             </Button>
                             <Button variant="outline" size="xl" asChild className="border-white/30 bg-white/5 text-secondary hover:bg-white/15 hover:text-secondary backdrop-blur-sm">
