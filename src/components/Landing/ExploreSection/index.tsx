@@ -42,14 +42,12 @@ export const ExploreSection = () => {
   const venues = Array.isArray(venuesRes?.data) ? venuesRes.data : venuesRes?.data?.venues || [];
 
   const handleGetAIRecommendations = () => {
-    if (!user?.id) return;
-
     const lat = 10.762622;
     const lng = 106.660172;
 
     aiMutation.mutate(
       {
-        userId: user.id as string,
+        userId: user?.id || "",
         preferences: {},
         lat,
         lng
