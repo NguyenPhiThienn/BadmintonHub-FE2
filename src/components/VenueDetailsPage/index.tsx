@@ -124,7 +124,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   return (
     <div className="min-h-screen bg-darkBackgroundV1 text-neutral-300 pb-32">
       <VenueHeader venue={venue} />
-
       <main className="mx-auto px-4 mt-4 space-y-4">
         <BookingSection
           dates={dates}
@@ -139,10 +138,8 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           onToggleSlot={toggleSlot}
           venueId={id}
         />
-
         <ReviewSection />
       </main>
-
       <VenueFooter
         selectedSlotsCount={selectedSlots.length}
         totalPrice={totalPrice}

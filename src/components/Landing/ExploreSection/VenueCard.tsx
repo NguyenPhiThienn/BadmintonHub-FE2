@@ -7,8 +7,8 @@ import { IVenue } from "@/interface/venue";
 import {
   mdiChevronRightCircleOutline,
   mdiClock,
-  mdiCreation,
   mdiMap,
+  mdiShimmer,
   mdiStar
 } from "@mdi/js";
 import { motion } from "framer-motion";
@@ -56,7 +56,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
 
           {isAI && (
             <Badge variant="badminton" className="absolute left-2 top-2">
-              <Icon path={mdiCreation} size={0.6} />
+              <Icon path={mdiShimmer} size={0.6} />
               Gợi ý AI {venue.matchScore && `(${venue.matchScore}%)`}
             </Badge>
           )}
@@ -93,7 +93,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
           {isAI && venue.detailedAnalysis && (
             <div className="mt-2 rounded-xl bg-primary/5 p-3 border border-primary/10">
               <div className="flex items-center gap-1.5 text-primary text-sm font-bold mb-1 uppercase">
-                <Icon path={mdiCreation} size={0.8} />
+                <Icon path={mdiShimmer} size={0.8} />
                 Phân tích từ AI
               </div>
               <p className="text-base text-neutral-500 italic">

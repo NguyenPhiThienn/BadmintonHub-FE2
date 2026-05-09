@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { venueApi } from "@/api/venue";
 import { IAIRecommendationRequest } from "@/interface/venue";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useVenues = (params?: { 
   page?: number; 
@@ -66,6 +66,14 @@ export const useVenuePricing = (venueId: string) => {
 export const useAiRecommendations = () => {
   return useMutation({
     mutationFn: (data: IAIRecommendationRequest) => venueApi.getAiRecommendations(data),
+  });
+};
+
+export const useAiBookingRecommendation = (venueId: string) => {
+  return useQuery({
+    queryKey: ["booking-recommendation", venueId],
+    queryFn: () => venueApi.getAiBookingRecommendation(venueId),
+    enabled: !!venueId,
   });
 };
 

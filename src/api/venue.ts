@@ -33,6 +33,9 @@ export const venueApi = {
   getDemandAnalytics: (params: { venueId: string }) =>
     sendGet("/ai/analytics/demand", params),
 
+  getAiBookingRecommendation: (venueId: string) =>
+    sendGet("/ai/booking-recommendation", { venueId }),
+
   // Admin specific
   getAdminVenues: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
     sendGet("/admin/venues", {

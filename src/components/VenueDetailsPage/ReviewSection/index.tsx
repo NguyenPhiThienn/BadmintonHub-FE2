@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { mdiCreation, mdiReply, mdiSend, mdiStar, mdiThumbUpOutline } from "@mdi/js";
+import { mdiReply, mdiSend, mdiShimmer, mdiStar, mdiThumbUpOutline } from "@mdi/js";
 import { useMemo, useState } from "react";
 const MOCK_NAMES = [
   "Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Minh Đức", "Hoàng Anh Tuấn",
@@ -86,7 +86,7 @@ export const ReviewSection = () => {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-secondary font-semibold mb-2 flex items-center gap-2">
-              <Icon path={mdiCreation} size={0.8} />
+              <Icon path={mdiShimmer} size={0.8} />
               Viết đánh giá của bạn
             </h3>
             <div className="flex items-center gap-4">
@@ -119,7 +119,6 @@ export const ReviewSection = () => {
           placeholder="Chia sẻ trải nghiệm của bạn"
         />
       </div>
-
       <div className="flex flex-col gap-4">
         {reviews.map((review) => (
           <div key={review.id} className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiArrowRight, mdiCheckCircle, mdiChevronRightCircleOutline, mdiClock, mdiCreation, mdiMagnify, mdiMap, mdiStar } from "@mdi/js"
+import { mdiArrowRight, mdiCheckCircle, mdiChevronRightCircleOutline, mdiClock, mdiMagnify, mdiMap, mdiShimmer, mdiStar } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
 import Image from "next/image"
 
@@ -141,7 +141,7 @@ export function PlayerSection() {
 
                                 {court.aiSuggested && (
                                     <Badge variant="badminton" className="absolute left-4 top-4 gap-1 shadow-lg bg-primary border-none">
-                                        <Icon path={mdiCreation} size={0.6} />
+                                        <Icon path={mdiShimmer} size={0.6} />
                                         Gợi ý AI
                                     </Badge>
                                 )}
