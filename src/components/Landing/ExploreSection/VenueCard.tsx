@@ -111,7 +111,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
               {venue.available || 5} sân trống
             </span>
             <Button>
-              Đặt ngay
+              Đặt sân ngay
               <Icon path={mdiChevronRightCircleOutline} size={0.8} />
             </Button>
           </div>

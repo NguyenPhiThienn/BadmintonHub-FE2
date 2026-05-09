@@ -1,34 +1,30 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useBookingDetails } from "@/hooks/useBooking";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
+import { useBookingDetails } from "@/hooks/useBooking";
 import {
-  mdiCheckCircle,
-  mdiHome,
-  mdiTicketOutline,
-  mdiInformationOutline,
-  mdiMapMarker,
-  mdiCurrencyUsd,
-  mdiQrcodeScan,
-  mdiPlaylistRemove,
-  mdiTagOutline,
-  mdiCalendarMonth,
-  mdiClockOutline,
   mdiAccountSupervisorCircle,
-  mdiPhone,
+  mdiCalendarMonth,
+  mdiCheckCircle,
+  mdiCurrencyUsd,
+  mdiHome,
   mdiMap,
-  mdiSoccerField
+  mdiMapMarker,
+  mdiPhone,
+  mdiPlaylistRemove,
+  mdiQrcodeScan,
+  mdiSoccerField,
+  mdiTagOutline
 } from "@mdi/js";
 import { motion } from "framer-motion";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const SuccessContent = () => {
   const searchParams = useSearchParams();
@@ -204,7 +200,7 @@ const SuccessContent = () => {
                   <div key={index} className="flex justify-between items-center bg-darkBackgroundV1 p-4 rounded-xl border border-darkBorderV1">
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-lg bg-accent/5 flex items-center justify-center border border-accent/10">
-                        <Icon path={mdiClockOutline} size={0.8} className="text-accent" />
+                        <Icon path={mdiSoccerField} size={0.8} className="text-accent" />
                       </div>
                       <div>
                         <p className="text-neutral-300 font-semibold">{detail.courtId?.name}</p>

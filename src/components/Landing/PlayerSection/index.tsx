@@ -1,12 +1,12 @@
 "use client"
 
-import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiMap, mdiStar, mdiClock, mdiMagnify, mdiCreation, mdiArrowRight, mdiCheckCircle, mdiChevronRightCircleOutline } from "@mdi/js"
+import { mdiArrowRight, mdiCheckCircle, mdiChevronRightCircleOutline, mdiClock, mdiCreation, mdiMagnify, mdiMap, mdiStar } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 40 },
@@ -198,7 +198,7 @@ export function PlayerSection() {
                                         {court.available} sân trống
                                     </span>
                                     <Button>
-                                        Đặt ngay
+                                        Đặt sân ngay
                                         <Icon path={mdiChevronRightCircleOutline} size={0.8} />
                                     </Button>
                                 </div>

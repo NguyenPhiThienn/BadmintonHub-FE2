@@ -1,50 +1,38 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Icon } from "@/components/ui/mdi-icon";
-import {
-  mdiChevronLeft,
-  mdiShareVariantOutline,
-  mdiStar,
-  mdiMapMarker,
-  mdiClockOutline,
-  mdiCalendar,
-  mdiSoccerField,
-  mdiInformationOutline,
-  mdiChartBar,
-  mdiChevronRight,
-  mdiBadminton,
-} from "@mdi/js";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/mdi-icon";
+import { useCreateBooking } from "@/hooks/useBooking";
 import {
-  useVenueDetails,
-  useVenueCourts,
-  useDemandAnalytics,
   useAvailability,
+  useDemandAnalytics,
+  useVenueCourts,
+  useVenueDetails,
   useVenuePricing
 } from "@/hooks/useVenue";
-import { ICourt, IAvailability, ISlot } from "@/interface/venue";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  CartesianGrid
-} from "recharts";
+import { IAvailability, ICourt, ISlot } from "@/interface/venue";
 import { cn } from "@/lib/utils";
-import { format, addDays, addHours, startOfToday, isSameDay, getDay } from "date-fns";
-import { useCreateBooking } from "@/hooks/useBooking";
-import { toast } from "react-toastify";
+import {
+  mdiBadminton,
+  mdiChevronLeft,
+  mdiChevronRight,
+  mdiInformationOutline,
+  mdiMapMarker,
+  mdiShareVariantOutline,
+  mdiSoccerField,
+  mdiStar
+} from "@mdi/js";
+import { addDays, addHours, format, getDay, isSameDay, startOfToday } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Autoplay, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 import {
   Breadcrumb,
@@ -237,7 +225,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
 
   return (
     <div className="min-h-screen bg-darkBackgroundV1 text-neutral-300 pb-32">
-      {/* 1. Image Slider */}
       <div className="relative h-72 md:h-96 w-full">
         <Swiper
           modules={[Pagination, Autoplay]}
@@ -282,7 +269,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
 
       <main className="mx-auto px-8 mt-8 space-y-8">
         <div className="flex items-center justify-between">
-          {/* Breadcrumb Section */}
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -299,7 +285,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
             </BreadcrumbList>
           </Breadcrumb>
 
-          {/* 2. Basic Info */}
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="yellow">
               <span className="text-nowrap">Đánh giá:</span>
@@ -312,79 +297,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
             </Badge>
           </div>
         </div>
-        {/* 3. AI Demand Analytics */}
-        <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Icon path={mdiChartBar} size={0.8} className="text-accent" />
-              <div className="space-y-1">
-                <h3 className="font-semibold text-base text-accent">AI Demand Forecast</h3>
-                <p className="text-neutral-400 text-base font-medium">Mức độ đông sân theo thời gian</p>
-              </div>
-            </div>
-            <Badge variant="green">
-              Nhu nhu cầu: {demandRes?.data?.demandLevel || "Cao"}
-            </Badge>
-          </div>
 
-          <div className="h-52 w-full mt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={demandData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity={1} />
-                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
-                  </linearGradient>
-                  <linearGradient id="barGradientNormal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#404040" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="#1a1a1a" stopOpacity={0.4} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis
-                  dataKey="hour"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
-                  dy={10}
-                />
-                <Tooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                  contentStyle={{
-                    backgroundColor: '#1a1a1a',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
-                    padding: '8px 12px'
-                  }}
-                  itemStyle={{ color: 'hsl(var(--accent))', fontWeight: 'bold', fontSize: '12px' }}
-                  labelStyle={{ color: '#9ca3af', marginBottom: '4px', fontSize: '12px' }}
-                  formatter={(value: number) => [`${value.toFixed(0)}%`, 'Nhu cầu']}
-                />
-                <Bar
-                  dataKey="level"
-                  radius={[12, 12, 0, 0]}
-                  barSize={80}
-                  animationDuration={1500}
-                  animationEasing="ease-out"
-                >
-                  {demandData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.isPeak ? 'url(#barGradientPeak)' : 'url(#barGradientNormal)'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex items-center gap-2 text-neutral-400 text-base italic">
-            <Icon path={mdiInformationOutline} size={0.8} />
-            Dự báo dựa trên dữ liệu 30 ngày qua.
-          </div>
-        </section>
-
-        {/* 4. Sticky Date Picker */}
         <section className="sticky top-0 z-20 bg-darkBackgroundV1/90 backdrop-blur-md space-y-4">
           <div className="flex items-center gap-4">
             <h3 className="text-accent font-semibold whitespace-nowrap">Chọn ngày chơi</h3>
@@ -449,7 +362,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           </div>
         </section>
 
-        {/* 5. Court & Time Slot Picker */}
         <section className="space-y-4">
           <div className="flex items-center gap-4 flex-1">
             <h3 className="text-accent font-semibold whitespace-nowrap">Chọn sân & khung giờ</h3>
@@ -486,7 +398,6 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
         </section>
       </main>
 
-      {/* 6. Sticky Footer */}
       <footer className="fixed bottom-0 left-0 right-0 z-30 bg-darkBackgroundV2/80 backdrop-blur-xl border-t border-darkBorderV1 p-4 flex items-center justify-between gap-4 shadow-2xl">
         <div className="space-y-1">
           <span className="text-neutral-400 text-base font-medium">

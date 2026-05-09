@@ -471,7 +471,7 @@ const MapExplorer = () => {
         onConfirm={handleBookConfirm}
         title="Xác nhận đặt sân"
         description={`Bạn có chắc chắn muốn đặt sân "${venues.find((v: IVenue) => v._id === selectedVenueId)?.name}" không?`}
-        confirmText="Đặt ngay"
+        confirmText="Đặt sân ngay"
         cancelText="Để sau"
         isPending={isBooking}
       />
