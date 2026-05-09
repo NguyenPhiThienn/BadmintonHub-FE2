@@ -13,11 +13,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { IVenue } from "@/interface/venue";
 import {
     mdiCheck,
-    mdiClockOutline,
     mdiClose,
-    mdiCurrencyUsd,
     mdiEyeOutline,
-    mdiMapMarkerOutline,
     mdiPlaylistRemove,
     mdiSquareEditOutline,
     mdiTrashCanOutline
@@ -58,6 +55,7 @@ export const VenueTable = memo(({
                         <TableHead className="w-12 text-center">STT</TableHead>
                         <TableHead>Tên cơ sở</TableHead>
                         <TableHead>Địa chỉ</TableHead>
+                        <TableHead className="text-center">Số sân</TableHead>
                         <TableHead className="text-center">Giờ mở cửa</TableHead>
                         <TableHead className="text-center">Giá thuê</TableHead>
                         <TableHead className="text-center">Trạng thái</TableHead>
@@ -71,6 +69,7 @@ export const VenueTable = memo(({
                                 <TableCell><Skeleton className="h-6 w-8" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-48" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-32" /></TableCell>
+                                <TableCell><Skeleton className="h-6 w-16 mx-auto" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-40" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-8 w-8 mx-auto" /></TableCell>
@@ -101,6 +100,11 @@ export const VenueTable = memo(({
                                     </TableCell>
                                     <TableCell className="max-w-[250px] text-wrap" title={venue.address}>
                                         {venue.address}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Badge variant="neutral">
+                                            {venue.totalCourts || 0} sân
+                                        </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="neutral">

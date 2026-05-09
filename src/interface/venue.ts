@@ -15,6 +15,7 @@ export interface IVenue {
   distance?: string;
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'REJECTED' | 'SUSPENDED';
   available?: number;
+  totalCourts?: number;
   ownerName?: string;
   ownerPhone?: string;
   ownerEmail?: string;
