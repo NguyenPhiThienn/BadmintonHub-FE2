@@ -4,9 +4,14 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { mdiReply, mdiSend, mdiShimmer, mdiStar, mdiThumbUpOutline } from "@mdi/js";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+
+const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then(mod => mod.RichTextEditor), { 
+  ssr: false,
+  loading: () => <div className="h-[130px] w-full bg-darkBackgroundV1 animate-pulse rounded-xl border border-darkBorderV1" />
+});
 const MOCK_NAMES = [
   "Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Minh Đức", "Hoàng Anh Tuấn",
   "Đặng Quang Huy", "Bùi Thị Mai", "Vũ Minh Hải", "Ngô Thanh Tâm", "Lý Gia Thành",

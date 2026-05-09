@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
 import { useAiBookingRecommendation } from "@/hooks/useVenue";
@@ -124,14 +125,24 @@ export const BookingSection = ({
                 <Icon path={mdiShimmer} size={0.8} className="text-accent" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-accent font-bold text-sm flex items-center gap-2">
+                <h4 className="text-accent font-semibold text-sm flex items-center gap-2">
                   AI ĐỀ XUẤT CHO BẠN
-                  <span className="bg-accent text-[10px] text-white px-2 py-0.5 rounded-full uppercase tracking-tighter">Tối ưu nhất</span>
+                  <Badge variant="green">
+                    Tối ưu nhất
+                  </Badge>
                 </h4>
-                <p className="text-neutral-300 text-sm font-medium">
-                  Ngày <span className="text-white">{format(parseISO(aiRec.date), 'dd/MM')}</span> lúc <span className="text-white">{aiRec.startTime}</span> là thời điểm tuyệt vời để ra sân!
-                </p>
-                <p className="text-neutral-500 text-xs italic line-clamp-1">
+                <div className="text-neutral-300 text-base font-medium flex items-center gap-1">
+                  Ngày
+                  <Badge variant="amber">
+                    {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
+                  </Badge>
+                  lúc
+                  <Badge variant="amber">
+                    {aiRec.startTime}
+                  </Badge>
+                  là thời điểm tuyệt vời để ra sân!
+                </div>
+                <p className="text-neutral-400 text-base italic line-clamp-1">
                   "{aiRec.reason}"
                 </p>
               </div>
@@ -140,20 +151,15 @@ export const BookingSection = ({
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
-                size="sm"
                 onClick={() => setShowAiRec(false)}
-                className="text-neutral-500 hover:text-neutral-300"
               >
                 Bỏ qua
               </Button>
               <Button
-                variant="accent"
-                size="sm"
                 onClick={handleApplyAiRec}
-                className="font-bold gap-2"
               >
-                <Icon path={mdiShimmer} size={0.6} />
-                Xem ngay
+                <Icon path={mdiShimmer} size={0.8} />
+                Chọn và xem khung giờ
               </Button>
             </div>
           </div>
@@ -217,7 +223,7 @@ export const BookingSection = ({
                       <span className="text-xs font-semibold mb-1 uppercase">
                         {format(date, 'EEE', { locale: vi })}
                       </span>
-                      <span className="text-sm font-bold">
+                      <span className="text-sm font-semibold">
                         {format(date, 'dd/MM')}
                       </span>
                     </button>
