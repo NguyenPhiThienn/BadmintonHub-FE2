@@ -40,11 +40,6 @@ const aiFeatures = [
         title: "Tự động hóa vận hành",
         description: "Tự động xử lý đặt sân, hủy sân, hoàn tiền. Giảm 80% công việc thủ công.",
     },
-    {
-        icon: mdiLightbulbOn,
-        title: "Phân tích thông minh",
-        description: "Báo cáo chi tiết về xu hướng thị trường, hành vi khách hàng và hiệu suất kinh doanh.",
-    },
 ]
 
 export function AISection() {

@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Icon } from "@/components/ui/mdi-icon";
-import { mdiEmailOutline, mdiArrowLeft, mdiSend, mdiLoading, mdiLockOutline, mdiEye, mdiEyeOff } from "@mdi/js";
-import { useForgotPassword } from "@/hooks/useAuth";
-import Link from "next/link";
-import { toast } from "react-toastify";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Label } from "@/components/ui/label";
+import { Icon } from "@/components/ui/mdi-icon";
+import { useForgotPassword } from "@/hooks/useAuth";
+import { mdiArrowLeft, mdiEmailOutline, mdiEye, mdiEyeOff, mdiLoading, mdiLockOutline, mdiSend } from "@mdi/js";
+import Link from "next/link";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 interface ForgotPasswordFormProps {
   onSwitchLogin?: () => void;

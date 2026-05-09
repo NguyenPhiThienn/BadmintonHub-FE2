@@ -44,14 +44,21 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog, onSucces
         const { accessToken, refreshToken, user } = response.data;
 
         localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("token", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("user", JSON.stringify(user));
 
         setUserContext(user, accessToken);
-        await fetchUserProfile();
+        fetchUserProfile();
 
         toast.success(response.message || "Đăng nhập thành công");
-        router.push("/");
+        const userRole = user?.role?.toLowerCase();
+        if (userRole === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
+
         if (onSuccess) onSuccess();
       }
     } catch (error: any) {

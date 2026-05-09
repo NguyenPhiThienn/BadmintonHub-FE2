@@ -10,6 +10,7 @@ import { useUser } from "@/context/useUserContext";
 import { Icon } from "@/components/ui/mdi-icon";
 import { mdiFlashOutline, mdiMapMarkerRadiusOutline, mdiFire, mdiFilterVariant } from "@mdi/js";
 import { IVenue, IAIRecommendationResponse } from "@/interface/venue";
+import { useRouter } from "next/navigation";
 
 // Swiper imports
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -25,11 +26,27 @@ const filters = [
 ];
 
 export const ExploreSection = () => {
+  const router = useRouter();
   const { user } = useUser();
-  const { data: venuesRes, isLoading } = useVenues({ limit: 12 });
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { data: venuesRes, isLoading } = useVenues({ limit: 12, search: debouncedSearch });
   const aiMutation = useAiRecommendations();
   const [activeFilter, setActiveFilter] = useState("nearby");
   const [recommendedVenues, setRecommendedVenues] = useState<IVenue[]>([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const handleSearch = (val: string) => {
+    if (val.trim()) {
+      router.push(`/venues?search=${encodeURIComponent(val)}`);
+    }
+  };
 
   const venues = Array.isArray(venuesRes?.data) ? venuesRes.data : venuesRes?.data?.venues || [];
 
@@ -66,7 +83,11 @@ export const ExploreSection = () => {
       {/* Search & Filter Header */}
       <div className="max-w-7xl mx-auto space-y-4">
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-          <SearchBar />
+          <SearchBar 
+            value={search} 
+            onChange={setSearch} 
+            onSearch={handleSearch} 
+          />
         </motion.div>
 
         <motion.div

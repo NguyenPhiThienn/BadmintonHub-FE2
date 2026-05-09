@@ -60,7 +60,7 @@ export const useAiRecommendations = () => {
 };
 
 // Admin specific
-export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string }) => {
+export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
   return useQuery({
     queryKey: ["admin-venues", params],
     queryFn: () => venueApi.getAdminVenues(params),

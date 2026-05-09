@@ -1,15 +1,11 @@
+import { MenuItem } from "@/interface/types";
 import {
   mdiAccountGroupOutline,
-  mdiAutoFix,
   mdiCalendarClock,
-  mdiClipboardCheckOutline,
-  mdiCogOutline,
   mdiCommentQuestionOutline,
   mdiSoccerField,
-  mdiTagOutline,
-  mdiViewDashboardOutline,
+  mdiViewDashboardOutline
 } from "@mdi/js";
-import { MenuItem } from "@/interface/types";
 
 export const getDashboardMenuItems = (permissions: string[] = [], role?: string): MenuItem[] => {
   const allItems: MenuItem[] = [
@@ -38,22 +34,10 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       icon: mdiCalendarClock,
     },
     {
-      id: "ai-analytics",
-      name: "Phân tích thông minh",
-      path: "/admin/ai-analytics",
-      icon: mdiAutoFix,
-    },
-    {
       id: "support-center",
       name: "Trung tâm hỗ trợ",
       path: "/admin/support",
       icon: mdiCommentQuestionOutline,
-    },
-    {
-      id: "system-settings",
-      name: "Cấu hình hệ thống",
-      path: "/admin/settings",
-      icon: mdiCogOutline,
     },
   ];
 

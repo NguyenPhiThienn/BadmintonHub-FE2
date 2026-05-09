@@ -15,7 +15,6 @@ import {
     mdiCheck,
     mdiClose,
     mdiEyeOutline,
-    mdiFileDocumentOutline,
     mdiPlaylistRemove,
     mdiSquareEditOutline,
     mdiTrashCanOutline
@@ -97,7 +96,7 @@ export const VenueTable = memo(({
                                     <TableCell className="font-medium text-accent hover:underline cursor-pointer" onClick={() => onAction(venue, "view")}>
                                         {venue.name}
                                     </TableCell>
-                                    <TableCell className="max-w-[200px] truncate" title={venue.address}>
+                                    <TableCell className="max-w-[250px] text-wrap" title={venue.address}>
                                         {venue.address}
                                     </TableCell>
                                     <TableCell className="text-center">

@@ -1,14 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Icon } from "@/components/ui/mdi-icon"
-import { mdiMenu, mdiClose, mdiBellOutline, mdiAccountOutline, mdiLogout, mdiLockReset, mdiTicketOutline, mdiHomeOutline, mdiMapMarkerOutline, mdiCalendarMonthOutline } from "@mdi/js"
-import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
-import Image from "next/image"
 import { AuthDialogs, AuthMode } from "@/components/Auth/AuthDialogs"
-import { useUser } from "@/context/useUserContext"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,7 +11,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Icon } from "@/components/ui/mdi-icon"
+import { useUser } from "@/context/useUserContext"
+import { mdiAccountOutline, mdiBellOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, mdiLockReset, mdiLogout, mdiMapMarkerOutline, mdiMenu, mdiTicketOutline } from "@mdi/js"
+import { AnimatePresence, motion } from "framer-motion"
+import Image from "next/image"
+import Link from "next/link"
+import { useState } from "react"
 
 const navLinks = [
     { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
@@ -80,17 +80,14 @@ export function Header() {
                                                 src={user.avatarUrl || `https://api.dicebear.com/9.x/bottts/svg?seed=${user.fullName}`}
                                                 alt={user.fullName}
                                             />
-                                            <AvatarFallback className="bg-primary/10 text-primary">
-                                                {user.fullName?.charAt(0) || "U"}
-                                            </AvatarFallback>
                                         </Avatar>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-semibold leading-none">{user.fullName}</p>
-                                            <p className="text-sm leading-none text-neutral-400">{user.email}</p>
+                                            <p className="text-sm font-semibold leading-none text-wrap">{user.fullName}</p>
+                                            <p className="text-sm leading-none text-neutral-400 line-clamp-1">{user.email}</p>
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />

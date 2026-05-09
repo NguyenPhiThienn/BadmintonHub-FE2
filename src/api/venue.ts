@@ -24,8 +24,13 @@ export const venueApi = {
     sendGet("/ai/analytics/demand", params),
 
   // Admin specific
-  getAdminVenues: (params?: { page?: number; limit?: number; status?: string }) =>
-    sendGet("/admin/venues", params),
+  getAdminVenues: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+    sendGet("/admin/venues", {
+      page: params?.page,
+      limit: params?.limit,
+      search: params?.search,
+      status: params?.status,
+    }),
 
   updateVenueStatus: (id: string, data: { status: string; reason?: string }) =>
     sendPatch(`/admin/venues/${id}/status`, data),

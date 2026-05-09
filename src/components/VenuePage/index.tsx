@@ -26,17 +26,23 @@ import { IVenue } from "@/interface/venue";
 import { mdiChevronRight, mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { LegalDocumentPreview } from "./LegalDocumentPreview";
-import { VenueTable } from "./VenueTable";
 import { VenueDetailsDialog } from "./VenueDetailsDialog";
+import { VenueTable } from "./VenueTable";
 
 export default function VenuePage() {
-    const [searchQuery, setSearchQuery] = useState("");
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const [searchQuery, setSearchQuery] = useState(searchParams?.get("search") || "");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
     const [sortOrder, setSortOrder] = useState("desc");
     const [locationFilter, setLocationFilter] = useState("all");
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(Number(searchParams?.get("page")) || 1);
     const [pageSize] = useState(10);
     const [previewVenue, setPreviewVenue] = useState<IVenue | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -45,6 +51,40 @@ export default function VenuePage() {
     const [selectedVenue, setSelectedVenue] = useState<IVenue | null>(null);
 
     const { isMobile } = useResponsive();
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        setCurrentPage(1);
+    }, [debouncedSearchQuery]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams?.toString() || "");
+        if (debouncedSearchQuery) {
+            params.set("search", debouncedSearchQuery);
+        } else {
+            params.delete("search");
+        }
+
+        if (currentPage > 1) {
+            params.set("page", currentPage.toString());
+        } else {
+            params.delete("page");
+        }
+
+        const queryString = params.toString();
+        router.push(pathname + (queryString ? `?${queryString}` : ""), { scroll: false });
+    }, [debouncedSearchQuery, currentPage, pathname, router, searchParams]);
 
     const {
         data: pendingRes,
@@ -52,8 +92,9 @@ export default function VenuePage() {
         isFetching,
         refetch
     } = useAdminVenues({
-        page: currentPage,
-        limit: pageSize
+        page: currentPage || 1,
+        limit: pageSize || 10,
+        search: debouncedSearchQuery
     });
 
     const { mutate: updateStatus } = useUpdateVenueStatus();
