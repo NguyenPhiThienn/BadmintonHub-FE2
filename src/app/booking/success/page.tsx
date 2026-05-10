@@ -58,77 +58,138 @@ const SuccessContent = () => {
       invoiceContainer.style.width = "800px";
       invoiceContainer.style.backgroundColor = "white";
       invoiceContainer.style.color = "#333";
-      invoiceContainer.style.padding = "40px";
-      invoiceContainer.style.fontFamily = "'Tinos', serif";
-
+      // Premium Invoice HTML Template
       invoiceContainer.innerHTML = `
-        <div style="border-bottom: 2px solid #41C651; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h1 style="color: #41C651; margin: 0; font-size: 32px; font-weight: bold;">HÓA ĐƠN ĐẶT SÂN</h1>
-            <p style="margin: 5px 0; color: #666; font-size: 14px;">Mã đơn hàng: #BH${booking._id?.slice(-6).toUpperCase()}</p>
-            <p style="margin: 5px 0; color: #666; font-size: 14px;">Ngày lập: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}</p>
-          </div>
-          <div style="text-align: right;">
-             <h2 style="margin: 0; color: #0A1F22; font-size: 24px;">BadmintonHub</h2>
-             <p style="margin: 0; color: #666; font-size: 12px;">Smart Booking System</p>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin khách hàng</h3>
-            <p style="margin: 10px 0;"><strong>Họ tên:</strong> ${booking.playerId?.fullName || 'Khách ẩn danh'}</p>
-            <p style="margin: 10px 0;"><strong>Số điện thoại:</strong> ${booking.playerId?.phone || 'N/A'}</p>
-            <p style="margin: 10px 0;"><strong>Email:</strong> ${booking.playerId?.email || 'N/A'}</p>
-          </div>
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin cơ sở</h3>
-            <p style="margin: 10px 0;"><strong>Tên sân:</strong> ${booking.venueId?.name}</p>
-            <p style="margin: 10px 0;"><strong>Địa chỉ:</strong> ${booking.venueId?.address}</p>
-          </div>
-        </div>
-
-        <h3 style="border-bottom: 2px solid #41C651; padding-bottom: 10px; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Chi tiết dịch vụ</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
-          <thead>
-            <tr style="background-color: #41C651; color: white;">
-              <th style="padding: 15px; text-align: left;">Ngày đặt</th>
-              <th style="padding: 15px; text-align: left;">Tên sân</th>
-              <th style="padding: 15px; text-align: center;">Khung giờ</th>
-              <th style="padding: 15px; text-align: right;">Đơn giá</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${booking.details?.map((detail: any) => `
-              <tr>
-                <td style="padding: 15px; border-bottom: 1px solid #eee;">${new Date(detail.bookingDate).toLocaleDateString('vi-VN')}</td>
-                <td style="padding: 15px; border-bottom: 1px solid #eee;">${detail.courtId?.name}</td>
-                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center; color: #41C651; font-weight: bold;">${detail.startTime} - ${detail.endTime}</td>
-                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: right;">${detail.price?.toLocaleString()}đ</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-        <div style="display: flex; justify-content: flex-end;">
-          <div style="width: 300px; background-color: #f9f9f9; padding: 20px; border-radius: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-              <span>Tổng cộng:</span>
-              <span style="font-weight: bold; font-size: 20px; color: #41C651;">${(booking.finalPrice || 0).toLocaleString()}đ</span>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Tinos:wght@400;700&display=swap');
+          * { font-family: 'Tinos', 'Times New Roman', serif; }
+        </style>
+        <div style="padding: 40px; background-color: white;">
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #41C651; padding-bottom: 30px; margin-bottom: 30px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <img src="${window.location.origin}/images/primary-logo.svg" style="height: 45px; width: auto;" />
+                <div style="height: 30px; width: 2px; background-color: #eee; margin: 0 10px;"></div>
+                <div style="color: #0A1F22; font-weight: bold; font-size: 20px;">BadmintonHub</div>
+              </div>
+              <h1 style="color: #41C651; margin: 0; font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">HÓA ĐƠN ĐẶT SÂN</h1>
+              <p style="margin: 8px 0 0 0; color: #666; font-size: 14px;">Mã đơn hàng: <span style="color: #0A1F22; font-weight: bold;">#BH${booking._id?.slice(-6).toUpperCase()}</span></p>
+              <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ngày lập: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}</p>
             </div>
-            <p style="text-align: right; margin: 0; font-style: italic; color: #666; font-size: 12px;">
-              Trạng thái: ĐÃ THANH TOÁN
-            </p>
+            <div style="text-align: right; color: #666; font-size: 13px; line-height: 1.6;">
+               <p style="margin: 0; font-weight: bold; color: #0A1F22; font-size: 16px; margin-bottom: 5px;">THÔNG TIN ĐƠN VỊ</p>
+               <p style="margin: 0;">CÔNG TY CP ĐẦU TƯ & DỊCH VỤ BADMINTONHUB</p>
+               <p style="margin: 0;">Hotline: 1900 633 633</p>
+               <p style="margin: 0;">Email: support@badmintonhub.vn</p>
+               <p style="margin: 0;">Website: www.badmintonhub.vn</p>
+            </div>
           </div>
-        </div>
 
-        <div style="margin-top: 60px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
-          <p>Cảm ơn bạn đã lựa chọn BadmintonHub!</p>
-          <p>Hệ thống đặt sân cầu lông thông minh hàng đầu Việt Nam.</p>
+          <!-- Customer & Venue Info -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+            <div style="background-color: #fcfcfc; padding: 25px; border-radius: 12px; border: 1px solid #f0f0f0;">
+              <h3 style="border-bottom: 2px solid #eee; padding-bottom: 12px; margin-top: 0; color: #0A1F22; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Thông tin khách hàng</h3>
+              <div style="margin-top: 15px; font-size: 14px; line-height: 1.8;">
+                <p style="margin: 0;"><strong>Họ tên:</strong> ${booking.playerId?.fullName || 'Khách ẩn danh'}</p>
+                <p style="margin: 0;"><strong>Số điện thoại:</strong> ${booking.playerId?.phone || 'N/A'}</p>
+                <p style="margin: 0;"><strong>Email:</strong> ${booking.playerId?.email || 'N/A'}</p>
+              </div>
+            </div>
+            <div style="background-color: #fcfcfc; padding: 25px; border-radius: 12px; border: 1px solid #f0f0f0;">
+              <h3 style="border-bottom: 2px solid #eee; padding-bottom: 12px; margin-top: 0; color: #0A1F22; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Thông tin cơ sở</h3>
+              <div style="margin-top: 15px; font-size: 14px; line-height: 1.8;">
+                <p style="margin: 0;"><strong>Tên sân:</strong> ${booking.venueId?.name}</p>
+                <p style="margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><strong>Địa chỉ:</strong> ${booking.venueId?.address}</p>
+                <p style="margin: 0;"><strong>Trạng thái:</strong> <span style="color: #41C651; font-weight: bold;">ĐÃ XÁC NHẬN</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Services Table -->
+          <h3 style="margin: 0 0 15px 0; color: #0A1F22; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Chi tiết lịch đặt</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+            <thead>
+              <tr style="background-color: #41C651; color: white;">
+                <th style="padding: 15px; text-align: left; border: 1px solid #41C651; font-size: 14px;">Ngày đặt</th>
+                <th style="padding: 15px; text-align: left; border: 1px solid #41C651; font-size: 14px;">Tên sân</th>
+                <th style="padding: 15px; text-align: center; border: 1px solid #41C651; font-size: 14px;">Khung giờ</th>
+                <th style="padding: 15px; text-align: right; border: 1px solid #41C651; font-size: 14px;">Đơn giá</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${booking.details?.map((detail: any) => `
+                <tr>
+                  <td style="padding: 14px; border: 1px solid #eee; font-size: 14px;">${new Date(detail.bookingDate).toLocaleDateString('vi-VN')}</td>
+                  <td style="padding: 14px; border: 1px solid #eee; font-size: 14px; font-weight: 500;">${detail.courtId?.name}</td>
+                  <td style="padding: 14px; border: 1px solid #eee; text-align: center; color: #41C651; font-weight: bold; font-size: 14px;">${detail.startTime} - ${detail.endTime}</td>
+                  <td style="padding: 14px; border: 1px solid #eee; text-align: right; font-size: 14px; font-weight: 500;">${detail.price?.toLocaleString()}đ</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <!-- Summary -->
+          <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+            <div style="width: 320px; background-color: #f9f9f9; padding: 25px; border-radius: 12px; border: 1px solid #eee;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #666;">
+                <span>Tạm tính:</span>
+                <span>${(booking.totalPrice || 0).toLocaleString()}đ</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #666;">
+                <span>Giảm giá:</span>
+                <span>-0đ</span>
+              </div>
+              <div style="height: 1px; background-color: #ddd; margin: 15px 0; border-top: 1px dashed #bbb;"></div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: bold; font-size: 16px; color: #0A1F22;">TỔNG CỘNG:</span>
+                <span style="font-weight: bold; font-size: 24px; color: #41C651;">${(booking.finalPrice || 0).toLocaleString()}đ</span>
+              </div>
+              <div style="margin-top: 20px; text-align: right; font-size: 12px; font-style: italic; color: #888;">
+                <p style="margin: 0;">Trạng thái: <span style="color: #41C651; font-weight: bold;">ĐÃ THANH TOÁN</span></p>
+                <p style="margin: 4px 0 0 0;">Phương thức: ${booking.payment?.method === 'VNPAY' ? 'Thẻ ngân hàng (VNPay)' : 'Tiền mặt'}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Info -->
+          <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="text-align: center; width: 200px;">
+              <p style="margin-bottom: 60px; font-weight: bold; font-size: 14px;">Khách hàng</p>
+              <p style="color: #999; font-size: 12px;">(Ký và ghi rõ họ tên)</p>
+            </div>
+            <div style="text-align: center; width: 200px;">
+              <p style="margin-bottom: 10px; font-size: 13px; color: #666;">Ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</p>
+              <p style="margin-bottom: 60px; font-weight: bold; font-size: 14px;">Đại diện BadmintonHub</p>
+              <div style="color: #41C651; font-weight: bold; font-size: 16px; transform: rotate(-5deg); border: 2px solid #41C651; padding: 5px 15px; display: inline-block; border-radius: 4px;">
+                ĐÃ THU TIỀN
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 80px; text-align: center; color: #bbb; font-size: 11px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+            <p>Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của BadmintonHub.</p>
+            <p>Hệ thống đặt sân cầu lông thông minh - Kết nối đam mê, nâng tầm sức khỏe.</p>
+          </div>
         </div>
       `;
 
       document.body.appendChild(invoiceContainer);
+
+      // Wait for images to load
+      const images = invoiceContainer.getElementsByTagName("img");
+      await Promise.all(
+        Array.from(images).map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+
+      // Add a small delay for font rendering
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const canvas = await html2canvas(invoiceContainer, {
         scale: 2,
