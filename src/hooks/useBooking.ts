@@ -25,6 +25,7 @@ export const useMyBookings = (params: { page?: number; limit?: number }) => {
   return useQuery({
     queryKey: ["my-bookings", params],
     queryFn: () => bookingApi.getMyBookings(params),
+    refetchInterval: 4000,
   });
 };
 

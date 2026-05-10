@@ -197,7 +197,7 @@ export default function MyBookingsPage() {
                         <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent flex-1">
                             <MyBookingsTable
                                 bookings={bookings}
-                                isLoading={isLoading || isFetching}
+                                isLoading={isLoading}
                                 currentPage={currentPage}
                                 pageSize={pageSize}
                                 onCancel={handleCancelBooking}
