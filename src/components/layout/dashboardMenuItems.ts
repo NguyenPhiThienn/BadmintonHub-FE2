@@ -1,12 +1,51 @@
 import { MenuItem } from "@/interface/types";
 import {
+  mdiAccountCircleOutline,
   mdiAccountGroupOutline,
+  mdiAccountMultipleOutline,
   mdiCalendarClock,
   mdiSoccerField,
   mdiViewDashboardOutline
 } from "@mdi/js";
 
 export const getDashboardMenuItems = (permissions: string[] = [], role?: string): MenuItem[] => {
+  const userRole = role?.toUpperCase();
+
+  if (userRole === "COURT_OWNER" || userRole === "OWNER") {
+    return [
+      {
+        id: "owner-dashboard",
+        name: "Tổng quan",
+        path: "/owner/dashboard",
+        icon: mdiViewDashboardOutline,
+      },
+      {
+        id: "owner-venues",
+        name: "Quản lý cơ sở",
+        path: "/owner/venues",
+        icon: mdiSoccerField,
+      },
+      {
+        id: "owner-bookings",
+        name: "Quản lý đơn đặt sân",
+        path: "/owner/bookings",
+        icon: mdiCalendarClock,
+      },
+      {
+        id: "owner-customers",
+        name: "Quản lý khách hàng",
+        path: "/owner/customers",
+        icon: mdiAccountMultipleOutline,
+      },
+      {
+        id: "owner-profile",
+        name: "Quản lý cá nhân",
+        path: "/owner/profile",
+        icon: mdiAccountCircleOutline,
+      }
+    ];
+  }
+
   const allItems: MenuItem[] = [
     {
       id: "dashboard",

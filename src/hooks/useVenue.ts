@@ -12,6 +12,7 @@ export const useVenues = (params?: {
   lng?: number;
   minPrice?: number;
   maxPrice?: number;
+  ownerId?: string;
 }) => {
   return useQuery({
     queryKey: ["venues", params],

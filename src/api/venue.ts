@@ -12,6 +12,7 @@ export const venueApi = {
     lng?: number;
     minPrice?: number;
     maxPrice?: number;
+    ownerId?: string;
   }) =>
     sendGet("/venues", params),
 

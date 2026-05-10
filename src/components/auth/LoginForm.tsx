@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
-import { mdiEmailOutline, mdiLockOutline, mdiEye, mdiEyeOff, mdiLogin, mdiLoading } from "@mdi/js";
+import { useUser } from "@/context/useUserContext";
 import { useLogin } from "@/hooks/useAuth";
+import { mdiEmailOutline, mdiEye, mdiEyeOff, mdiLoading, mdiLockOutline, mdiLogin } from "@mdi/js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useUser } from "@/context/useUserContext";
 
 interface LoginFormProps {
   onSwitchRegister?: () => void;
@@ -52,9 +52,11 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog, onSucces
         fetchUserProfile();
 
         toast.success(response.message || "Đăng nhập thành công");
-        const userRole = user?.role?.toLowerCase();
-        if (userRole === "admin") {
+        const userRole = user?.role?.toUpperCase();
+        if (userRole === "ADMIN") {
           router.push("/admin");
+        } else if (userRole === "COURT_OWNER" || userRole === "OWNER") {
+          router.push("/owner");
         } else {
           router.push("/");
         }
