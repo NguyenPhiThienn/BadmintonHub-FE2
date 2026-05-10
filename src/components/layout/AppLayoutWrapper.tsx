@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import DashboardLayout from "./DashboardLayout";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
-import ProtectedRoute from "@/components/Auth/ProtectedRoute";
+import { ProtectedRoute } from "@/components/Auth";
 
 export default function AppLayoutWrapper({
   children,

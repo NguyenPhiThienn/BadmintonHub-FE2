@@ -1,6 +1,6 @@
 "use client"
 
-import { AuthDialogs, AuthMode } from "@/components/Auth/AuthDialogs"
+import { AuthDialogs, AuthMode } from "@/components/Auth"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
