@@ -32,9 +32,7 @@ export function Header() {
 
     return (
         <motion.header
-            className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl"
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            className="fixed top-0 left-0 right-0 z-[100] w-full border-b border-border/40 bg-white"
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const }}
         >
             <div className="mx-auto flex h-16 max-w-8xl items-center justify-between px-4 lg:px-8">

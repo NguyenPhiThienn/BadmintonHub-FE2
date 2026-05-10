@@ -181,7 +181,7 @@ export default function ProfilePage() {
         <div className="min-h-screen flex flex-col bg-darkBackgroundV1">
             <Header />
 
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 space-y-4">
+            <main className="flex-1 max-w-7xl mx-auto w-full px-4 pt-24 pb-8 space-y-4">
                 {/* Breadcrumbs */}
                 <Breadcrumb>
                     <BreadcrumbList>
