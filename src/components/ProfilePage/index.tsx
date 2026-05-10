@@ -86,7 +86,7 @@ export default function ProfilePage() {
         const loadData = async () => {
             try {
                 const statsRes = await bookingApi.getMyStatistics();
-                if (statsRes.success) {
+                if (statsRes.statusCode === 200) {
                     setStats(statsRes.data);
                 }
             } catch (error) {
@@ -105,7 +105,7 @@ export default function ProfilePage() {
         setIsPending(true);
         try {
             const res = await usersApi.updateProfile({ fullName, phone, avatarUrl });
-            if (res.success) {
+            if (res.statusCode === 200) {
                 toast.success("Cập nhật thông tin thành công!");
                 fetchUserProfile();
             } else {
@@ -125,7 +125,7 @@ export default function ProfilePage() {
         try {
             setIsPending(true);
             const res = await uploadApi.uploadImage(file);
-            if (res.success) {
+            if (res.statusCode === 200) {
                 setAvatarUrl(res.data.url);
                 toast.success("Tải ảnh lên thành công! Nhấn lưu để cập nhật hồ sơ.");
             }
@@ -145,7 +145,7 @@ export default function ProfilePage() {
         setIsPassPending(true);
         try {
             const res = await authApi.changePassword({ oldPassword, newPassword });
-            if (res.success) {
+            if (res.statusCode === 200) {
                 toast.success("Đổi mật khẩu thành công!");
                 setIsPassDialogOpen(false);
                 setOldPassword("");
@@ -229,36 +229,54 @@ export default function ProfilePage() {
 
                         {/* Statistics Section */}
                         <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4 shadow-lg">
-                            <h3 className="text-accent font-semibold mb-2 flex items-center gap-2">
+                            <h3 className="text-accent font-semibold flex items-center gap-2">
                                 <Icon path={mdiCalendarCheckOutline} size={0.8} />
                                 Thống kê cá nhân
                             </h3>
-                            <div className="grid grid-cols-1 gap-4">
-                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4">
+                            <div className="grid grid-cols-1 gap-3">
+                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4 transition-all hover:border-blue-500/30">
                                     <div className="p-3 bg-blue-500/10 rounded-lg">
                                         <Icon path={mdiClockOutline} size={0.8} className="text-blue-500" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-neutral-400 uppercase font-bold tracking-wider">Tổng giờ chơi</p>
-                                        <p className="text-xl font-bold text-white">{isStatsLoading ? "..." : `${stats?.totalHours || 0}h`}</p>
+                                        <p className="text-xl font-bold text-white">
+                                            {isStatsLoading ? (
+                                                <span className="animate-pulse opacity-50">...</span>
+                                            ) : (
+                                                `${stats?.totalHours || 0}h`
+                                            )}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4">
+                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4 transition-all hover:border-purple-500/30">
                                     <div className="p-3 bg-purple-500/10 rounded-lg">
                                         <Icon path={mdiCalendarCheckOutline} size={0.8} className="text-purple-500" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-neutral-400 uppercase font-bold tracking-wider">Lượt đặt sân</p>
-                                        <p className="text-xl font-bold text-white">{isStatsLoading ? "..." : stats?.totalBookings || 0}</p>
+                                        <p className="text-xl font-bold text-white">
+                                            {isStatsLoading ? (
+                                                <span className="animate-pulse opacity-50">...</span>
+                                            ) : (
+                                                stats?.totalBookings || 0
+                                            )}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4">
+                                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-xl flex items-center gap-4 transition-all hover:border-green-500/30">
                                     <div className="p-3 bg-green-500/10 rounded-lg">
                                         <Icon path={mdiCash} size={0.8} className="text-green-500" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-neutral-400 uppercase font-bold tracking-wider">Tổng chi tiêu</p>
-                                        <p className="text-xl font-bold text-white">{isStatsLoading ? "..." : (stats?.totalSpent || 0).toLocaleString()}đ</p>
+                                        <p className="text-xl font-bold text-white">
+                                            {isStatsLoading ? (
+                                                <span className="animate-pulse opacity-50">...</span>
+                                            ) : (
+                                                `${(stats?.totalSpent || 0).toLocaleString("vi-VN")}đ`
+                                            )}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
