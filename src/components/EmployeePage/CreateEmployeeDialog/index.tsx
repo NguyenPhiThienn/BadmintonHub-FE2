@@ -108,10 +108,19 @@ export const CreateEmployeeDialog = ({
                         </div>
                         <div className="space-y-2">
                             <Label>Ngày sinh <span className="text-red-400 italic text-sm">(*)</span></Label>
-                            <DatePicker
-                                date={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
-                                onDateChange={(date) => handleChange("dateOfBirth", date?.toISOString())}
-                                captionLayout="dropdown"
+                                <DatePicker
+                                    date={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
+                                    onDateChange={(date) => {
+                                        if (date) {
+                                            const year = date.getFullYear();
+                                            const month = String(date.getMonth() + 1).padStart(2, "0");
+                                            const day = String(date.getDate()).padStart(2, "0");
+                                            handleChange("dateOfBirth", `${year}-${month}-${day}`);
+                                        } else {
+                                            handleChange("dateOfBirth", "");
+                                        }
+                                    }}
+                                    captionLayout="dropdown"
                                 toYear={new Date().getFullYear() + 10}
                             />
                         </div>

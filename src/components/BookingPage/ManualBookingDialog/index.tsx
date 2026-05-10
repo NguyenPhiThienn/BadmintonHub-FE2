@@ -67,7 +67,13 @@ export const ManualBookingDialog = ({
             type: "BOOKING",
             venueId: "",
             courtId: "",
-            bookingDate: new Date().toISOString().split("T")[0],
+            bookingDate: (() => {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, "0");
+                const day = String(now.getDate()).padStart(2, "0");
+                return `${year}-${month}-${day}`;
+            })(),
             startTime: "08:00",
             endTime: "09:00",
             customerName: "",
@@ -224,7 +230,16 @@ export const ManualBookingDialog = ({
                                             <FormControl>
                                                 <DatePicker
                                                     date={field.value ? new Date(field.value) : undefined}
-                                                    onDateChange={(date) => field.onChange(date ? date.toISOString().split("T")[0] : "")}
+                                                    onDateChange={(date) => {
+                                                        if (date) {
+                                                            const year = date.getFullYear();
+                                                            const month = String(date.getMonth() + 1).padStart(2, "0");
+                                                            const day = String(date.getDate()).padStart(2, "0");
+                                                            field.onChange(`${year}-${month}-${day}`);
+                                                        } else {
+                                                            field.onChange("");
+                                                        }
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -338,8 +353,8 @@ export const ManualBookingDialog = ({
                                     <FormItem>
                                         <FormControl>
                                             <Textarea
+                                                rows={4}
                                                 placeholder={bookingType === "BOOKING" ? "Yêu cầu đặc biệt của khách..." : "Lý do khóa sân bảo trì..."}
-                                                className="resize-none bg-darkBackgroundV1 border-darkBorderV1 min-h-[80px]"
                                                 {...field}
                                             />
                                         </FormControl>
