@@ -56,7 +56,7 @@ export const VenueDetailsDialog = ({
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent size="medium">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-secondary">
+                    <DialogTitle className="flex items-center gap-2 text-accent">
                         <Icon path={mdiStoreOutline} size={0.8} />
                         <span>Chi tiết cơ sở sân: {venueData?.name}</span>
                     </DialogTitle>
@@ -90,7 +90,7 @@ export const VenueDetailsDialog = ({
                         <>
                             {/* Section: Basic Info */}
                             <div className="flex items-center gap-3 md:gap-4">
-                                <h3 className="text-secondary font-semibold whitespace-nowrap">Thông tin cơ bản</h3>
+                                <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin cơ bản</h3>
                                 <div className="flex-1 border-b border-dashed border-accent mr-1" />
                             </div>
 
@@ -208,7 +208,7 @@ export const VenueDetailsDialog = ({
 
                             {/* Section: Courts List */}
                             <div className="flex items-center gap-3 md:gap-4 mt-4">
-                                <h3 className="text-secondary font-semibold whitespace-nowrap">Danh sách sân con</h3>
+                                <h3 className="text-accent font-semibold whitespace-nowrap">Danh sách sân con</h3>
                                 <div className="flex-1 border-b border-dashed border-accent mr-1" />
                             </div>
 
@@ -236,7 +236,7 @@ export const VenueDetailsDialog = ({
                                             venueData.courts.map((court: any, idx: number) => (
                                                 <TableRow key={court._id}>
                                                     <TableCell className="text-center font-medium">{idx + 1}</TableCell>
-                                                    <TableCell className="text-secondary">{court.name}</TableCell>
+                                                    <TableCell className="text-accent">{court.name}</TableCell>
                                                     <TableCell>
                                                         <Badge variant="neutral">{court.type}</Badge>
                                                     </TableCell>
@@ -254,7 +254,7 @@ export const VenueDetailsDialog = ({
 
                             {/* Section: Map */}
                             <div className="flex items-center gap-3 md:gap-4 mt-4">
-                                <h3 className="text-secondary font-semibold whitespace-nowrap">Vị trí bản đồ</h3>
+                                <h3 className="text-accent font-semibold whitespace-nowrap">Vị trí bản đồ</h3>
                                 <div className="flex-1 border-b border-dashed border-accent mr-1" />
                             </div>
 

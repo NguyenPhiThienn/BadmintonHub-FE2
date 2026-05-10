@@ -93,21 +93,19 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
         router.push(pathname + (queryString ? `?${queryString}` : ""), { scroll: false });
     }, [debouncedSearchQuery, currentPage, pathname, router, searchParams]);
 
-    const {
-        data: venuesRes,
-        isLoading,
-        isFetching,
-        refetch
-    } = type === "admin"
-            ? useAdminVenues({
-                page: currentPage || 1,
-                limit: pageSize || 10,
-                search: debouncedSearchQuery
-            })
-            : useMyVenues({
-                page: currentPage || 1,
-                limit: pageSize || 10
-            });
+    const adminQuery = useAdminVenues({
+        page: currentPage || 1,
+        limit: pageSize || 10,
+        search: debouncedSearchQuery
+    }, { enabled: type === "admin" });
+
+    const ownerQuery = useMyVenues({
+        page: currentPage || 1,
+        limit: pageSize || 10
+    }, { enabled: type === "owner" });
+
+    const venuesQuery = type === "admin" ? adminQuery : ownerQuery;
+    const { data: venuesRes, isLoading, isFetching, refetch } = venuesQuery;
 
     const { mutate: updateStatus } = useUpdateVenueStatus();
     const { mutate: deleteVenueMutation, isPending: isDeleting } = useDeleteVenue();

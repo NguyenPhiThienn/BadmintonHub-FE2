@@ -1,8 +1,8 @@
 export interface IVenue {
   _id: string;
-  ownerId: string;
+  ownerId: string | { _id: string; fullName: string; email: string; phone: string };
   name: string;
-  images?: string[];
+  images?: IVenueImage[];
   pricePerHour: number;
   address: string;
   description?: string;
@@ -30,9 +30,31 @@ export interface IVenue {
   courts?: ICourt[];
 }
 
+export interface IVenueImage {
+  _id?: string;
+  venueId?: string;
+  imageUrl: string;
+  isPrimary: boolean;
+}
+
 export interface IVenueResponse {
-  status: number;
-  data: IVenue[];
+  statusCode: number;
+  message: string;
+  data: IVenue;
+}
+
+export interface IVenuesListResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    venues: IVenue[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
 }
 
 export interface IAIRecommendationRequest {

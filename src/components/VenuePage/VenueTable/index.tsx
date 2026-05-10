@@ -39,8 +39,8 @@ interface VenueTableProps {
 export const VenueTable = memo(({
     venues,
     isLoading = false,
-    onApprove = () => {},
-    onReject = () => {},
+    onApprove = () => { },
+    onReject = () => { },
     onAction,
     onDelete,
     onViewLegal,
@@ -97,7 +97,7 @@ export const VenueTable = memo(({
                                     onClick={() => onAction(venue, "view")}
                                 >
                                     <TableCell className="text-center">{rowNumber}</TableCell>
-                                    <TableCell className="font-medium text-accent hover:underline cursor-pointer" onClick={() => onAction(venue, "view")}>
+                                    <TableCell className="text-sm text-accent hover:underline cursor-pointer" onClick={() => onAction(venue, "view")}>
                                         {venue.name}
                                     </TableCell>
                                     <TableCell className="max-w-[250px] text-wrap" title={venue.address}>
@@ -105,7 +105,7 @@ export const VenueTable = memo(({
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="neutral">
-                                            {venue.totalCourts || 0} sân
+                                            {venue.available ?? 0}/{venue.totalCourts || 0} sân trống
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">

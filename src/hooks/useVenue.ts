@@ -1,6 +1,6 @@
 import { venueApi } from "@/api/venue";
-import { IAIRecommendationRequest } from "@/interface/venue";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { IAIRecommendationRequest, IVenuesListResponse } from "@/interface/venue";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 export const useVenues = (params?: { 
   page?: number; 
@@ -14,14 +14,14 @@ export const useVenues = (params?: {
   maxPrice?: number;
   ownerId?: string;
 }) => {
-  return useQuery({
+  return useQuery<IVenuesListResponse>({
     queryKey: ["venues", params],
     queryFn: () => venueApi.getVenues(params),
   });
 };
 
-export const useMyVenues = (params?: { page?: number; limit?: number }, options?: any) => {
-  return useQuery({
+export const useMyVenues = (params?: { page?: number; limit?: number }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
+  return useQuery<IVenuesListResponse>({
     queryKey: ["my-venues", params],
     queryFn: () => venueApi.getMyVenues(params),
     ...options,
@@ -87,8 +87,8 @@ export const useAiBookingRecommendation = (venueId: string) => {
 };
 
 // Admin specific
-export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }, options?: any) => {
-  return useQuery({
+export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
+  return useQuery<IVenuesListResponse>({
     queryKey: ["admin-venues", params],
     queryFn: () => venueApi.getAdminVenues(params),
     ...options,
