@@ -33,6 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+import { ConfirmDialog } from "../ui/confirm-dialog";
 import { MyBookingsTable } from "./MyBookingsTable";
 
 interface UserStats {
@@ -81,6 +82,9 @@ export default function MyBookingsPage() {
         }
     }, [user]);
 
+    const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+    const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
+
     const handleRefresh = () => {
         setCurrentPage(1);
         setStatusFilter("all");
@@ -89,20 +93,27 @@ export default function MyBookingsPage() {
     };
 
     const handleCancelBooking = (id: string) => {
-        if (window.confirm("Bạn có chắc chắn muốn hủy đơn đặt sân này không?")) {
-            updateStatusMutation.mutate(
-                { id, data: { status: "CANCELLED" } },
-                {
-                    onSuccess: () => {
-                        toast.success("Hủy đặt sân thành công");
-                        refetch();
-                    },
-                    onError: () => {
-                        toast.error("Không thể hủy đặt sân vào lúc này");
-                    },
-                }
-            );
-        }
+        setBookingToCancel(id);
+        setIsCancelDialogOpen(true);
+    };
+
+    const confirmCancelBooking = () => {
+        if (!bookingToCancel) return;
+
+        updateStatusMutation.mutate(
+            { id: bookingToCancel, data: { status: "CANCELLED" } },
+            {
+                onSuccess: () => {
+                    toast.success("Hủy đặt sân thành công");
+                    setIsCancelDialogOpen(false);
+                    setBookingToCancel(null);
+                    refetch();
+                },
+                onError: () => {
+                    toast.error("Không thể hủy đặt sân vào lúc này");
+                },
+            }
+        );
     };
 
     if (!user) {
@@ -209,6 +220,21 @@ export default function MyBookingsPage() {
                 </div>
             </main>
             <Footer />
+
+            <ConfirmDialog
+                isOpen={isCancelDialogOpen}
+                onClose={() => {
+                    setIsCancelDialogOpen(false);
+                    setBookingToCancel(null);
+                }}
+                onConfirm={confirmCancelBooking}
+                title="Hủy đặt sân"
+                description="Bạn có chắc chắn muốn hủy đơn đặt sân này không? Hành động này không thể hoàn tác."
+                confirmText="Hủy đặt sân"
+                cancelText="Quay lại"
+                variant="destructive"
+                isPending={updateStatusMutation.isPending}
+            />
         </div>
     );
 }

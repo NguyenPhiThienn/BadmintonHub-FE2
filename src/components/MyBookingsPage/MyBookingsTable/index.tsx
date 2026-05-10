@@ -11,12 +11,12 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { BookingStatus, IBooking } from "@/interface/booking";
+import { formatDateWithTime } from "@/lib/format";
 import {
     mdiCancel,
     mdiEyeOutline,
     mdiPlaylistRemove,
 } from "@mdi/js";
-import { format } from "date-fns";
 import Link from "next/link";
 import { memo } from "react";
 
@@ -94,21 +94,17 @@ export const MyBookingsTable = memo(({
                             const rowNumber = (currentPage - 1) * pageSize + index + 1;
                             const venueName = typeof booking.venueId === "object" ? booking.venueId.name : "Sân cầu lông";
                             const venueAddress = typeof booking.venueId === "object" ? booking.venueId.address : "";
-
-                            const firstDetail = booking.details[0];
-                            const bookingDate = firstDetail ? format(new Date(firstDetail.bookingDate), "dd/MM/yyyy") : "-";
-
                             return (
                                 <TableRow key={booking._id} className="hover:bg-darkBorderV1/30 transition-colors">
                                     <TableCell className="text-center font-medium">{rowNumber}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <span className="font-semibold text-accent">{venueName}</span>
+                                            <Link href={`/venue/${typeof booking.venueId === "object" ? booking.venueId._id : booking.venueId}`}><span className="hover:underline text-accent">{venueName}</span></Link>
                                             <span className="text-sm text-neutral-400 line-clamp-2">{venueAddress}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="neutral">{bookingDate}</Badge>
+                                        <Badge variant="neutral">{formatDateWithTime(booking.createdAt)}</Badge>
                                     </TableCell>
                                     <TableCell>
                                         {booking.details.map((d, i) => (
