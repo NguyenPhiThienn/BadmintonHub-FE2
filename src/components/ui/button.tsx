@@ -34,11 +34,11 @@ const buttonVariants = cva(
         link: "text-accent underline-offset-4 hover:underline",
         ghost2: "hover:bg-secondary text-primary hover:text-primary dark:hover:bg-accent/50",
         accent:
-          'bg-accent text-secondary hover:bg-accent/80',
+          'bg-accent text-white hover:bg-accent/80',
         'ghost-badminton':
           'hover:bg-primary/10 hover:text-primary',
         badminton:
-          'bg-primary text-secondary hover:bg-secondary hover:shadow-lg transition-all duration-300',
+          'bg-primary text-white hover:bg-secondary hover:shadow-lg transition-all duration-300',
         'cta-badminton':
           'bg-white text-primary hover:bg-accent/10 shadow-lg hover:shadow-xl font-semibold transition-all duration-300',
       },
