@@ -25,7 +25,6 @@ import {
   mdiSoccerField,
   mdiTagOutline
 } from "@mdi/js";
-import axios from "axios";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -48,118 +47,105 @@ const SuccessContent = () => {
     setIsDownloading(true);
 
     try {
-      const htmlContent = `
-        <div style="padding: 40px; font-family: 'Tinos', serif; background-color: white; color: #333;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #41C651; padding-bottom: 20px; margin-bottom: 30px;">
-            <div>
-              <h1 style="color: #41C651; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 1px;">HÓA ĐƠN ĐẶT SÂN</h1>
-              <p style="margin: 5px 0; color: #666; font-size: 14px;">Mã đơn hàng: #BH${booking._id?.slice(-6).toUpperCase()}</p>
-              <p style="margin: 5px 0; color: #666; font-size: 14px;">Ngày lập: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}</p>
-            </div>
-            <div style="text-align: right;">
-               <img src="https://badminton-hub.vercel.app/images/primary-logo.svg" style="height: 60px; margin-bottom: 5px;" onerror="this.src='https://badmintonhub.vn/wp-content/uploads/2023/10/logo-badmintonhub.png'" />
-               <p style="margin: 0; font-weight: bold; color: #0A1F22; font-size: 18px;">BadmintonHub</p>
-               <p style="margin: 0; color: #666; font-size: 12px;">Smart Booking System</p>
-            </div>
-          </div>
+      const { jsPDF } = await import("jspdf");
+      const html2canvas = (await import("html2canvas")).default;
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
-            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-              <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin khách hàng</h3>
-              <p style="margin: 10px 0;"><strong>Họ tên:</strong> ${booking.playerId?.fullName || 'Khách ẩn danh'}</p>
-              <p style="margin: 10px 0;"><strong>Số điện thoại:</strong> ${booking.playerId?.phone || 'N/A'}</p>
-              <p style="margin: 10px 0;"><strong>Email:</strong> ${booking.playerId?.email || 'N/A'}</p>
-            </div>
-            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
-              <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin cơ sở</h3>
-              <p style="margin: 10px 0;"><strong>Tên sân:</strong> ${booking.venueId?.name}</p>
-              <p style="margin: 10px 0;"><strong>Địa chỉ:</strong> ${booking.venueId?.address}</p>
-              <p style="margin: 10px 0;"><strong>Hotline:</strong> 1900 633 633</p>
-            </div>
-          </div>
+      // Create a temporary container for the invoice
+      const invoiceContainer = document.createElement("div");
+      invoiceContainer.style.position = "absolute";
+      invoiceContainer.style.left = "-9999px";
+      invoiceContainer.style.top = "0";
+      invoiceContainer.style.width = "800px";
+      invoiceContainer.style.backgroundColor = "white";
+      invoiceContainer.style.color = "#333";
+      invoiceContainer.style.padding = "40px";
+      invoiceContainer.style.fontFamily = "'Tinos', serif";
 
-          <h3 style="border-bottom: 2px solid #41C651; padding-bottom: 10px; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Chi tiết dịch vụ</h3>
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
-            <thead>
-              <tr style="background-color: #41C651; color: white;">
-                <th style="padding: 15px; text-align: left; border: 1px solid #41C651;">Ngày đặt</th>
-                <th style="padding: 15px; text-align: left; border: 1px solid #41C651;">Tên sân</th>
-                <th style="padding: 15px; text-align: center; border: 1px solid #41C651;">Khung giờ</th>
-                <th style="padding: 15px; text-align: right; border: 1px solid #41C651;">Đơn giá</th>
+      invoiceContainer.innerHTML = `
+        <div style="border-bottom: 2px solid #41C651; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h1 style="color: #41C651; margin: 0; font-size: 32px; font-weight: bold;">HÓA ĐƠN ĐẶT SÂN</h1>
+            <p style="margin: 5px 0; color: #666; font-size: 14px;">Mã đơn hàng: #BH${booking._id?.slice(-6).toUpperCase()}</p>
+            <p style="margin: 5px 0; color: #666; font-size: 14px;">Ngày lập: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}</p>
+          </div>
+          <div style="text-align: right;">
+             <h2 style="margin: 0; color: #0A1F22; font-size: 24px;">BadmintonHub</h2>
+             <p style="margin: 0; color: #666; font-size: 12px;">Smart Booking System</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin khách hàng</h3>
+            <p style="margin: 10px 0;"><strong>Họ tên:</strong> ${booking.playerId?.fullName || 'Khách ẩn danh'}</p>
+            <p style="margin: 10px 0;"><strong>Số điện thoại:</strong> ${booking.playerId?.phone || 'N/A'}</p>
+            <p style="margin: 10px 0;"><strong>Email:</strong> ${booking.playerId?.email || 'N/A'}</p>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
+            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Thông tin cơ sở</h3>
+            <p style="margin: 10px 0;"><strong>Tên sân:</strong> ${booking.venueId?.name}</p>
+            <p style="margin: 10px 0;"><strong>Địa chỉ:</strong> ${booking.venueId?.address}</p>
+          </div>
+        </div>
+
+        <h3 style="border-bottom: 2px solid #41C651; padding-bottom: 10px; color: #0A1F22; font-size: 16px; text-transform: uppercase;">Chi tiết dịch vụ</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+          <thead>
+            <tr style="background-color: #41C651; color: white;">
+              <th style="padding: 15px; text-align: left;">Ngày đặt</th>
+              <th style="padding: 15px; text-align: left;">Tên sân</th>
+              <th style="padding: 15px; text-align: center;">Khung giờ</th>
+              <th style="padding: 15px; text-align: right;">Đơn giá</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${booking.details?.map((detail: any) => `
+              <tr>
+                <td style="padding: 15px; border-bottom: 1px solid #eee;">${new Date(detail.bookingDate).toLocaleDateString('vi-VN')}</td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee;">${detail.courtId?.name}</td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center; color: #41C651; font-weight: bold;">${detail.startTime} - ${detail.endTime}</td>
+                <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: right;">${detail.price?.toLocaleString()}đ</td>
               </tr>
-            </thead>
-            <tbody>
-              ${booking.details?.map((detail: any) => `
-                <tr>
-                  <td style="padding: 15px; border-bottom: 1px solid #eee; font-weight: 500;">${new Date(detail.bookingDate).toLocaleDateString('vi-VN')}</td>
-                  <td style="padding: 15px; border-bottom: 1px solid #eee;">${detail.courtId?.name}</td>
-                  <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: center; color: #41C651; font-weight: bold;">${detail.startTime} - ${detail.endTime}</td>
-                  <td style="padding: 15px; border-bottom: 1px solid #eee; text-align: right; font-weight: 600;">${detail.price?.toLocaleString()}đ</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+            `).join('')}
+          </tbody>
+        </table>
 
-          <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-            <div style="width: 350px; background-color: #f9f9f9; padding: 25px; border-radius: 12px; border: 1px solid #eee;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <span style="color: #666;">Tạm tính:</span>
-                <span style="font-weight: 600;">${(booking.totalPrice || 0).toLocaleString()}đ</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #ff4d4f;">
-                <span>Giảm giá:</span>
-                <span>-0đ</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 2px dashed #ddd;">
-                <span style="font-weight: bold; font-size: 20px; color: #0A1F22;">TỔNG CỘNG:</span>
-                <span style="font-weight: bold; font-size: 22px; color: #41C651;">${(booking.finalPrice || 0).toLocaleString()}đ</span>
-              </div>
-              <div style="margin-top: 20px; text-align: right;">
-                <p style="margin: 0; font-style: italic; color: #666; font-size: 13px;">
-                  Trạng thái: <span style="color: #41C651; font-weight: bold; text-transform: uppercase;">ĐÃ THANH TOÁN</span>
-                </p>
-                <p style="margin: 5px 0 0 0; font-style: italic; color: #666; font-size: 13px;">
-                  Hình thức: ${booking.payment?.method === 'VNPAY' ? 'Thẻ ngân hàng (VNPay)' : 'Tiền mặt tại quầy'}
-                </p>
-              </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <div style="width: 300px; background-color: #f9f9f9; padding: 20px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>Tổng cộng:</span>
+              <span style="font-weight: bold; font-size: 20px; color: #41C651;">${(booking.finalPrice || 0).toLocaleString()}đ</span>
             </div>
+            <p style="text-align: right; margin: 0; font-style: italic; color: #666; font-size: 12px;">
+              Trạng thái: ĐÃ THANH TOÁN
+            </p>
           </div>
+        </div>
 
-          <div style="margin-top: 80px; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div style="text-align: center; width: 200px;">
-              <p style="margin-bottom: 60px; font-weight: bold;">Người mua hàng</p>
-              <p style="color: #999;">(Ký và ghi rõ họ tên)</p>
-            </div>
-            <div style="text-align: center; width: 250px;">
-              <p style="margin-bottom: 10px;">Ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}</p>
-              <p style="margin-bottom: 60px; font-weight: bold;">Đại diện BadmintonHub</p>
-              <div style="color: #41C651; font-weight: bold; font-size: 18px; transform: rotate(-5deg); border: 2px solid #41C651; padding: 5px 10px; display: inline-block; border-radius: 5px;">
-                ĐÃ THU TIỀN
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top: 100px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
-            <p>Cảm ơn bạn đã lựa chọn BadmintonHub - Hệ thống đặt sân cầu lông thông minh hàng đầu Việt Nam.</p>
-            <p>Mọi thắc mắc vui lòng liên hệ Hotline: 1900 633 633 hoặc Email: support@badmintonhub.vn</p>
-          </div>
+        <div style="margin-top: 60px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
+          <p>Cảm ơn bạn đã lựa chọn BadmintonHub!</p>
+          <p>Hệ thống đặt sân cầu lông thông minh hàng đầu Việt Nam.</p>
         </div>
       `;
 
-      const response = await axios.post('/api/pdf', {
-        htmlContent,
-        cssContent: '',
-      }, {
-        responseType: 'blob',
+      document.body.appendChild(invoiceContainer);
+
+      const canvas = await html2canvas(invoiceContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "white",
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `HoaDon_BH${booking._id?.slice(-6).toUpperCase()}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`HoaDon_BH${booking._id?.slice(-6).toUpperCase()}.pdf`);
+
+      document.body.removeChild(invoiceContainer);
       toast.success('Tải hóa đơn thành công!');
     } catch (err) {
       console.error('Download PDF error:', err);
