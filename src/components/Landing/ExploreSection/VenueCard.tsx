@@ -96,8 +96,8 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
                 <Icon path={mdiShimmer} size={0.8} />
                 Phân tích từ AI
               </div>
-              <p className="text-base text-neutral-500 italic">
-                "{venue.detailedAnalysis}"
+              <p className="text-base text-neutral-600 italic">
+                {venue.detailedAnalysis}
               </p>
             </div>
           )}
