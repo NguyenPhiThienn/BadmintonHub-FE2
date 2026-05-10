@@ -8,17 +8,8 @@ import './font.css'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'BadmintonHub - Hệ thống quản lý doanh nghiệp thông minh',
-  description: 'Giải pháp quản lý nhân sự, thiết bị, công việc và công ty toàn diện cho doanh nghiệp.',
-  icons: {
-    icon: [
-      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-  },
+  title: 'BadmintonHub - Nền tảng đặt sân cầu lông hàng đầu',
+  description: 'Tìm kiếm và đặt sân cầu lông dễ dàng, nhanh chóng với BadmintonHub. Hệ thống quản lý sân bãi chuyên nghiệp.',
 }
 
 export default function RootLayout({
