@@ -23,7 +23,7 @@ import { useUpdateBookingStatus } from "@/hooks/useBooking";
 import { useOwnerBookings } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import { BookingStatus, IBooking } from "@/interface/booking";
-import { mdiCalendarClock, mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
+import { mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -142,23 +142,12 @@ export default function BookingPage() {
                                 {!isMobile && "Làm mới"}
                             </Button>
                         </div>
-
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant="outline"
-                                onClick={() => { }}
-                                title="Xem lịch biểu"
-                            >
-                                <Icon path={mdiCalendarClock} size={0.8} />
-                                {!isMobile && "Lịch biểu"}
-                            </Button>
-                            <Button
-                                onClick={() => setIsManualBookingOpen(true)}
-                            >
-                                <Icon path={mdiPlus} size={0.8} />
-                                {!isMobile && "Đặt sân thủ công"}
-                            </Button>
-                        </div>
+                        <Button
+                            onClick={() => setIsManualBookingOpen(true)}
+                        >
+                            <Icon path={mdiPlus} size={0.8} />
+                            {!isMobile && "Đặt sân thủ công"}
+                        </Button>
                     </div>
 
                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">

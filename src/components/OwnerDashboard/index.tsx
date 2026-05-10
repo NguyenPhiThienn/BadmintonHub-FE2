@@ -1,16 +1,18 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMe } from "@/hooks/useAuth";
 import { useOccupancyStats, useRevenueStats } from "@/hooks/useOwner";
-import { useVenues } from "@/hooks/useVenue";
+import { useMyVenues } from "@/hooks/useVenue";
 import { IOccupancyData } from "@/interface/owner";
 import { mdiCalendarCheck, mdiChartBar, mdiChartLine, mdiFinance, mdiSoccerField } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { RevenuePredictionDialog } from "./RevenuePredictionDialog";
 
 const StatCard = ({ title, value, icon, color, delay = 0 }: any) => {
   return (
@@ -44,7 +46,7 @@ export default function OwnerDashboard() {
 
   const [selectedVenueId, setSelectedVenueId] = useState<string>("all");
 
-  const { data: venuesRes } = useVenues({ ownerId: userId });
+  const { data: venuesRes } = useMyVenues({ page: 1, limit: 10 });
   const venues = venuesRes?.data?.venues || [];
 
   const revenueParams = selectedVenueId !== "all" ? { venueId: selectedVenueId } : {};
@@ -92,6 +94,20 @@ export default function OwnerDashboard() {
         <div>
           <h1 className="text-2xl font-semibold text-neutral-300">Tổng quan kinh doanh</h1>
           <p className="text-neutral-400 text-base mt-1">Theo dõi hiệu suất và doanh thu của các cơ sở sân.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Select value={selectedVenueId} onValueChange={setSelectedVenueId}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Chọn cơ sở" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả cơ sở</SelectItem>
+              {venues.map((v: any) => (
+                <SelectItem key={v._id} value={v._id}>{v.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <RevenuePredictionDialog venueId={selectedVenueId} />
         </div>
       </header>
 

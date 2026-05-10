@@ -24,3 +24,11 @@ export const useOwnerBookings = (params: IOwnerBookingQuery) => {
     refetchInterval: 4000,
   });
 };
+
+export const usePredictRevenue = (params?: { venueId?: string }) => {
+  return useQuery({
+    queryKey: ["owner", "predict-revenue", params],
+    queryFn: () => ownerApi.getPredictRevenue(params),
+    enabled: false, // Don't fetch automatically
+  });
+};

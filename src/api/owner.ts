@@ -6,4 +6,7 @@ export const ownerApi = {
 
   getOccupancyStats: (params?: { venueId?: string }) =>
     sendGet("/dashboard/bookings", params),
+
+  getPredictRevenue: (params?: { venueId?: string }) =>
+    sendGet("/dashboard/predict-revenue", params),
 };
