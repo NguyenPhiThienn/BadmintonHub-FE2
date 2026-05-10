@@ -184,14 +184,14 @@ export const BookingDetailsDialog = ({
                                 {booking.details.map((detail, idx) => (
                                     <TableRow key={idx}>
                                         <TableCell className="text-center">{idx + 1}</TableCell>
-                                        <TableCell className="font-medium text-secondary">
-                                            {typeof detail.courtId === 'object' ? detail.courtId.name : "N/A"}
+                                        <TableCell>
+                                            <Badge variant="green">
+                                                {typeof detail.courtId === 'object' ? detail.courtId.name : "N/A"}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant="neutral">
-                                                {
-                                                    formatDateWithTime(detail.bookingDate)
-                                                }
+                                                {formatDateWithTime(booking.createdAt)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -222,7 +222,7 @@ export const BookingDetailsDialog = ({
                                 )}
                                 <div className="border-t border-dashed border-accent/30 pt-2 flex justify-between items-center">
                                     <div className="flex items-center gap-1 text-accent font-semibold">
-                                        <Icon path={mdiCashMultiple} size={0.7} />
+                                        <Icon path={mdiCashMultiple} size={0.8} />
                                         <span className="text-xs uppercase tracking-wider">Tổng cộng</span>
                                     </div>
                                     <span className="text-lg font-bold text-accent">
@@ -234,7 +234,7 @@ export const BookingDetailsDialog = ({
                     </div>
                 </div>
 
-                <DialogFooter className="p-4 pt-0">
+                <DialogFooter>
                     <Button variant="outline" onClick={onClose} className="gap-2">
                         <Icon path={mdiClose} size={0.8} />
                         Đóng

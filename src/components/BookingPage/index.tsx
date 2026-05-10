@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
-import { useOwnerBookings, useUpdateBookingStatus } from "@/hooks/useBooking";
+import { useUpdateBookingStatus } from "@/hooks/useBooking";
+import { useOwnerBookings } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import { BookingStatus, IBooking } from "@/interface/booking";
 import { mdiCalendarClock, mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
@@ -163,7 +164,7 @@ export default function BookingPage() {
                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
                         <BookingTable
                             bookings={bookings}
-                            isLoading={isLoading || isFetching}
+                            isLoading={isLoading}
                             onAction={handleAction}
                             onUpdateStatus={handleUpdateStatus}
                             currentPage={currentPage}

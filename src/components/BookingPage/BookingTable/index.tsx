@@ -1,6 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
     Table,
@@ -21,7 +22,7 @@ import {
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 interface BookingTableProps {
     bookings: IBooking[];
@@ -40,6 +41,21 @@ export const BookingTable = memo(({
     currentPage = 1,
     pageSize = 10,
 }: BookingTableProps) => {
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        bookingId: string;
+        status: BookingStatus;
+        title: string;
+        description: string;
+        variant: "default" | "destructive";
+    }>({
+        isOpen: false,
+        bookingId: "",
+        status: "PENDING",
+        title: "",
+        description: "",
+        variant: "default"
+    });
 
     const getStatusVariant = (status: BookingStatus) => {
         switch (status) {
@@ -59,6 +75,25 @@ export const BookingTable = memo(({
             case "CANCELLED": return "Đã hủy";
             default: return status;
         }
+    };
+
+    const handleConfirmRequest = (booking: IBooking, status: BookingStatus) => {
+        const isConfirm = status === "CONFIRMED";
+        setConfirmConfig({
+            isOpen: true,
+            bookingId: booking._id,
+            status,
+            title: isConfirm ? "Xác nhận đơn đặt sân" : "Hủy đơn đặt sân",
+            description: isConfirm
+                ? `Bạn có chắc chắn muốn xác nhận đơn đặt sân #${booking._id.slice(-6).toUpperCase()} không?`
+                : `Bạn có chắc chắn muốn hủy đơn đặt sân #${booking._id.slice(-6).toUpperCase()} không? Hành động này không thể hoàn tác.`,
+            variant: isConfirm ? "default" : "destructive"
+        });
+    };
+
+    const handleConfirmAction = () => {
+        onUpdateStatus(confirmConfig.bookingId, confirmConfig.status);
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
     };
 
     return (
@@ -173,7 +208,7 @@ export const BookingTable = memo(({
                                                                     size="icon"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        onUpdateStatus(booking._id, "CONFIRMED");
+                                                                        handleConfirmRequest(booking, "CONFIRMED");
                                                                     }}
                                                                 >
                                                                     <Icon path={mdiCheckCircleOutline} size={0.8} />
@@ -191,7 +226,7 @@ export const BookingTable = memo(({
                                                                     variant="destructive"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        onUpdateStatus(booking._id, "CANCELLED");
+                                                                        handleConfirmRequest(booking, "CANCELLED");
                                                                     }}
                                                                 >
                                                                     <Icon path={mdiCloseCircleOutline} size={0.8} />
@@ -210,6 +245,17 @@ export const BookingTable = memo(({
                     )}
                 </TableBody>
             </Table>
+
+            <ConfirmDialog
+                isOpen={confirmConfig.isOpen}
+                onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={handleConfirmAction}
+                title={confirmConfig.title}
+                description={confirmConfig.description}
+                variant={confirmConfig.variant}
+                confirmText="Đồng ý"
+                cancelText="Hủy"
+            />
         </div>
     );
 });

@@ -3,8 +3,7 @@ import {
   IAdminBookingQuery,
   IBookingRequest,
   IManualBookingRequest,
-  IOwnerBookingQuery,
-  IUpdateBookingStatusRequest,
+  IUpdateBookingStatusRequest
 } from "@/interface/booking";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -69,13 +68,6 @@ export const useCreatePaymentUrl = () => {
   return useMutation({
     mutationFn: (data: { bookingId: string; method: "VNPAY" | "MOMO" | "CASH" }) =>
       paymentApi.createPaymentUrl(data),
-  });
-};
-
-export const useOwnerBookings = (params: IOwnerBookingQuery) => {
-  return useQuery({
-    queryKey: ["owner-bookings", params],
-    queryFn: () => bookingApi.getOwnerBookings(params),
   });
 };
 

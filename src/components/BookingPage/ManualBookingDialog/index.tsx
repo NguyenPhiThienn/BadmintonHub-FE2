@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
     Dialog,
     DialogContent,
@@ -25,11 +26,20 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { TimePicker } from "@/components/ui/time-picker";
 import { useCreateManualBooking } from "@/hooks/useBooking";
 import { useVenueDetails } from "@/hooks/useVenue";
 import { IManualBookingRequest } from "@/interface/booking";
 import { ICourt, IVenue } from "@/interface/venue";
-import { mdiCalendarPlus, mdiLoading, mdiLockOutline } from "@mdi/js";
+import {
+    mdiAccountOutline,
+    mdiCalendarClock,
+    mdiCalendarPlus,
+    mdiLoading,
+    mdiLockOutline,
+    mdiNoteOutline,
+    mdiStoreOutline
+} from "@mdi/js";
 import Icon from "@mdi/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -95,137 +105,127 @@ export const ManualBookingDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent size="medium">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-secondary">
+                    <DialogTitle className="flex items-center gap-2 text-accent">
                         <Icon path={bookingType === "BOOKING" ? mdiCalendarPlus : mdiLockOutline} size={0.8} />
                         <span>{bookingType === "BOOKING" ? "Đặt sân thủ công" : "Khóa sân tạm thời"}</span>
                     </DialogTitle>
                 </DialogHeader>
 
-                <Tabs value={bookingType} onValueChange={(v) => setBookingType(v as any)} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-darkBackgroundV1 border border-darkBorderV1">
-                        <TabsTrigger value="BOOKING">Đơn đặt sân</TabsTrigger>
-                        <TabsTrigger value="LOCK">Khóa sân</TabsTrigger>
-                    </TabsList>
-                </Tabs>
+                <div className="p-4 bg-darkCardV1/30 border-b border-darkBorderV1">
+                    <Tabs value={bookingType} onValueChange={(v) => setBookingType(v as any)} className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 bg-darkBackgroundV1 border border-darkBorderV1">
+                            <TabsTrigger value="BOOKING" className="gap-2">
+                                <Icon path={mdiCalendarPlus} size={0.6} />
+                                Đơn đặt sân
+                            </TabsTrigger>
+                            <TabsTrigger value="LOCK" className="gap-2">
+                                <Icon path={mdiLockOutline} size={0.6} />
+                                Khóa sân
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="venueId"
-                                rules={{ required: "Vui lòng chọn cơ sở" }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Cơ sở</FormLabel>
-                                        <Select
-                                            onValueChange={(val) => {
-                                                field.onChange(val);
-                                                setSelectedVenueId(val);
-                                            }}
-                                            value={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Chọn cơ sở" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {venues.map((v) => (
-                                                    <SelectItem key={v._id} value={v._id}>{v.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                    <form id="manual-booking-form" onSubmit={form.handleSubmit(onSubmit)} className="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 md:p-4 space-y-6">
+                        {/* Section: Cơ sở & Sân */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
+                                    <Icon path={mdiStoreOutline} size={0.8} />
+                                    Địa điểm & Sân
+                                </h3>
+                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                            </div>
 
-                            <FormField
-                                control={form.control}
-                                name="courtId"
-                                rules={{ required: "Vui lòng chọn sân" }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Sân con</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value} disabled={!selectedVenueId}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder={selectedVenueId ? "Chọn sân" : "Vui lòng chọn cơ sở trước"} />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {courts.map((c: ICourt) => (
-                                                    <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="bookingDate"
-                                rules={{ required: "Vui lòng chọn ngày" }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Ngày đặt</FormLabel>
-                                        <FormControl>
-                                            <Input type="date" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="startTime"
-                                rules={{ required: "Chọn giờ bắt đầu" }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Giờ bắt đầu</FormLabel>
-                                        <FormControl>
-                                            <Input type="time" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="endTime"
-                                rules={{ required: "Chọn giờ kết thúc" }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Giờ kết thúc</FormLabel>
-                                        <FormControl>
-                                            <Input type="time" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        {bookingType === "BOOKING" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg bg-accent/5 border border-dashed border-accent/30">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
-                                    name="customerName"
-                                    rules={{ required: bookingType === "BOOKING" ? "Vui lòng nhập tên khách" : false }}
+                                    name="venueId"
+                                    rules={{ required: "Vui lòng chọn cơ sở" }}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tên khách hàng</FormLabel>
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Cơ sở
+                                            </FormLabel>
+                                            <Select
+                                                onValueChange={(val) => {
+                                                    field.onChange(val);
+                                                    setSelectedVenueId(val);
+                                                }}
+                                                value={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn cơ sở" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="bg-darkCardV1 border-darkBorderV1">
+                                                    {venues.map((v) => (
+                                                        <SelectItem key={v._id} value={v._id}>{v.name}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="courtId"
+                                    rules={{ required: "Vui lòng chọn sân" }}
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Sân con
+                                            </FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value} disabled={!selectedVenueId}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder={selectedVenueId ? "Chọn sân" : "Chọn cơ sở trước"} />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="bg-darkCardV1 border-darkBorderV1">
+                                                    {courts.map((c: ICourt) => (
+                                                        <SelectItem key={c._id} value={c._id}>{c.name} - {c.type}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Section: Thời gian */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
+                                    <Icon path={mdiCalendarClock} size={0.8} />
+                                    Thời gian
+                                </h3>
+                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="bookingDate"
+                                    rules={{ required: "Vui lòng chọn ngày" }}
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Ngày đặt
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Nhập tên khách..." {...field} />
+                                                <DatePicker
+                                                    date={field.value ? new Date(field.value) : undefined}
+                                                    onDateChange={(date) => field.onChange(date ? date.toISOString().split("T")[0] : "")}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -234,48 +234,141 @@ export const ManualBookingDialog = ({
 
                                 <FormField
                                     control={form.control}
-                                    name="customerPhone"
+                                    name="startTime"
+                                    rules={{ required: "Giờ bắt đầu" }}
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Số điện thoại (Tùy chọn)</FormLabel>
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Giờ bắt đầu
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Nhập SĐT..." {...field} />
+                                                <TimePicker
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="endTime"
+                                    rules={{ required: "Giờ kết thúc" }}
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Giờ kết thúc
+                                            </FormLabel>
+                                            <FormControl>
+                                                <TimePicker
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
+                        </div>
+
+                        {/* Section: Khách hàng (Chỉ hiện khi là BOOKING) */}
+                        {bookingType === "BOOKING" && (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3 md:gap-4">
+                                    <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
+                                        <Icon path={mdiAccountOutline} size={0.8} />
+                                        Thông tin khách hàng
+                                    </h3>
+                                    <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="customerName"
+                                        rules={{ required: bookingType === "BOOKING" ? "Tên khách là bắt buộc" : false }}
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                    Tên khách hàng
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Nhập tên khách..." {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="customerPhone"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                    Số điện thoại
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="09xx xxx xxx" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
                         )}
 
-                        <FormField
-                            control={form.control}
-                            name="note"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Ghi chú</FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder={bookingType === "BOOKING" ? "Ghi chú về đơn đặt..." : "Lý do khóa sân..."}
-                                            className="resize-none"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {/* Section: Ghi chú */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
+                                    <Icon path={mdiNoteOutline} size={0.8} />
+                                    Ghi chú thêm
+                                </h3>
+                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                            </div>
 
-                        <DialogFooter className="pt-4">
-                            <Button type="button" variant="outline" onClick={onClose}>
-                                Hủy
-                            </Button>
-                            <Button type="submit" disabled={isPending} className="min-w-[120px]">
-                                {isPending ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : "Xác nhận"}
-                            </Button>
-                        </DialogFooter>
+                            <FormField
+                                control={form.control}
+                                name="note"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder={bookingType === "BOOKING" ? "Yêu cầu đặc biệt của khách..." : "Lý do khóa sân bảo trì..."}
+                                                className="resize-none bg-darkBackgroundV1 border-darkBorderV1 min-h-[80px]"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     </form>
                 </Form>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={onClose}>
+                        Đóng
+                    </Button>
+                    <Button
+                        type="submit"
+                        disabled={isPending}
+                        form="manual-booking-form"
+                    >
+                        {isPending ? (
+                            <div className="flex items-center gap-2">
+                                <Icon path={mdiLoading} size={0.8} className="animate-spin" />
+                                <span>Đang xử lý...</span>
+                            </div>
+                        ) : (
+                            <span>Xác nhận thực hiện</span>
+                        )}
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

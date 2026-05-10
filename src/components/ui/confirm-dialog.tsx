@@ -59,7 +59,7 @@ export const ConfirmDialog = ({
         </DialogHeader>
 
         <div className="p-3 md:p-4">
-          <p className="text-sm text-neutral-300">{description}</p>
+          <p className="text-base text-neutral-300">{description}</p>
         </div>
 
         <DialogFooter>
