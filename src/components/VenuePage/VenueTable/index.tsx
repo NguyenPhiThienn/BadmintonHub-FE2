@@ -51,6 +51,9 @@ export const VenueTable = memo(({
 
     return (
         <div className="w-full overflow-auto border border-darkBackgroundV1 rounded-md">
+            <p className="text-sm text-neutral-400 bg-darkBackgroundV1 p-2 py-3 rounded-lg italic">
+                &quot;{/*venue.description*/}&quot;
+            </p>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -240,3 +243,5 @@ export const VenueTable = memo(({
         </div>
     );
 });
+
+VenueTable.displayName = "VenueTable";

@@ -164,8 +164,8 @@ export const BookingSection = ({
                 {aiRec.benefits && aiRec.benefits.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
                     {aiRec.benefits.map((benefit: string, idx: number) => (
-                      <Badge variant="green">
-                        <div key={idx} className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                      <Badge key={idx} variant="green">
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                         {benefit}
                       </Badge>
                     ))}

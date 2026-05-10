@@ -32,7 +32,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
   };
 
   const displayPrice = `${venue.pricePerHour?.toLocaleString("vi-VN")}đ/h`;
-  const displayImage = venue.images?.[0] || "/images/court-1.jpg";
+  const displayImage = venue.images?.[0]?.imageUrl || "/images/court-1.jpg";
 
   return (
     <motion.div

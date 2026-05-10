@@ -18,15 +18,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useResponsive } from "@/hooks/use-mobile";
 import { useAdminBookings, useUpdateBookingStatus } from "@/hooks/useBooking";
-import { IBooking, BookingStatus } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/interface/booking";
 import { mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { BookingDetailsDialog } from "../BookingDetailsDialog";
 import { BookingTable } from "../BookingTable";
-import { useResponsive } from "@/hooks/use-mobile";
 
 export default function AdminBookingPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -62,8 +62,9 @@ export default function AdminBookingPage() {
         setIsDetailsDialogOpen(true);
     };
 
-    const handleUpdateStatus = (id: string, status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED') => {
-        updateStatus({ id, data: { status } });
+    const handleUpdateStatus = (id: string, status: BookingStatus) => {
+        if (status === 'PENDING') return;
+        updateStatus({ id, data: { status: status as 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' } });
     };
 
     const handlePageChange = (page: number) => {
@@ -208,8 +209,7 @@ export default function AdminBookingPage() {
                         <BookingTable
                             bookings={filteredBookings}
                             isLoading={isLoading || isFetching}
-                            isSearching={!!searchQuery}
-                            onView={handleView}
+                            onAction={handleView}
                             onUpdateStatus={handleUpdateStatus}
                             currentPage={currentPage}
                             pageSize={pageSize}

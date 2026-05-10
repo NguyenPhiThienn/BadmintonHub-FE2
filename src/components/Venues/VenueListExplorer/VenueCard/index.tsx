@@ -20,7 +20,7 @@ interface VenueCardHorizontalProps {
 
 export const VenueCard = ({ venue, onClick, userLocation }: VenueCardHorizontalProps) => {
   const router = useRouter();
-  const displayImage = venue.images?.[0] || "/images/court-1.jpg";
+  const displayImage = venue.images?.[0]?.imageUrl || "/images/court-1.jpg";
 
   // Calculate distance
   const vLat = venue.coordinates?.coordinates[1];
