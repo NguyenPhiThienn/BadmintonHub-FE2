@@ -19,4 +19,10 @@ export const usersApi = {
 
   resetPassword: (id: string): Promise<any> =>
     sendPost(`/users/${id}/reset-password`, {}),
+
+  getProfile: (): Promise<IProfileResponse> => 
+    sendGet("/users/profile"),
+
+  updateProfile: (data: { fullName: string; phone: string; avatarUrl: string }): Promise<any> => 
+    sendPut("/users/profile", data),
 };

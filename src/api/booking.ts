@@ -24,6 +24,8 @@ export const bookingApi = {
     sendPost("/bookings/manual", data),
   getBookingCalendar: (venueId: string, params: { date: string }) =>
     sendGet(`/bookings/calendar/${venueId}`, params),
+  getMyStatistics: () =>
+    sendGet("/bookings/my-statistics"),
 };
 
 export const adminBookingApi = {

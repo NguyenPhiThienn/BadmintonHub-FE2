@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Icon } from "@/components/ui/mdi-icon";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useVenues } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
 import { mdiBadminton, mdiChevronLeft, mdiCrosshairsGps, mdiFire, mdiMagnify, mdiMapMarkerRadius, mdiRefresh, mdiTagOutline } from "@mdi/js";
@@ -19,6 +20,28 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import VenueListExplorer from "../VenueListExplorer";
 import { VenueCard } from "../VenueListExplorer/VenueCard";
+
+const VenueCardSkeleton = () => (
+  <div className="flex flex-col gap-3 p-3 bg-darkCardV1 border-2 border-darkBorderV1 rounded-2xl animate-pulse">
+    <div className="flex gap-3">
+      <Skeleton className="w-28 h-28 shrink-0 rounded-xl bg-darkBackgroundV2" />
+      <div className="flex flex-col gap-2 w-full">
+        <Skeleton className="h-5 w-3/4 rounded bg-darkBackgroundV2" />
+        <Skeleton className="h-4 w-1/2 rounded bg-darkBackgroundV2" />
+        <Skeleton className="h-6 w-1/3 rounded bg-darkBackgroundV2" />
+        <div className="flex gap-2">
+          <Skeleton className="h-6 w-16 rounded-full bg-darkBackgroundV2" />
+          <Skeleton className="h-6 w-16 rounded-full bg-darkBackgroundV2" />
+        </div>
+      </div>
+    </div>
+    <div className="flex flex-col gap-2 border-t border-darkBorderV1 pt-3">
+      <Skeleton className="h-4 w-full rounded bg-darkBackgroundV2" />
+      <Skeleton className="h-4 w-5/6 rounded bg-darkBackgroundV2" />
+      <Skeleton className="h-10 w-full rounded-lg bg-darkBackgroundV2 mt-2" />
+    </div>
+  </div>
+);
 
 const MapExplorer = () => {
   const router = useRouter();
@@ -319,25 +342,34 @@ const MapExplorer = () => {
           </div>
 
           <div className="flex flex-col gap-4">
-            {venues.map((venue: IVenue, index: number) => (
-              <div
-                key={venue._id}
-                id={`venue-card-desktop-${venue._id}`}
-                onClick={() => {
-                  setSelectedVenueId(venue._id);
-                  const vLat = venue.coordinates?.coordinates[1];
-                  const vLng = venue.coordinates?.coordinates[0];
-                  if (vLat && vLng) {
-                    map?.panTo({ lat: vLat, lng: vLng });
-                    map?.setZoom(16);
-                  }
-                }}
-                className={`transition-all duration-300 cursor-pointer ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""
-                  }`}
-              >
-                <VenueCard venue={venue} />
-              </div>
-            ))}
+            {isLoading && limit === 10 ? (
+              Array.from({ length: 5 }).map((_, i) => <VenueCardSkeleton key={i} />)
+            ) : (
+              <>
+                {venues.map((venue: IVenue, index: number) => (
+                  <div
+                    key={venue._id}
+                    id={`venue-card-desktop-${venue._id}`}
+                    onClick={() => {
+                      setSelectedVenueId(venue._id);
+                      const vLat = venue.coordinates?.coordinates[1];
+                      const vLng = venue.coordinates?.coordinates[0];
+                      if (vLat && vLng) {
+                        map?.panTo({ lat: vLat, lng: vLng });
+                        map?.setZoom(16);
+                      }
+                    }}
+                    className={`transition-all duration-300 cursor-pointer ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""
+                      }`}
+                  >
+                    <VenueCard venue={venue} />
+                  </div>
+                ))}
+                {isLoading && limit > 10 && (
+                  Array.from({ length: 3 }).map((_, i) => <VenueCardSkeleton key={`more-${i}`} />)
+                )}
+              </>
+            )}
           </div>
 
           {hasMore && (
@@ -345,9 +377,10 @@ const MapExplorer = () => {
               <Button
                 variant="outline"
                 onClick={() => setLimit(prev => prev + 10)}
-                className="w-full bg-darkCardV2 border-darkBorderV1 text-neutral-300 hover:text-white hover:bg-accent/20"
+                disabled={isLoading}
+                className="w-full bg-darkCardV2 border-darkBorderV1 text-neutral-300 hover:text-white hover:bg-accent/20 disabled:opacity-50"
               >
-                Hiển thị thêm
+                {isLoading ? "Đang tải..." : "Hiển thị thêm"}
               </Button>
             </div>
           )}
