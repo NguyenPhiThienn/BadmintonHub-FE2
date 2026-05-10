@@ -15,6 +15,9 @@ export const venueApi = {
     ownerId?: string;
   }) =>
     sendGet("/venues", params),
+  
+  getMyVenues: (params?: { page?: number; limit?: number }) =>
+    sendGet("/venues/my-venues", params),
 
   getVenueById: (id: string) =>
     sendGet(`/venues/${id}`),
@@ -57,4 +60,7 @@ export const venueApi = {
 
   updateVenue: (id: string, data: any) =>
     sendPut(`/venues/${id}`, data),
+
+  addVenueImage: (id: string, data: { imageUrl: string; isPrimary: boolean }) =>
+    sendPost(`/venues/${id}/images`, data),
 };

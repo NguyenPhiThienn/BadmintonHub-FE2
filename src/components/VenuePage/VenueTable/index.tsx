@@ -26,25 +26,27 @@ import { memo } from "react";
 interface VenueTableProps {
     venues: IVenue[];
     isLoading?: boolean;
-    onApprove: (venue: IVenue) => void;
-    onReject: (venue: IVenue) => void;
+    onApprove?: (venue: IVenue) => void;
+    onReject?: (venue: IVenue) => void;
     onAction: (venue: IVenue, mode: "view" | "edit") => void;
     onDelete: (id: string) => void;
     onViewLegal: (venue: IVenue) => void;
     currentPage?: number;
     pageSize?: number;
+    showAdminActions?: boolean;
 }
 
 export const VenueTable = memo(({
     venues,
     isLoading = false,
-    onApprove,
-    onReject,
+    onApprove = () => {},
+    onReject = () => {},
     onAction,
     onDelete,
     onViewLegal,
     currentPage = 1,
     pageSize = 10,
+    showAdminActions = true,
 }: VenueTableProps) => {
 
     return (
@@ -125,7 +127,7 @@ export const VenueTable = memo(({
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end space-x-2">
-                                            {venue.status === 'PENDING' && (
+                                            {showAdminActions && venue.status === 'PENDING' && (
                                                 <>
                                                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                         <Tooltip>

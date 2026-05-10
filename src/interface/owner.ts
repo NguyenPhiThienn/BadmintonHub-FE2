@@ -15,6 +15,7 @@ export interface IRevenueStats {
 }
 
 export interface IOccupancyData {
+  _id: string;
   date: string;
   bookedHours: number;
   capacity: number;

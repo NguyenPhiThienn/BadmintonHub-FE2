@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMe } from "@/hooks/useAuth";
 import { useOccupancyStats, useRevenueStats } from "@/hooks/useOwner";
@@ -24,16 +23,15 @@ const StatCard = ({ title, value, icon, color, delay = 0 }: any) => {
     >
       <Card className="bg-darkCardV1/40 border-darkBorderV1 hover:border-accent/40 transition-all group h-full overflow-hidden">
         <CardContent className="p-4">
-          <div className={`w-fit p-2 rounded-lg bg-${color}/10 text-${color} border border-${color}/20 group-hover:scale-105 transition-transform duration-300 mb-3`}>
-            <Icon path={icon} size={0.8} />
-          </div>
-
-          <div className="flex items-center justify-between gap-4 overflow-hidden">
-            <p className="text-neutral-400 text-sm font-medium uppercase truncate">{title}</p>
-            <h3 className="text-xl font-semibold text-neutral-300 tracking-tight whitespace-nowrap">
+          <div className="flex justify-between items-center">
+            <div className={`w-fit p-2 rounded-lg bg-${color}/10 text-${color} border border-${color}/20 group-hover:scale-105 transition-transform duration-300 mb-3`}>
+              <Icon path={icon} size={0.8} />
+            </div>
+            <h3 className="text-xl font-semibold text-neutral-300 whitespace-nowrap">
               {value}
             </h3>
           </div>
+          <p className="text-neutral-400 text-xs font-semibold uppercase">{title}</p>
         </CardContent>
       </Card>
     </motion.div>
@@ -57,15 +55,23 @@ export default function OwnerDashboard() {
   const revenueDetails = revenueRes?.data?.details || [];
   const occupancyData = occupancyRes?.data?.occupancyData || [];
 
-  const formattedRevenueData = revenueDetails.map((item: any) => ({
-    name: `${item._id.day}/${item._id.month}`,
-    value: item.totalRevenue,
-  }));
+  const formattedRevenueData = [...revenueDetails]
+    .sort((a, b) => {
+      const dateA = new Date(a._id.year, a._id.month - 1, a._id.day).getTime();
+      const dateB = new Date(b._id.year, b._id.month - 1, b._id.day).getTime();
+      return dateA - dateB;
+    })
+    .map((item: any) => ({
+      name: `${item._id.day}/${item._id.month}`,
+      value: item.totalRevenue,
+    }));
 
-  const formattedOccupancyData = occupancyData.map((item: IOccupancyData) => ({
-    name: item.date.split('-').slice(1).join('/'),
-    rate: item.occupancyRate,
-  }));
+  const formattedOccupancyData = [...occupancyData]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .map((item: IOccupancyData) => ({
+      name: item.date.split("-").reverse().slice(0, 2).join("/"),
+      rate: item.occupancyRate,
+    }));
 
   if (isRevenueLoading || isOccupancyLoading) {
     return (
@@ -85,25 +91,7 @@ export default function OwnerDashboard() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-300">Tổng quan kinh doanh</h1>
-          <p className="text-neutral-400 text-sm mt-1">Theo dõi hiệu suất và doanh thu của các cơ sở sân.</p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Icon path={mdiSoccerField} size={0.8} className="text-accent" />
-            <span className="text-sm text-neutral-300 font-medium">Cơ sở:</span>
-          </div>
-          <Select value={selectedVenueId} onValueChange={setSelectedVenueId}>
-            <SelectTrigger className="w-[200px] bg-darkCardV1/60 border-darkBorderV1">
-              <SelectValue placeholder="Chọn cơ sở" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả cơ sở</SelectItem>
-              {venues.map((v: any) => (
-                <SelectItem key={v._id} value={v._id}>{v.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <p className="text-neutral-400 text-base mt-1">Theo dõi hiệu suất và doanh thu của các cơ sở sân.</p>
         </div>
       </header>
 
@@ -116,14 +104,14 @@ export default function OwnerDashboard() {
           delay={0.1}
         />
         <StatCard
-          title="Tổng lượt đặt"
+          title="Tổng số đơn đặt"
           value={revenueSummary?.totalBookings || 0}
           icon={mdiCalendarCheck}
           color="accent"
           delay={0.2}
         />
         <StatCard
-          title="Tỷ lệ lấp đầy TB"
+          title="Hiệu suất khai thác trung bình"
           value={`${(occupancyData.reduce((acc: number, curr: any) => acc + curr.occupancyRate, 0) / (occupancyData.length || 1)).toFixed(1)}%`}
           icon={mdiChartBar}
           color="accent"
@@ -140,9 +128,9 @@ export default function OwnerDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-darkCardV1/40 border-darkBorderV1">
-          <CardHeader className="flex flex-row items-center gap-2 border-b border-neutral-800 pb-4 mx-4">
+          <CardHeader className="flex flex-row items-center gap-2 border-b border-neutral-800 pb-4 mx-4 bg-transparent">
             <Icon path={mdiChartLine} size={0.8} className="text-accent" />
-            <CardTitle className="text-lg font-semibold text-accent">Biểu đồ doanh thu</CardTitle>
+            <CardTitle className="text-lg font-semibold text-accent bg-transparent">Biểu đồ doanh thu</CardTitle>
           </CardHeader>
           <CardContent className="h-[350px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -156,14 +144,14 @@ export default function OwnerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1A2F32" vertical={false} />
                 <XAxis
                   dataKey="name"
-                  stroke="#525252"
+                  stroke="#a3a3a3"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#525252"
+                  stroke="#a3a3a3"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
@@ -171,7 +159,7 @@ export default function OwnerDashboard() {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: "#0A1F22", border: "1px solid #1A2F32", borderRadius: "12px" }}
-                  itemStyle={{ color: "#fff" }}
+                  itemStyle={{ color: "#a3a3a3" }}
                   formatter={(value: number) => [`${value?.toLocaleString()} đ`, "Doanh thu"]}
                 />
                 <Area type="monotone" dataKey="value" stroke="#41C651" fillOpacity={1} fill="url(#colorRevenue)" strokeWidth={3} />
@@ -181,9 +169,9 @@ export default function OwnerDashboard() {
         </Card>
 
         <Card className="bg-darkCardV1/40 border-darkBorderV1">
-          <CardHeader className="flex flex-row items-center gap-2 border-b border-neutral-800 pb-4 mx-4">
+          <CardHeader className="flex flex-row items-center gap-2 border-b border-neutral-800 pb-4 mx-4 bg-transparent">
             <Icon path={mdiChartBar} size={0.8} className="text-accent" />
-            <CardTitle className="text-lg font-semibold text-accent">Tỷ lệ lấp đầy (7 ngày)</CardTitle>
+            <CardTitle className="text-lg font-semibold text-accent bg-transparent">Hiệu suất khai thác (7 ngày gần nhất)</CardTitle>
           </CardHeader>
           <CardContent className="h-[350px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -191,14 +179,14 @@ export default function OwnerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1A2F32" vertical={false} />
                 <XAxis
                   dataKey="name"
-                  stroke="#525252"
+                  stroke="#a3a3a3"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                   dy={10}
                 />
                 <YAxis
-                  stroke="#525252"
+                  stroke="#a3a3a3"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
@@ -206,8 +194,8 @@ export default function OwnerDashboard() {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: "#0A1F22", border: "1px solid #1A2F32", borderRadius: "12px" }}
-                  itemStyle={{ color: "#fff" }}
-                  formatter={(value: number) => [`${value}%`, "Tỷ lệ lấp đầy"]}
+                  itemStyle={{ color: "#a3a3a3" }}
+                  formatter={(value: number) => [`${value}%`, "Hiệu suất khai thác"]}
                 />
                 <Bar dataKey="rate" fill="#41C651" radius={[4, 4, 0, 0]} barSize={40} />
               </BarChart>

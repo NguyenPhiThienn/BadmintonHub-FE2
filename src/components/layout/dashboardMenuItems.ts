@@ -16,7 +16,7 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       {
         id: "owner-dashboard",
         name: "Tổng quan",
-        path: "/owner/dashboard",
+        path: "/owner",
         icon: mdiViewDashboardOutline,
       },
       {

@@ -60,12 +60,18 @@ export const VenueDialog = ({
             closeTime: "22:00",
             pricePerHour: 0,
             courts: [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
+            images: [{ imageUrl: "", isPrimary: true }],
         },
     });
 
     const { fields: courtFields, append: appendCourt, remove: removeCourt } = useFieldArray({
         control: form.control,
         name: "courts",
+    });
+
+    const { fields: imageFields, append: appendImage, remove: removeImage } = useFieldArray({
+        control: form.control,
+        name: "images",
     });
 
     useEffect(() => {
@@ -79,6 +85,7 @@ export const VenueDialog = ({
                     closeTime: initialData.closeTime || "22:00",
                     pricePerHour: initialData.pricePerHour || 0,
                     courts: (initialData.courts as any) || [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
+                    images: (initialData.images as any) || [{ imageUrl: "", isPrimary: true }],
                 });
             } else {
                 form.reset({
@@ -89,6 +96,7 @@ export const VenueDialog = ({
                     closeTime: "22:00",
                     pricePerHour: 0,
                     courts: [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
+                    images: [{ imageUrl: "", isPrimary: true }],
                 });
             }
         }
@@ -242,11 +250,9 @@ export const VenueDialog = ({
                                 </Button>
                             </div>
 
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 mb-4">
                                 {courtFields.map((field, index) => (
                                     <div key={field.id} className="relative p-4 rounded-lg border border-neutral-900 bg-black">
-
-
                                         <div className="grid grid-cols-2 gap-4 w-full">
                                             <FormField
                                                 control={form.control}
@@ -283,7 +289,68 @@ export const VenueDialog = ({
                                                     <Icon path={mdiTrashCanOutline} size={0.8} />
                                                 </Button>
                                             </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
+                            <div className="flex items-center gap-3 md:gap-4 mt-4">
+                                <h3 className="text-accent font-semibold whitespace-nowrap">Hình ảnh cơ sở ({imageFields.length})</h3>
+                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => appendImage({ imageUrl: "", isPrimary: false })}
+                                >
+                                    <Icon path={mdiPlus} size={0.8} />
+                                    Thêm ảnh
+                                </Button>
+                            </div>
+
+                            <div className="flex flex-col gap-4">
+                                {imageFields.map((field, index) => (
+                                    <div key={field.id} className="relative p-4 rounded-lg border border-neutral-900 bg-black">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name={`images.${index}.imageUrl`}
+                                                rules={{ required: "URL hình ảnh không được để trống" }}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>URL hình ảnh</FormLabel>
+                                                        <FormControl>
+                                                            <Input placeholder="https://..." {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <div className="flex items-end gap-4">
+                                                <FormField
+                                                    control={form.control}
+                                                    name={`images.${index}.isPrimary`}
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex items-center gap-2 space-y-0 pb-2">
+                                                            <FormControl>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={field.value}
+                                                                    onChange={field.onChange}
+                                                                    className="w-4 h-4 rounded border-neutral-700 bg-black text-accent focus:ring-accent"
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className="text-xs text-neutral-400">Ảnh chính</FormLabel>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => removeImage(index)}
+                                                >
+                                                    <Icon path={mdiTrashCanOutline} size={0.8} />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

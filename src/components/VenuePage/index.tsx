@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
-import { useAdminVenues, useDeleteVenue, useUpdateVenueStatus, useCreateVenue, useUpdateVenue } from "@/hooks/useVenue";
+import { useAdminVenues, useCreateVenue, useDeleteVenue, useMyVenues, useUpdateVenue, useUpdateVenueStatus } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
 import { mdiChevronRight, mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
@@ -34,7 +34,11 @@ import { VenueDetailsDialog } from "./VenueDetailsDialog";
 import { VenueDialog } from "./VenueDialog";
 import { VenueTable } from "./VenueTable";
 
-export default function VenuePage() {
+interface VenuePageProps {
+    type?: "admin" | "owner";
+}
+
+export default function VenuePage({ type = "admin" }: VenuePageProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -90,23 +94,28 @@ export default function VenuePage() {
     }, [debouncedSearchQuery, currentPage, pathname, router, searchParams]);
 
     const {
-        data: pendingRes,
+        data: venuesRes,
         isLoading,
         isFetching,
         refetch
-    } = useAdminVenues({
-        page: currentPage || 1,
-        limit: pageSize || 10,
-        search: debouncedSearchQuery
-    });
+    } = type === "admin"
+            ? useAdminVenues({
+                page: currentPage || 1,
+                limit: pageSize || 10,
+                search: debouncedSearchQuery
+            })
+            : useMyVenues({
+                page: currentPage || 1,
+                limit: pageSize || 10
+            });
 
     const { mutate: updateStatus } = useUpdateVenueStatus();
     const { mutate: deleteVenueMutation, isPending: isDeleting } = useDeleteVenue();
     const { mutate: createVenue, isPending: isCreating } = useCreateVenue();
     const { mutate: updateVenue, isPending: isUpdating } = useUpdateVenue();
 
-    const venues = pendingRes?.data?.venues || [];
-    const pagination = pendingRes?.data?.pagination;
+    const venues = venuesRes?.data?.venues || [];
+    const pagination = venuesRes?.data?.pagination;
 
     const handleApprove = (venue: IVenue) => {
         updateStatus({
@@ -277,13 +286,14 @@ export default function VenuePage() {
                         <VenueTable
                             venues={venues}
                             isLoading={isLoading || isFetching}
-                            onApprove={handleApprove}
-                            onReject={handleReject}
+                            onApprove={type === "admin" ? handleApprove : undefined}
+                            onReject={type === "admin" ? handleReject : undefined}
                             onAction={handleAction}
                             onDelete={handleDelete}
                             onViewLegal={handleViewLegal}
                             currentPage={currentPage}
                             pageSize={pageSize}
+                            showAdminActions={type === "admin"}
                         />
                     </Card>
                 </motion.div>

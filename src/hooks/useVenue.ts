@@ -20,6 +20,14 @@ export const useVenues = (params?: {
   });
 };
 
+export const useMyVenues = (params?: { page?: number; limit?: number }, options?: any) => {
+  return useQuery({
+    queryKey: ["my-venues", params],
+    queryFn: () => venueApi.getMyVenues(params),
+    ...options,
+  });
+};
+
 export const useVenueDetails = (id: string) => {
   return useQuery({
     queryKey: ["venue", id],
@@ -79,10 +87,11 @@ export const useAiBookingRecommendation = (venueId: string) => {
 };
 
 // Admin specific
-export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
+export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }, options?: any) => {
   return useQuery({
     queryKey: ["admin-venues", params],
     queryFn: () => venueApi.getAdminVenues(params),
+    ...options,
   });
 };
 
@@ -116,6 +125,7 @@ export const useCreateVenue = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
       queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["my-venues"] });
     },
   });
 };
@@ -127,6 +137,18 @@ export const useUpdateVenue = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
       queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["my-venues"] });
+      queryClient.invalidateQueries({ queryKey: ["venue", id] });
+    },
+  });
+};
+
+export const useAddVenueImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { imageUrl: string; isPrimary: boolean } }) =>
+      venueApi.addVenueImage(id, data),
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["venue", id] });
     },
   });
