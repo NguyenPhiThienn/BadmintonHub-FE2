@@ -15,13 +15,14 @@ import { Icon } from "@/components/ui/mdi-icon";
 import { useVenues } from "@/hooks/useVenue";
 import { IVenue } from "@/interface/venue";
 import { mdiBadminton, mdiChevronLeft, mdiCrosshairsGps, mdiFire, mdiMagnify, mdiMapMarkerRadius, mdiRefresh, mdiTagOutline } from "@mdi/js";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import VenueListExplorer from "../VenueListExplorer";
 import { VenueCard } from "../VenueListExplorer/VenueCard";
 
 const MapExplorer = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [map, setMap] = useState<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -57,7 +58,7 @@ const MapExplorer = () => {
       params.delete("search");
     }
     const queryString = params.toString();
-    router.push(`${window.location.pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
   }, [search, router, searchParams]);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ const MapExplorer = () => {
       params.delete("sortBy");
     }
     const queryString = params.toString();
-    router.push(`${window.location.pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
+    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, { scroll: false });
   }, [sortBy, router, searchParams]);
 
   useEffect(() => {

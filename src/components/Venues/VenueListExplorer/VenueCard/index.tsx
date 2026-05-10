@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { IVenue } from "@/interface/venue";
-import { Icon } from "@/components/ui/mdi-icon";
-import { mdiMapMarker, mdiStar, mdiClock, mdiStarOutline, mdiStarHalfFull, mdiTagOutline, mdiBadminton } from "@mdi/js";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/mdi-icon";
+import { IVenue } from "@/interface/venue";
+import { mdiBadminton, mdiClock, mdiMapMarker, mdiStar, mdiStarHalfFull, mdiStarOutline, mdiTagOutline } from "@mdi/js";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { calculateDistance, formatDistance } from "@/lib/utils/distance";
@@ -94,7 +93,7 @@ export const VenueCard = ({ venue, onClick, userLocation }: VenueCardHorizontalP
 
         {venue.description && (
           <p className="text-sm text-neutral-400 bg-darkBackgroundV1 p-2 py-3 rounded-lg italic">
-            "{venue.description}"
+            {venue.description}
           </p>
         )}
 

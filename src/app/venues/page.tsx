@@ -50,7 +50,9 @@ export default function VenuesPage() {
           </Breadcrumb>
         </div>
         <div className="flex-1">
-          <MapExplorer />
+          <React.Suspense fallback={<div className="h-full w-full bg-black animate-pulse" />}>
+            <MapExplorer />
+          </React.Suspense>
         </div>
       </main>
     </>
