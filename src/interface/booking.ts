@@ -88,3 +88,37 @@ export interface IAdminBookingQuery {
 export interface IUpdateBookingStatusRequest {
   status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 }
+
+export interface IManualBookingRequest {
+  type: "BOOKING" | "LOCK";
+  venueId: string;
+  courtId: string;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  customerName?: string;
+  customerPhone?: string;
+  note?: string;
+}
+
+export interface IBookingCalendarEvent {
+  type: "BOOKING" | "LOCK";
+  startTime: string;
+  endTime: string;
+  status: string;
+  customerName?: string;
+  reason?: string;
+}
+
+export interface IBookingCalendarResponse {
+  courtId: string;
+  courtName: string;
+  events: IBookingCalendarEvent[];
+}
+
+export interface IOwnerBookingQuery {
+  page?: number;
+  limit?: number;
+  status?: BookingStatus;
+  venueId?: string;
+}

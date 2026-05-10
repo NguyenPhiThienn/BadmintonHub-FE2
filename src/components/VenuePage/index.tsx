@@ -223,10 +223,7 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
                         </BreadcrumbList>
                     </Breadcrumb>
 
-                    <Button variant="accent" className="gap-2" onClick={handleCreateVenue}>
-                        <Icon path={mdiPlus} size={0.8} />
-                        Thêm cơ sở sân mới
-                    </Button>
+
                 </div>
 
                 <motion.div
@@ -255,19 +252,6 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
                                     <SelectItem value="asc">Cũ nhất trước</SelectItem>
                                 </SelectContent>
                             </Select>
-
-                            <Select value={locationFilter} onValueChange={setLocationFilter}>
-                                <SelectTrigger className="w-[160px]">
-                                    <SelectValue placeholder="Khu vực" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Toàn quốc</SelectItem>
-                                    <SelectItem value="hcm">TP. Hồ Chí Minh</SelectItem>
-                                    <SelectItem value="hn">Hà Nội</SelectItem>
-                                    <SelectItem value="dn">Đà Nẵng</SelectItem>
-                                </SelectContent>
-                            </Select>
-
                             <Button
                                 onClick={() => refetch()}
                                 disabled={isFetching}
@@ -278,6 +262,10 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
                                 {!isMobile && "Làm mới"}
                             </Button>
                         </div>
+                        <Button variant="accent" onClick={handleCreateVenue}>
+                            <Icon path={mdiPlus} size={0.8} />
+                            Thêm cơ sở sân mới
+                        </Button>
                     </div>
 
                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">

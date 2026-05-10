@@ -4,6 +4,8 @@ import {
   IBookingRequest,
   IAdminBookingQuery,
   IUpdateBookingStatusRequest,
+  IOwnerBookingQuery,
+  IManualBookingRequest,
 } from "@/interface/booking";
 
 export const useCreateBooking = () => {
@@ -42,7 +44,9 @@ export const useUpdateBookingStatus = () => {
       bookingApi.updateBookingStatus(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["booking"] });
+      queryClient.invalidateQueries({ queryKey: ["booking-calendar"] });
     },
   });
 };
@@ -65,5 +69,31 @@ export const useCreatePaymentUrl = () => {
   return useMutation({
     mutationFn: (data: { bookingId: string; method: "VNPAY" | "MOMO" | "CASH" }) =>
       paymentApi.createPaymentUrl(data),
+  });
+};
+
+export const useOwnerBookings = (params: IOwnerBookingQuery) => {
+  return useQuery({
+    queryKey: ["owner-bookings", params],
+    queryFn: () => bookingApi.getOwnerBookings(params),
+  });
+};
+
+export const useCreateManualBooking = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: IManualBookingRequest) => bookingApi.createManualBooking(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["booking-calendar"] });
+    },
+  });
+};
+
+export const useBookingCalendar = (venueId: string, params: { date: string }) => {
+  return useQuery({
+    queryKey: ["booking-calendar", venueId, params],
+    queryFn: () => bookingApi.getBookingCalendar(venueId, params),
+    enabled: !!venueId && !!params.date,
   });
 };

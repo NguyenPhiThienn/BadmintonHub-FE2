@@ -1,5 +1,5 @@
 import { venueApi } from "@/api/venue";
-import { IAIRecommendationRequest, IVenuesListResponse } from "@/interface/venue";
+import { IAIRecommendationRequest, IVenueResponse, IVenuesListResponse } from "@/interface/venue";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 export const useVenues = (params?: { 
@@ -29,7 +29,7 @@ export const useMyVenues = (params?: { page?: number; limit?: number }, options?
 };
 
 export const useVenueDetails = (id: string) => {
-  return useQuery({
+  return useQuery<IVenueResponse>({
     queryKey: ["venue", id],
     queryFn: () => venueApi.getVenueById(id),
     enabled: !!id,

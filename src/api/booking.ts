@@ -2,7 +2,9 @@ import { sendGet, sendPost, sendPut } from "./axios";
 import {
   IBookingRequest,
   IAdminBookingQuery,
-  IUpdateBookingStatusRequest
+  IUpdateBookingStatusRequest,
+  IOwnerBookingQuery,
+  IManualBookingRequest
 } from "@/interface/booking";
 
 export const bookingApi = {
@@ -16,6 +18,12 @@ export const bookingApi = {
     sendGet(`/bookings/venue/${venueId}`, params),
   updateBookingStatus: (id: string, data: IUpdateBookingStatusRequest) =>
     sendPut(`/bookings/${id}/status`, data),
+  getOwnerBookings: (params: IOwnerBookingQuery) =>
+    sendGet("/bookings/owner/all", params),
+  createManualBooking: (data: IManualBookingRequest) =>
+    sendPost("/bookings/manual", data),
+  getBookingCalendar: (venueId: string, params: { date: string }) =>
+    sendGet(`/bookings/calendar/${venueId}`, params),
 };
 
 export const adminBookingApi = {
