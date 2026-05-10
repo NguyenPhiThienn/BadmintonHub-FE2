@@ -11,12 +11,13 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { IBooking, BookingStatus } from "@/interface/booking";
-import { 
-    mdiCheckCircleOutline, 
-    mdiCloseCircleOutline, 
-    mdiEyeOutline, 
-    mdiPlaylistRemove 
+import { BookingStatus, IBooking } from "@/interface/booking";
+import { formatDateWithTime } from "@/lib/format";
+import {
+    mdiCheckCircleOutline,
+    mdiCloseCircleOutline,
+    mdiEyeOutline,
+    mdiPlaylistRemove
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
@@ -39,7 +40,7 @@ export const BookingTable = memo(({
     currentPage = 1,
     pageSize = 10,
 }: BookingTableProps) => {
-    
+
     const getStatusVariant = (status: BookingStatus) => {
         switch (status) {
             case "PENDING": return "orange";
@@ -71,6 +72,7 @@ export const BookingTable = memo(({
                         <TableHead>Cơ sở</TableHead>
                         <TableHead className="text-center">Số lượng sân</TableHead>
                         <TableHead className="text-right">Tổng tiền</TableHead>
+                        <TableHead>Ngày & giờ đặt</TableHead>
                         <TableHead className="text-center">Trạng thái</TableHead>
                         <TableHead className="text-right">Thao tác</TableHead>
                     </TableRow>
@@ -85,13 +87,14 @@ export const BookingTable = memo(({
                                 <TableCell><Skeleton className="h-6 w-40" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-16 mx-auto" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24 ml-auto" /></TableCell>
+                                <TableCell><Skeleton className="h-6 w-28" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24 mx-auto" /></TableCell>
                                 <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
                             </TableRow>
                         ))
                     ) : bookings.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8}>
+                            <TableCell colSpan={9}>
                                 <div className="text-center text-neutral-400 text-base py-4 italic flex items-center justify-center gap-2">
                                     <Icon path={mdiPlaylistRemove} size={1} className="flex-shrink-0" />
                                     Không có đơn đặt sân nào.
@@ -101,9 +104,9 @@ export const BookingTable = memo(({
                     ) : (
                         bookings.map((booking, index) => {
                             const rowNumber = (currentPage - 1) * pageSize + index + 1;
-                            const customerName = typeof booking.playerId === 'object' ? booking.playerId.fullName : "Khách vãng lai";
-                            const venueName = typeof booking.venueId === 'object' ? booking.venueId.name : "N/A";
-                            
+                            const customerName = (booking.playerId && typeof booking.playerId === 'object') ? booking.playerId.fullName : "Khách vãng lai";
+                            const venueName = (booking.venueId && typeof booking.venueId === 'object') ? booking.venueId.name : "N/A";
+
                             return (
                                 <TableRow
                                     key={booking._id}
@@ -112,19 +115,30 @@ export const BookingTable = memo(({
                                 >
                                     <TableCell className="text-center">{rowNumber}</TableCell>
                                     <TableCell>
-                                        <Badge variant="neutral" className="font-mono">#{booking._id.slice(-6).toUpperCase()}</Badge>
+                                        <Badge variant="neutral">#{booking._id.slice(-6).toUpperCase()}</Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm font-medium text-neutral-200">{customerName}</span>
+                                    <TableCell >
+                                        <Badge variant="neutral">
+                                            {customerName}
+                                        </Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <span className="text-sm text-neutral-400">{venueName}</span>
+                                    <TableCell className="min-w-[200px]">
+                                        <span className="text-accent hover:underline cursor-pointer">{venueName}</span>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="neutral">{booking.details?.length || 0}</Badge>
                                     </TableCell>
-                                    <TableCell className="text-right font-semibold text-accent">
-                                        {booking.finalPrice?.toLocaleString() || booking.totalPrice.toLocaleString()} đ
+                                    <TableCell className="text-right">
+                                        <Badge variant="green">
+                                            {booking.finalPrice?.toLocaleString() || booking.totalPrice.toLocaleString()} đ
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="neutral">
+                                            {
+                                                formatDateWithTime(booking.createdAt)
+                                            }
+                                        </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant={getStatusVariant(booking.status)}>
@@ -138,8 +152,6 @@ export const BookingTable = memo(({
                                                     <TooltipTrigger asChild>
                                                         <Button
                                                             size="icon"
-                                                            variant="ghost"
-                                                            className="hover:bg-accent/10 text-accent"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 onAction(booking);
@@ -159,8 +171,6 @@ export const BookingTable = memo(({
                                                             <TooltipTrigger asChild>
                                                                 <Button
                                                                     size="icon"
-                                                                    variant="ghost"
-                                                                    className="hover:bg-green-500/10 text-green-500"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         onUpdateStatus(booking._id, "CONFIRMED");
@@ -178,8 +188,7 @@ export const BookingTable = memo(({
                                                             <TooltipTrigger asChild>
                                                                 <Button
                                                                     size="icon"
-                                                                    variant="ghost"
-                                                                    className="hover:bg-red-500/10 text-red-500"
+                                                                    variant="destructive"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         onUpdateStatus(booking._id, "CANCELLED");
