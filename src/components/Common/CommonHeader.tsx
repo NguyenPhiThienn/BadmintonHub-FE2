@@ -9,7 +9,7 @@ import {
 import { useUser } from "@/context/useUserContext";
 import { useMe } from "@/hooks/useAuth";
 import { useMenuSidebar } from "@/stores/useMenuSidebar";
-import { mdiAccountTie, mdiLogout, mdiOfficeBuildingMarker } from "@mdi/js";
+import { mdiAccountTie, mdiLogout } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { HamburgerMenu } from "iconsax-reactjs";
 import Image from "next/image";
@@ -40,10 +40,10 @@ export default function CommonHeader() {
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex flex-col items-end">
               <span className="text-sm text-neutral-300 font-semibold truncate max-w-[200px]">
-                👋 Xin chào, {profile?.role === "COURT_OWNER" ? (profile?.employeeName || "Chủ sân") : (profile?.employee?.position || "Quản trị viên")}
+                👋 Xin chào, {profile?.role === "OWNER" || profile?.role === "COURT_OWNER" ? "Chủ sân" : (profile?.employee?.position || "Quản trị viên")}
               </span>
               <span className="text-xs font-semibold text-accent text-right max-w-[220px] truncate">
-                {profile?.role === "COURT_OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
+                {profile?.role === "OWNER" ? profile?.fullName : profile?.role === "COURT_OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
               </span>
             </div>
 
@@ -51,7 +51,7 @@ export default function CommonHeader() {
               <DropdownMenuTrigger asChild>
                 <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden border border-accent/70 shadow-[0_0_15px_rgba(68,215,182,0.2)] p-0.5 cursor-pointer transition-transform hover:scale-105 active:scale-95">
                   <img
-                    src={profile?.employee?.avatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${profile?.username || "Sophie"}`}
+                    src={profile?.role === "OWNER" ? profile?.avatarUrl : (profile?.employee?.avatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${profile?.username || "Sophie"}`)}
                     alt="Avatar"
                     className="w-full h-full object-cover rounded-full"
                   />
@@ -61,14 +61,8 @@ export default function CommonHeader() {
                 <DropdownMenuLabel className="flex flex-col !p-0 !py-1">
                   <div className="flex gap-1">
                     <Icon path={mdiAccountTie} size={0.8} className="flex-shrink-0" />
-                    <span className="text-sm font-semibold capitalize">{profile?.fullName || "Admin"}</span>
+                    <span className="text-sm font-semibold capitalize">{profile?.fullName || profile?.employeeName || "Admin"}</span>
                   </div>
-                  {
-                    profile?.partnerName === "admin" && <div className="flex gap-1">
-                      <Icon path={mdiOfficeBuildingMarker} size={0.8} className="flex-shrink-0" />
-                      <span className="text-xs text-neutral-400 font-normal">{profile?.partnerName || "admin"}</span>
-                    </div>
-                  }
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
