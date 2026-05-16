@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "@/api/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 export const useLogin = () => {
@@ -50,9 +50,11 @@ export const useRefreshToken = () => {
 };
 
 export const useMe = () => {
+  const token = typeof window !== "undefined" ? (localStorage.getItem("accessToken") || localStorage.getItem("token")) : null;
   return useQuery({
     queryKey: ["me"],
     queryFn: () => authApi.getMe(),
+    enabled: !!token,
   });
 };
 

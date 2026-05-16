@@ -29,9 +29,9 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState, useRef, useEffect } from "react";
-import { toast } from "react-toastify";
 import { QRCodeSVG } from "qrcode.react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 const SuccessContent = () => {
   const searchParams = useSearchParams();
@@ -95,9 +95,10 @@ const SuccessContent = () => {
             <div style="background-color: #fcfcfc; padding: 25px; border-radius: 12px; border: 1px solid #f0f0f0;">
               <h3 style="border-bottom: 2px solid #eee; padding-bottom: 12px; margin-top: 0; color: #0A1F22; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">Thông tin khách hàng</h3>
               <div style="margin-top: 15px; font-size: 14px; line-height: 1.8;">
-                <p style="margin: 0;"><strong>Họ tên:</strong> ${booking.playerId?.fullName || 'Khách ẩn danh'}</p>
-                <p style="margin: 0;"><strong>Số điện thoại:</strong> ${booking.playerId?.phone || 'N/A'}</p>
-                <p style="margin: 0;"><strong>Email:</strong> ${booking.playerId?.email || 'N/A'}</p>
+                <p style="margin: 0;"><strong>Họ tên:</strong> ${booking.customerName || booking.playerId?.fullName || 'Khách ẩn danh'}</p>
+                <p style="margin: 0;"><strong>Số điện thoại:</strong> ${booking.customerPhone || booking.playerId?.phone || 'N/A'}</p>
+                <p style="margin: 0;"><strong>Email:</strong> ${booking.customerEmail || booking.playerId?.email || 'N/A'}</p>
+                ${booking.isWeekly ? '<p style="margin: 4px 0 0 0; color: #41C651; font-weight: bold;">(Đặt sân cố định hàng tuần)</p>' : ''}
               </div>
             </div>
             <div style="background-color: #fcfcfc; padding: 25px; border-radius: 12px; border: 1px solid #f0f0f0;">
@@ -460,21 +461,20 @@ const SuccessContent = () => {
                   <Label>Người đặt</Label>
                 </div>
                 <div className="flex flex-col gap-2">
-                  {
-                    booking.playerId?.fullName ? <Badge variant="green">
-                      <Icon path={mdiAccountSupervisorCircle} size={0.6} />
-                      {booking.playerId?.fullName}
-                    </Badge> : <span className="text-neutral-400 italic">Khách ẩn danh</span>
-                  }
-
-                  {
-                    booking.playerId?.phone ?
-                      <Badge variant="neutral">
-                        <Icon path={mdiPhone} size={0.6} />
-                        {booking.playerId?.phone}
-                      </Badge> :
-                      <span className="text-neutral-400 italic">Chưa thiết lập số điện thoại</span>
-                  }
+                  <Badge variant="green">
+                    <Icon path={mdiAccountSupervisorCircle} size={0.6} />
+                    {booking.customerName || booking.playerId?.fullName || "Khách ẩn danh"}
+                  </Badge>
+                  <Badge variant="neutral">
+                    <Icon path={mdiPhone} size={0.6} />
+                    {booking.customerPhone || booking.playerId?.phone || "Chưa thiết lập số điện thoại"}
+                  </Badge>
+                  {booking.isWeekly && (
+                    <Badge variant="neutral" className="bg-accent/10 text-accent border-accent/20">
+                      <Icon path={mdiCheckCircle} size={0.6} />
+                      Đặt sân cố định hàng tuần
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>

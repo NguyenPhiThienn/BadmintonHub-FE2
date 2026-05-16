@@ -2,6 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAiBookingRecommendation } from "@/hooks/useVenue";
@@ -382,33 +384,30 @@ export const BookingSection = ({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Họ và tên</label>
-                  <input
+                  <Label>Họ và tên</Label>
+                  <Input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Nhập họ và tên"
-                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Số điện thoại</label>
-                  <input
+                  <Label>Số điện thoại</Label>
+                  <Input
                     type="text"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="Nhập số điện thoại"
-                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
                   />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Email</label>
-                  <input
+                  <Label>Email</Label>
+                  <Input
                     type="email"
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
                     placeholder="Nhập email để nhận thông tin đơn hàng"
-                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
                   />
                 </div>
               </div>
@@ -417,7 +416,7 @@ export const BookingSection = ({
 
           {/* Weekly Booking Checkbox */}
           {selectedSlots.length > 0 && (
-            <section className="pt-4">
+            <section className="pt-2">
               <button
                 onClick={() => setIsWeekly(!isWeekly)}
                 className={cn(
