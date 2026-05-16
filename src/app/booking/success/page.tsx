@@ -29,8 +29,9 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
+import { QRCodeSVG } from "qrcode.react";
 
 const SuccessContent = () => {
   const searchParams = useSearchParams();
@@ -39,6 +40,9 @@ const SuccessContent = () => {
 
   const { data: bookingRes, isLoading, error } = useBookingDetails(bookingId || "");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingQR, setIsDownloadingQR] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   const booking = bookingRes?.data;
 
@@ -215,6 +219,77 @@ const SuccessContent = () => {
       setIsDownloading(false);
     }
   };
+
+  const handleDownloadQR = async () => {
+    if (!qrRef.current) return;
+    setIsDownloadingQR(true);
+    try {
+      const svg = qrRef.current.querySelector("svg");
+      if (!svg) return;
+
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new (window as any).Image();
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      img.onload = () => {
+        canvas.width = img.width + 40;
+        canvas.height = img.height + 40;
+        if (ctx) {
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 20, 20);
+          const pngUrl = canvas.toDataURL("image/png");
+          const downloadLink = document.createElement("a");
+          downloadLink.href = pngUrl;
+          downloadLink.download = `QR_BH${booking._id?.slice(-6).toUpperCase()}.png`;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        }
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+      toast.success("Tải ảnh QR thành công!");
+    } catch (err) {
+      console.error("QR Download error:", err);
+      toast.error("Không thể tải ảnh QR");
+    } finally {
+      setIsDownloadingQR(false);
+    }
+  };
+
+  useEffect(() => {
+    const sendEmail = async () => {
+      if (booking && !emailSent) {
+        const email = booking.customerEmail || booking.playerId?.email;
+        if (email) {
+          try {
+            await fetch('/api/booking/send-confirmation', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                booking,
+                venue: booking.venueId,
+                details: booking.details
+              }),
+            });
+            setEmailSent(true);
+            console.log('Confirmation email sent');
+          } catch (err) {
+            console.error('Failed to send confirmation email:', err);
+          }
+        }
+      }
+    };
+
+    if (booking) {
+      sendEmail();
+    }
+  }, [booking, emailSent]);
 
   if (isLoading) {
     return (
@@ -484,11 +559,21 @@ const SuccessContent = () => {
         <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/10">
           <Icon path={mdiQrcodeScan} size={1} className="text-accent" />
         </div>
-        <div className="space-y-4">
-          <h3 className="text-white text-lg font-semibold">Hướng dẫn nhận sân</h3>
-          <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
-            Vui lòng đến sân đúng giờ. Bạn có thể xuất trình **mã đơn hàng** hoặc **mã QR** trong mục chi tiết vé cho nhân viên trực sân để được hỗ trợ check-in và nhận sân nhanh nhất.
-          </p>
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center w-full">
+          <div className="space-y-4 flex-1">
+            <h3 className="text-white text-lg font-semibold">Hướng dẫn nhận sân</h3>
+            <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
+              Vui lòng đến sân đúng giờ. Bạn có thể xuất trình **mã đơn hàng** hoặc **mã QR** trong mục chi tiết vé cho nhân viên trực sân để được hỗ trợ check-in và nhận sân nhanh nhất.
+            </p>
+          </div>
+          <div ref={qrRef} className="bg-white p-2 rounded-xl border-4 border-accent/20">
+            <QRCodeSVG
+              value={`${window.location.origin}/booking/success?bookingId=${booking._id}`}
+              size={120}
+              level="H"
+              includeMargin={false}
+            />
+          </div>
         </div>
       </motion.div>
 
@@ -521,6 +606,14 @@ const SuccessContent = () => {
         >
           {isDownloading ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiDownload} size={0.8} />}
           {isDownloading ? "Đang xử lý..." : "Tải hóa đơn PDF"}
+        </Button>
+        <Button
+          className="flex-1 bg-white text-black hover:bg-neutral-200"
+          onClick={handleDownloadQR}
+          disabled={isDownloadingQR}
+        >
+          {isDownloadingQR ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiQrcodeScan} size={0.8} />}
+          {isDownloadingQR ? "Đang xử lý..." : "Tải ảnh QR"}
         </Button>
       </motion.div>
 

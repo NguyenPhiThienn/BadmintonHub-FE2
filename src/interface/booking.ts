@@ -35,6 +35,10 @@ export interface IBooking {
   status: BookingStatus;
   createdAt: string;
   updatedAt?: string;
+  isWeekly?: boolean;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
 }
 
 export interface IBookingRequest {
@@ -44,6 +48,10 @@ export interface IBookingRequest {
   details: Omit<IBookingDetail, 'courtId'>[] & { courtId: string }[];
   totalPrice?: number;
   finalPrice?: number;
+  isWeekly?: boolean;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
 }
 
 export interface IBookingResponse {

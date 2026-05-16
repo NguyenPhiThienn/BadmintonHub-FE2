@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAiBookingRecommendation } from "@/hooks/useVenue";
 import { IAvailability, ICourt, ISlot } from "@/interface/venue";
 import { cn } from "@/lib/utils";
-import { mdiBadminton, mdiCash, mdiChevronLeft, mdiChevronRight, mdiCreditCardOutline, mdiInformationOutline, mdiShimmer, mdiSoccerField } from "@mdi/js";
+import { mdiBadminton, mdiChevronLeft, mdiChevronRight, mdiInformationOutline, mdiShimmer, mdiSoccerField } from "@mdi/js";
 import { format, isSameDay, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
+import Image from "next/image";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -27,6 +28,14 @@ interface BookingSectionProps {
   venueId: string;
   paymentMethod: "VNPAY" | "CASH";
   setPaymentMethod: (method: "VNPAY" | "CASH") => void;
+  customerName: string;
+  setCustomerName: (name: string) => void;
+  customerPhone: string;
+  setCustomerPhone: (phone: string) => void;
+  customerEmail: string;
+  setCustomerEmail: (email: string) => void;
+  isWeekly: boolean;
+  setIsWeekly: (isWeekly: boolean) => void;
 }
 
 const CourtTimeGrid = ({
@@ -104,7 +113,15 @@ export const BookingSection = ({
   onToggleSlot,
   venueId,
   paymentMethod,
-  setPaymentMethod
+  setPaymentMethod,
+  customerName,
+  setCustomerName,
+  customerPhone,
+  setCustomerPhone,
+  customerEmail,
+  setCustomerEmail,
+  isWeekly,
+  setIsWeekly
 }: BookingSectionProps) => {
   const { data: aiRecRes, isLoading: isAiLoading } = useAiBookingRecommendation(venueId);
   const [showAiRec, setShowAiRec] = useState(true);
@@ -319,7 +336,15 @@ export const BookingSection = ({
                       : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
                   )}
                 >
-                  <Icon path={mdiCash} size={1} />
+                  <div className="w-10 h-10 flex-shrink-0 bg-white rounded-full overflow-hidden p-1">
+                    <Image
+                      src="/images/money-logo.webp"
+                      alt="Cash"
+                      width={32}
+                      height={32}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                   <span className="font-semibold text-base">Thanh toán bằng tiền mặt</span>
                 </button>
                 <button
@@ -331,10 +356,92 @@ export const BookingSection = ({
                       : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
                   )}
                 >
-                  <Icon path={mdiCreditCardOutline} size={1} />
+                  <div className="w-10 h-10 flex-shrink-0 bg-white rounded-full overflow-hidden p-1">
+                    <Image
+                      src="/images/vnpay-logo.webp"
+                      alt="VNPay"
+                      width={32}
+                      height={32}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                   <span className="font-semibold text-base">Thanh toán bằng VNPay</span>
                 </button>
               </div>
+            </section>
+          )}
+
+          {/* Customer Info Section */}
+          {selectedSlots.length > 0 && (
+            <section className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-1 flex items-center gap-3 md:gap-4">
+                  <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin khách hàng</h3>
+                  <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Họ và tên</label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Nhập họ và tên"
+                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Số điện thoại</label>
+                  <input
+                    type="text"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="Nhập số điện thoại"
+                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="text-xs font-semibold text-neutral-500 uppercase ml-1">Email</label>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="Nhập email để nhận thông tin đơn hàng"
+                    className="w-full bg-darkCardV1 border-2 border-darkBorderV1 rounded-xl p-3 text-neutral-300 focus:border-accent outline-none transition-all"
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Weekly Booking Checkbox */}
+          {selectedSlots.length > 0 && (
+            <section className="pt-4">
+              <button
+                onClick={() => setIsWeekly(!isWeekly)}
+                className={cn(
+                  "flex items-center gap-3 p-4 rounded-xl border-2 transition-all w-full text-left",
+                  isWeekly
+                    ? "bg-accent/10 border-accent text-accent"
+                    : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
+                )}
+              >
+                <div className={cn(
+                  "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all",
+                  isWeekly ? "bg-accent border-accent" : "border-neutral-600"
+                )}>
+                  {isWeekly && (
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-base">Có đặt sân cố định hàng tuần hay không</p>
+                  <p className="text-sm opacity-70">Hệ thống sẽ tự động tạo đơn cho các tuần tiếp theo</p>
+                </div>
+              </button>
             </section>
           )}
         </div>

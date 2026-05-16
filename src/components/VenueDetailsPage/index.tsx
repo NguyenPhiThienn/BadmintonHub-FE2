@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
 import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
+import { useMe } from "@/hooks/useAuth";
 import {
   useAvailability,
   useVenueDetails,
@@ -37,6 +38,24 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [selectedSlots, setSelectedSlots] = useState<{ courtId: string, time: string, price: number }[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<"VNPAY" | "CASH">("CASH");
+
+  // Customer Info States
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [isWeekly, setIsWeekly] = useState(false);
+
+  // Auth Hook
+  const { data: meRes } = useMe();
+  const me = meRes?.data;
+
+  useEffect(() => {
+    if (me) {
+      setCustomerName(me.fullName || "");
+      setCustomerPhone(me.phone || "");
+      setCustomerEmail(me.email || "");
+    }
+  }, [me]);
 
   // API Hooks
   const { data: venueRes, isLoading: isVenueLoading } = useVenueDetails(id);
@@ -85,7 +104,12 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
         bookingDate: format(selectedDate, 'yyyy-MM-dd'),
         startTime: slot.time,
         endTime: `${(parseInt(slot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`
-      }))
+      })),
+      note: "",
+      isWeekly,
+      customerName,
+      customerPhone,
+      customerEmail
     };
 
     createBooking(payload, {
@@ -153,6 +177,14 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           venueId={id}
           paymentMethod={paymentMethod}
           setPaymentMethod={setPaymentMethod}
+          customerName={customerName}
+          setCustomerName={setCustomerName}
+          customerPhone={customerPhone}
+          setCustomerPhone={setCustomerPhone}
+          customerEmail={customerEmail}
+          setCustomerEmail={setCustomerEmail}
+          isWeekly={isWeekly}
+          setIsWeekly={setIsWeekly}
         />
 
         <ReviewSection />
