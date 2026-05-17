@@ -108,7 +108,7 @@ export const CreateUserDialog = ({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="PLAYER">Người chơi</SelectItem>
-                                    <SelectItem value="COURT_OWNER">Chủ sân</SelectItem>
+                                    <SelectItem value="OWNER">Chủ sân</SelectItem>
                                     <SelectItem value="ADMIN">Quản trị viên</SelectItem>
                                 </SelectContent>
                             </Select>

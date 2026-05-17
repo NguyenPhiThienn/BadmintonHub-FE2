@@ -14,3 +14,10 @@ export const useChartData = (type: string = "revenue", period: string = "month")
     queryFn: () => adminApi.getChartData({ type, period }),
   });
 };
+
+export const useAdminRevenueReport = (params: { page?: number; limit?: number; method?: string; ownerId?: string; venueId?: string; startDate?: string; endDate?: string }) => {
+  return useQuery({
+    queryKey: ["admin", "revenue-report", params],
+    queryFn: () => adminApi.getRevenueReport(params),
+  });
+};

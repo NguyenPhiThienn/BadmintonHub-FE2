@@ -135,9 +135,8 @@ const RevenueFlowChart = ({ chartData }: { chartData: IChartData | undefined }) 
   );
 };
 
-const TopPerformingVenues = () => {
-  // Mock data as not provided in API yet, but required by design
-  const topVenues = [
+const TopPerformingVenues = ({ topVenues }: { topVenues?: any[] }) => {
+  const displayVenues = topVenues && topVenues.length > 0 ? topVenues : [
     { name: "Sân Cầu Lông Thống Nhất", bookings: 450, revenue: "27.5M", growth: "+12%" },
     { name: "Badminton Hub Quận 7", bookings: 380, revenue: "22.0M", growth: "+8%" },
     { name: "Sân Thành Công Gò Vấp", bookings: 310, revenue: "18.6M", growth: "+15%" },
@@ -162,7 +161,7 @@ const TopPerformingVenues = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topVenues.map((venue, i) => (
+            {displayVenues.map((venue, i) => (
               <TableRow key={i}>
                 <TableCell className="text-center font-semibold">{i + 1}</TableCell>
                 <TableCell className="text-left font-medium text-neutral-300">{venue.name}</TableCell>
@@ -182,7 +181,8 @@ const TopPerformingVenues = () => {
   );
 };
 
-const ActiveUsersMap = () => {
+const ActiveUsersMap = ({ onlineNow }: { onlineNow?: number }) => {
+  const displayOnlineNow = onlineNow || 152;
   return (
     <Card className="bg-darkCardV1/40 border-darkBorderV1 h-full">
       <CardHeader>
@@ -195,7 +195,7 @@ const ActiveUsersMap = () => {
           <div className="absolute inset-4 bg-accent/20 rounded-full animate-pulse opacity-40" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <h4 className="text-4xl font-semibold text-accent">152</h4>
+              <h4 className="text-4xl font-semibold text-accent">{displayOnlineNow}</h4>
               <p className="text-xs text-gray-500 uppercase font-semibold">Online Now</p>
             </div>
           </div>
@@ -249,13 +249,13 @@ export default function AdminDashboardPage() {
           <RevenueFlowChart chartData={chartData} />
         </div>
         <div>
-          <ActiveUsersMap />
+          <ActiveUsersMap onlineNow={summaryData?.onlineNow} />
         </div>
       </div>
 
       {/* Ranking & Secondary Data */}
       <div className="grid grid-cols-1 gap-4">
-        <TopPerformingVenues />
+        <TopPerformingVenues topVenues={summaryData?.topVenues} />
       </div>
     </div>
   );

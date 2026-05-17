@@ -72,7 +72,8 @@ export const UserDetailsDialog = ({
         email: "",
         phone: "",
         password: "",
-        role: ""
+        role: "",
+        status: "ACTIVE"
     });
 
     useEffect(() => {
@@ -82,7 +83,8 @@ export const UserDetailsDialog = ({
                 email: userData.email || "",
                 phone: userData.phone || "",
                 password: "",
-                role: userData.role?.toString() || ""
+                role: userData.role?.toString() || "",
+                status: (userData as any).status || "ACTIVE"
             });
         }
     }, [userData, isOpen]);
@@ -92,7 +94,8 @@ export const UserDetailsDialog = ({
             fullName: formData.fullName,
             role: formData.role,
             email: formData.email,
-            phone: formData.phone
+            phone: formData.phone,
+            status: formData.status
         };
 
         if (formData.password.trim()) {
@@ -254,12 +257,24 @@ export const UserDetailsDialog = ({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="PLAYER">Người chơi</SelectItem>
-                                            <SelectItem value="COURT_OWNER">Chủ sân</SelectItem>
+                                            <SelectItem value="OWNER">Chủ sân</SelectItem>
                                             <SelectItem value="ADMIN">Quản trị viên</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
+                                    <Label htmlFor="status">Trạng thái tài khoản</Label>
+                                    <Select value={formData.status} onValueChange={(val) => setFormData({ ...formData, status: val })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Chọn trạng thái" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+                                            <SelectItem value="BLOCKED">Đã khóa</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2 col-span-2">
                                     <Label htmlFor="fullName">Họ và tên <span className="text-red-400 italic text-sm">(*)</span></Label>
                                     <Input
                                         id="fullName"

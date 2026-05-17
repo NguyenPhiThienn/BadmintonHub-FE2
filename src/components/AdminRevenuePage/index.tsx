@@ -1,0 +1,384 @@
+"use client";
+
+import { useState } from "react";
+import { useAdminRevenueReport } from "@/hooks/useAdmin";
+import { useUsers } from "@/hooks/useUsers";
+import { useAdminVenues } from "@/hooks/useVenue";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/ui/pagination";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { motion } from "framer-motion";
+import Icon from "@mdi/react";
+import {
+    mdiFinance,
+    mdiCash,
+    mdiCreditCardOutline,
+    mdiWallet,
+    mdiLoading,
+    mdiRefresh,
+    mdiFilterOutline,
+    mdiCalendarRange
+} from "@mdi/js";
+
+export default function AdminRevenuePage() {
+    const [page, setPage] = useState(1);
+    const [method, setMethod] = useState("all");
+    const [ownerId, setOwnerId] = useState("all");
+    const [venueId, setVenueId] = useState("all");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
+    // Load filter data
+    const { data: ownersResponse } = useUsers({ page: 1, limit: 1000, role: "COURT_OWNER" });
+    const { data: venuesResponse } = useAdminVenues({ page: 1, limit: 1000 });
+
+    const owners = ownersResponse?.data?.users || [];
+    const venues = venuesResponse?.data?.venues || [];
+
+    // Load revenue report
+    const {
+        data: reportResponse,
+        isLoading,
+        isFetching,
+        refetch
+    } = useAdminRevenueReport({
+        page,
+        limit: 10,
+        method: method !== "all" ? method : undefined,
+        ownerId: ownerId !== "all" ? ownerId : undefined,
+        venueId: venueId !== "all" ? venueId : undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+    });
+
+    const reportData = reportResponse?.data || {};
+    const transactions = reportData.transactions || [];
+    const stats = reportData.stats || {
+        totalRevenue: 0,
+        count: 0,
+        cashRevenue: 0,
+        vnpayRevenue: 0,
+        momoRevenue: 0
+    };
+    const pagination = reportData.pagination || {
+        total: 0,
+        totalPages: 1
+    };
+
+    const handleResetFilters = () => {
+        setMethod("all");
+        setOwnerId("all");
+        setVenueId("all");
+        setStartDate("");
+        setEndDate("");
+        setPage(1);
+    };
+
+    return (
+        <TooltipProvider>
+            <div className="space-y-6 bg-darkCardV1 p-4 md:p-6 rounded-2xl border border-darkBorderV1 min-h-[85vh]">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Quản lý doanh thu</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                        <h1 className="text-2xl font-bold text-accent tracking-tight mt-1">Báo cáo & Phân tích doanh thu</h1>
+                        <p className="text-sm text-neutral-400">Theo dõi, lọc và thống kê chi tiết mọi giao dịch trong hệ thống.</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => refetch()}
+                            disabled={isFetching}
+                            className="text-neutral-400 hover:text-white"
+                        >
+                            <Icon path={mdiRefresh} size={0.8} className={isFetching ? "animate-spin mr-2" : "mr-2"} />
+                            Làm mới
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={handleResetFilters}
+                            className="border-darkBorderV1 text-neutral-400 hover:text-white"
+                        >
+                            Đặt lại bộ lọc
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Filters Panel */}
+                <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 rounded-xl p-4 md:p-5 space-y-4">
+                    <div className="flex items-center gap-2 text-accent font-medium">
+                        <Icon path={mdiFilterOutline} size={0.7} />
+                        <span>Bộ lọc tìm kiếm nâng cao</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {/* Phương thức */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-neutral-400 font-medium">Phương thức thanh toán</label>
+                            <Select value={method} onValueChange={(val) => { setMethod(val); setPage(1); }}>
+                                <SelectTrigger className="w-full bg-darkCardV1 border-darkBorderV1">
+                                    <SelectValue placeholder="Tất cả phương thức" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tất cả phương thức</SelectItem>
+                                    <SelectItem value="CASH">Tiền mặt</SelectItem>
+                                    <SelectItem value="VNPAY">VNPay</SelectItem>
+                                    <SelectItem value="MOMO">Ví MoMo</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Chủ sân */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-neutral-400 font-medium">Chủ sân sở hữu</label>
+                            <Select value={ownerId} onValueChange={(val) => { setOwnerId(val); setPage(1); }}>
+                                <SelectTrigger className="w-full bg-darkCardV1 border-darkBorderV1">
+                                    <SelectValue placeholder="Tất cả chủ sân" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả chủ sân</SelectItem>
+                                    {owners.map((owner: any) => (
+                                        <SelectItem key={owner._id} value={owner._id}>
+                                            {owner.fullName || owner.email}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Cơ sở sân */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-neutral-400 font-medium">Cơ sở sân</label>
+                            <Select value={venueId} onValueChange={(val) => { setVenueId(val); setPage(1); }}>
+                                <SelectTrigger className="w-full bg-darkCardV1 border-darkBorderV1">
+                                    <SelectValue placeholder="Tất cả cơ sở" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="all">Tất cả cơ sở</SelectItem>
+                                    {venues.map((venue: any) => (
+                                        <SelectItem key={venue._id} value={venue._id}>
+                                            {venue.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Từ ngày */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-neutral-400 font-medium">Từ ngày</label>
+                            <div className="relative">
+                                <Input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+                                    className="bg-darkCardV1 border-darkBorderV1 w-full pl-9 pr-3 text-neutral-300"
+                                />
+                                <Icon path={mdiCalendarRange} size={0.7} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                            </div>
+                        </div>
+
+                        {/* Đến ngày */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-neutral-400 font-medium">Đến ngày</label>
+                            <div className="relative">
+                                <Input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+                                    className="bg-darkCardV1 border-darkBorderV1 w-full pl-9 pr-3 text-neutral-300"
+                                />
+                                <Icon path={mdiCalendarRange} size={0.7} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Stat Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Card 1: Tổng doanh thu */}
+                    <motion.div whileHover={{ y: -4 }} className="h-full">
+                        <Card className="bg-gradient-to-br from-accent/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-accent/40 transition-all h-full">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Tổng doanh thu</p>
+                                    <h3 className="text-xl font-bold text-neutral-200">{(stats.totalRevenue || 0).toLocaleString()} đ</h3>
+                                    <p className="text-xs text-neutral-400 italic">{stats.count || 0} lượt thanh toán</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 text-accent">
+                                    <Icon path={mdiFinance} size={1} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+
+                    {/* Card 2: Tiền mặt */}
+                    <motion.div whileHover={{ y: -4 }} className="h-full">
+                        <Card className="bg-gradient-to-br from-green-500/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-green-500/40 transition-all h-full">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu Tiền mặt</p>
+                                    <h3 className="text-xl font-bold text-green-400">{(stats.cashRevenue || 0).toLocaleString()} đ</h3>
+                                    <p className="text-xs text-neutral-400 italic">Thanh toán trực tiếp tại quầy</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400">
+                                    <Icon path={mdiCash} size={1} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+
+                    {/* Card 3: VNPay */}
+                    <motion.div whileHover={{ y: -4 }} className="h-full">
+                        <Card className="bg-gradient-to-br from-blue-500/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-blue-500/40 transition-all h-full">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu VNPay</p>
+                                    <h3 className="text-xl font-bold text-blue-400">{(stats.vnpayRevenue || 0).toLocaleString()} đ</h3>
+                                    <p className="text-xs text-neutral-400 italic">Thẻ ATM / QR VNPay</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                                    <Icon path={mdiCreditCardOutline} size={1} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+
+                    {/* Card 4: MoMo */}
+                    <motion.div whileHover={{ y: -4 }} className="h-full">
+                        <Card className="bg-gradient-to-br from-pink-500/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-pink-500/40 transition-all h-full">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu Ví MoMo</p>
+                                    <h3 className="text-xl font-bold text-pink-400">{(stats.momoRevenue || 0).toLocaleString()} đ</h3>
+                                    <p className="text-xs text-neutral-400 italic">Cổng thanh toán MoMo</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400">
+                                    <Icon path={mdiWallet} size={1} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                </div>
+
+                {/* Table Section */}
+                <Card className="bg-transparent border border-darkBorderV1 overflow-hidden p-0">
+                    <div className="w-full overflow-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="border-b border-darkBorderV1 bg-darkBackgroundV1/40">
+                                    <TableHead className="w-12 text-center text-neutral-400">STT</TableHead>
+                                    <TableHead className="text-neutral-400">Mã giao dịch</TableHead>
+                                    <TableHead className="text-neutral-400">Khách hàng</TableHead>
+                                    <TableHead className="text-neutral-400">Cơ sở sân</TableHead>
+                                    <TableHead className="text-neutral-400">Chủ sở hữu</TableHead>
+                                    <TableHead className="text-center text-neutral-400">Số tiền</TableHead>
+                                    <TableHead className="text-center text-neutral-400">Phương thức</TableHead>
+                                    <TableHead className="text-right text-neutral-400">Thời gian</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading || isFetching ? (
+                                    [...Array(5)].map((_, i) => (
+                                        <TableRow key={i} className="border-b border-darkBorderV1/40">
+                                            <TableCell colSpan={8} className="text-center py-6">
+                                                <div className="flex items-center justify-center gap-2 text-neutral-400">
+                                                    <Icon path={mdiLoading} size={0.8} className="animate-spin text-accent" />
+                                                    <span>Đang tải dữ liệu giao dịch...</span>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : transactions.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="text-center py-12 text-neutral-400 italic">
+                                            Không tìm thấy giao dịch doanh thu nào phù hợp với bộ lọc.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    transactions.map((t: any, index: number) => {
+                                        const stt = (page - 1) * 10 + index + 1;
+                                        return (
+                                            <TableRow key={t._id} className="hover:bg-darkBorderV1/10 border-b border-darkBorderV1/40 transition-colors">
+                                                <TableCell className="text-center text-neutral-300 font-medium">{stt}</TableCell>
+                                                <TableCell className="font-mono text-xs text-neutral-400 max-w-[120px] truncate" title={t._id}>
+                                                    {t.transaction_id || t._id}
+                                                </TableCell>
+                                                <TableCell className="text-neutral-200">
+                                                    <div>
+                                                        <div className="font-semibold text-sm">{t.booking?.customerName || "N/A"}</div>
+                                                        <div className="text-xs text-neutral-400">{t.booking?.customerPhone || ""}</div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-neutral-200 font-semibold text-sm">
+                                                    {t.venue?.name || "N/A"}
+                                                </TableCell>
+                                                <TableCell className="text-neutral-300">
+                                                    <div>
+                                                        <div className="font-medium text-sm">{t.owner?.fullName || "N/A"}</div>
+                                                        <div className="text-xs text-neutral-400">{t.owner?.email || ""}</div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-center text-accent font-bold">
+                                                    {(t.amount || 0).toLocaleString()} đ
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Badge
+                                                        variant={
+                                                            t.method === "CASH" ? "green" : t.method === "VNPAY" ? "blue" : "purple"
+                                                        }
+                                                    >
+                                                        {t.method === "CASH" ? "Tiền mặt" : t.method === "VNPAY" ? "VNPay" : "Ví MoMo"}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right text-xs text-neutral-400 font-medium">
+                                                    {new Date(t.createdAt).toLocaleString("vi-VN", {
+                                                        year: "numeric",
+                                                        month: "2-digit",
+                                                        day: "2-digit",
+                                                        hour: "2-digit",
+                                                        minute: "2-digit"
+                                                    })}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </Card>
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                    <div className="flex justify-center mt-6">
+                        <Pagination
+                            page={page}
+                            pageSize={10}
+                            total={pagination.total}
+                            totalPages={pagination.totalPages}
+                            onPageChange={(p) => setPage(p)}
+                        />
+                    </div>
+                )}
+            </div>
+        </TooltipProvider>
+    );
+}

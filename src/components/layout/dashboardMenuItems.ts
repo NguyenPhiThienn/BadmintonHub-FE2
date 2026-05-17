@@ -6,7 +6,8 @@ import {
   mdiCalendarClock,
   mdiSoccerField,
   mdiStorefrontOutline,
-  mdiViewDashboardOutline
+  mdiViewDashboardOutline,
+  mdiFinance
 } from "@mdi/js";
 
 export const getDashboardMenuItems = (permissions: string[] = [], role?: string): MenuItem[] => {
@@ -77,6 +78,12 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       name: "Quản lý đặt sân",
       path: "/admin/bookings",
       icon: mdiCalendarClock,
+    },
+    {
+      id: "revenue-management",
+      name: "Quản lý doanh thu",
+      path: "/admin/revenue",
+      icon: mdiFinance,
     },
   ];
 

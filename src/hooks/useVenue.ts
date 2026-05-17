@@ -103,6 +103,7 @@ export const useUpdateVenueStatus = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
       queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["my-venues"] });
     },
   });
 };
@@ -114,6 +115,7 @@ export const useDeleteVenue = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-venues"] });
       queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["my-venues"] });
     },
   });
 };

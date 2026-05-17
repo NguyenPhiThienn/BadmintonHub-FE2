@@ -141,8 +141,8 @@ export default function UserPage() {
                                 <SelectContent>
                                     <SelectItem value="all">Tất cả vai trò</SelectItem>
                                     <SelectItem value="PLAYER">Người chơi</SelectItem>
-                                    <SelectItem value="COURT_OWNER">Chủ sân</SelectItem>
-                                    <SelectItem value="admin">Quản trị viên</SelectItem>
+                                    <SelectItem value="OWNER">Chủ sân</SelectItem>
+                                    <SelectItem value="ADMIN">Quản trị viên</SelectItem>
                                 </SelectContent>
                             </Select>
 

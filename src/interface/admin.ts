@@ -8,6 +8,13 @@ export interface ISummaryStats {
   };
   venues: number;
   occupancyRate: number;
+  topVenues?: {
+    name: string;
+    bookings: number;
+    revenue: string;
+    growth: string;
+  }[];
+  onlineNow?: number;
 }
 
 export interface IChartItem {
