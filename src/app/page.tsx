@@ -1,6 +1,5 @@
 import { AboutSection } from "@/components/Landing/AboutSection"
 import { AISection } from "@/components/Landing/AISection"
-import { CoreValuesSection } from "@/components/Landing/CoreValuesSection"
 import { CTASection } from "@/components/Landing/CTASection"
 import { ExploreSection } from "@/components/Landing/ExploreSection"
 import { Footer } from "@/components/Landing/Footer"
@@ -15,7 +14,6 @@ export default function Home() {
       <HeroSection />
       <ExploreSection />
       <AboutSection />
-      <CoreValuesSection />
       <HowItWorksSection />
       <AISection />
       <CTASection />

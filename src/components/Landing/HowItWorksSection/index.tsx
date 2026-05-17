@@ -1,7 +1,7 @@
 "use client"
 
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiAccountPlus, mdiMagnify, mdiCheckCircle, mdiArrowRight, mdiListBoxOutline } from "@mdi/js"
+import { mdiAccountPlus, mdiBadminton, mdiHandball, mdiListBoxOutline, mdiMapSearch } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
 
 const fadeUp: Variants = {
@@ -24,7 +24,7 @@ const steps = [
     },
     {
         step: 2,
-        icon: mdiMagnify,
+        icon: mdiMapSearch,
         title: "Tìm và đặt sân",
         description: "AI gợi ý sân phù hợp nhất. Chọn giờ, thanh toán online - xong! Không cần gọi điện.",
         color: "secondary",
@@ -32,7 +32,7 @@ const steps = [
     },
     {
         step: 3,
-        icon: mdiCheckCircle,
+        icon: mdiHandball,
         title: "Chơi và tận hưởng",
         description: "Nhận thông báo xác nhận, đến sân và bắt đầu trận đấu. Đánh giá sân để giúp cộng đồng.",
         color: "primary",
@@ -139,7 +139,7 @@ export function HowItWorksSection() {
                                         </h3>
                                     </div>
 
-                                    <p className="text-base leading-relaxed text-neutral-400">
+                                    <p className="text-base text-gray-600 font-medium">
                                         {step.description}
                                     </p>
 
@@ -148,9 +148,9 @@ export function HowItWorksSection() {
                                         {step.details.map((detail) => (
                                             <span
                                                 key={detail}
-                                                className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2.5 py-0.5 text-sm font-medium text-primary"
+                                                className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2.5 py-0.5 text-sm font-medium text-primary border border-green-950/20"
                                             >
-                                                <Icon path={mdiCheckCircle} size={0.6} />
+                                                <Icon path={mdiBadminton} size={0.6} />
                                                 {detail}
                                             </span>
                                         ))}
