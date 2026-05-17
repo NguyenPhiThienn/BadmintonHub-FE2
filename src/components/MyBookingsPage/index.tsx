@@ -27,6 +27,7 @@ import { useUser } from "@/context/useUserContext";
 import { useMyBookings, useUpdateBookingStatus } from "@/hooks/useBooking";
 import {
     mdiCalendarCheckOutline,
+    mdiClose,
     mdiMagnify,
     mdiRefresh
 } from "@mdi/js";
@@ -180,9 +181,21 @@ export default function MyBookingsPage() {
                                     placeholder="Tìm kiếm theo tên sân..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 py-2 w-full"
+                                    className="pl-10 pr-10 py-2 w-full"
                                 />
                                 <Icon path={mdiMagnify} size={0.8} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSearchQuery("");
+                                            setDebouncedSearchQuery("");
+                                        }}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-white transition-colors"
+                                    >
+                                        <Icon path={mdiClose} size={0.8} />
+                                    </button>
+                                )}
                             </div>
                             <div className="flex items-center gap-3 w-full md:w-auto">
                                 <Select value={statusFilter} onValueChange={setStatusFilter}>
