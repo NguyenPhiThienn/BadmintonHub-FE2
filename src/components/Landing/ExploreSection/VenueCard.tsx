@@ -89,8 +89,8 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             <Icon path={mdiMap} size={0.6} className="flex-shrink-0" />
             <span className="line-clamp-1">{venue.address}</span>
           </div>
-          {/* AI Analysis */}
-          {isAI && venue.detailedAnalysis && (
+          {/* AI Analysis or Description */}
+          {isAI && venue.detailedAnalysis ? (
             <div className="mt-2 rounded-xl bg-primary/5 p-3 border border-primary/10">
               <div className="flex items-center gap-1.5 text-primary text-sm font-bold mb-1 uppercase">
                 <Icon path={mdiShimmer} size={0.8} />
@@ -100,6 +100,12 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
                 {venue.detailedAnalysis}
               </p>
             </div>
+          ) : (
+            venue.description && (
+              <p className="mt-2 text-sm text-gray-600 font-medium line-clamp-2 leading-relaxed">
+                {venue.description}
+              </p>
+            )
           )}
           {/* Bottom action row */}
           <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/50">

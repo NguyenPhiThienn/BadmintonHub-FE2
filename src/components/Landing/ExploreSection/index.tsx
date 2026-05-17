@@ -12,6 +12,7 @@ import { AIRecommendationSection } from "./AIRecommendationSection";
 import { VenueCard } from "./VenueCard";
 
 // Swiper imports
+import { Badge } from "@/components/ui/badge";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
@@ -93,9 +94,9 @@ export const ExploreSection = () => {
               "Danh sách sân quoanh đây"
             )}
           </h2>
-          <span className="text-base text-neutral-400 cursor-pointer hover:underline">
+          <Badge variant="neutral">
             {recommendedVenues.length > 0 ? "Kết quả phù hợp nhất" : "Gần bạn nhất"}
-          </span>
+          </Badge>
         </motion.div>
 
         {isLoading || aiMutation.isPending ? (
