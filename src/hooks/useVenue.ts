@@ -44,15 +44,17 @@ export const useVenueCourts = (venueId: string) => {
   });
 };
 
-export const useAvailability = (params: { courtId?: string; venueId?: string; date: string }) => {
+export const useAvailability = (params: { courtId?: string; venueId?: string; date: string; userId?: string }) => {
   return useQuery({
-    queryKey: ["availability", params.courtId, params.venueId, params.date],
+    queryKey: ["availability", params.courtId, params.venueId, params.date, params.userId],
     queryFn: () => venueApi.getAvailability({
       courtId: params.courtId,
       venueId: params.venueId,
-      date: params.date
+      date: params.date,
+      userId: params.userId
     }),
     enabled: (!!params.courtId || !!params.venueId) && !!params.date,
+    refetchInterval: 5000, // Auto-refresh availability every 5 seconds to get live locks! Beautiful!
   });
 };
 
@@ -152,6 +154,28 @@ export const useAddVenueImage = () => {
       venueApi.addVenueImage(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["venue", id] });
+    },
+  });
+};
+
+export const useLockSlot = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { courtId: string; date: string; startTime: string; userId: string }) =>
+      venueApi.lockSlot(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+    },
+  });
+};
+
+export const useUnlockSlot = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { courtId: string; date: string; startTime: string; userId: string }) =>
+      venueApi.unlockSlot(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
     },
   });
 };

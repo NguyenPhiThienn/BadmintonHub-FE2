@@ -1,8 +1,6 @@
 "use client";
 
-import { authApi } from "@/api/auth";
-import { bookingApi } from "@/api/booking";
-import { usersApi } from "@/api/users";
+
 import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +24,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { useUser } from "@/context/useUserContext";
-import { useUpdateMe } from "@/hooks/useAuth";
+import { useChangePassword, useUpdateMe, useUpdateProfile } from "@/hooks/useAuth";
+import { useMyStatistics } from "@/hooks/useBooking";
 import { useUploadImage } from "@/hooks/useUpload";
 import {
     mdiAccountOutline,
@@ -59,8 +58,8 @@ interface UserStats {
 export default function ProfilePage() {
     const { user, profile, fetchUserProfile } = useUser();
     const [isPending, setIsPending] = useState(false);
-    const [isStatsLoading, setIsStatsLoading] = useState(true);
-    const [stats, setStats] = useState<UserStats | null>(null);
+    const { data: statsRes, isLoading: isStatsLoading } = useMyStatistics();
+    const stats = statsRes?.data || null;
 
     // Form states
     const [fullName, setFullName] = useState("");
@@ -70,6 +69,8 @@ export default function ProfilePage() {
     // Mutation hooks
     const uploadImageMutation = useUploadImage();
     const updateMeMutation = useUpdateMe();
+    const updateProfileMutation = useUpdateProfile();
+    const changePasswordMutation = useChangePassword();
 
     // Change Password states
     const [isPassDialogOpen, setIsPassDialogOpen] = useState(false);
@@ -89,35 +90,14 @@ export default function ProfilePage() {
         }
     }, [profile]);
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const statsRes = await bookingApi.getMyStatistics();
-                if (statsRes.statusCode === 200) {
-                    setStats(statsRes.data);
-                }
-            } catch (error) {
-                console.error("Error fetching stats:", error);
-            } finally {
-                setIsStatsLoading(false);
-            }
-        };
 
-        if (user) {
-            loadData();
-        }
-    }, [user]);
 
     const handleSave = async () => {
         setIsPending(true);
         try {
-            const res = await usersApi.updateProfile({ fullName, phone, avatarUrl });
-            if (res.statusCode === 200) {
-                toast.success("Cập nhật thông tin thành công!");
-                fetchUserProfile();
-            } else {
-                toast.error(res.message || "Cập nhật thất bại");
-            }
+            await updateProfileMutation.mutateAsync({ fullName, phone, avatarUrl });
+            toast.success("Cập nhật thông tin thành công!");
+            fetchUserProfile();
         } catch (error: any) {
             toast.error(error.message || "Có lỗi xảy ra, vui lòng thử lại!");
         } finally {
@@ -159,18 +139,13 @@ export default function ProfilePage() {
 
         setIsPassPending(true);
         try {
-            const res = await authApi.changePassword({ oldPassword, newPassword });
-            if (res.statusCode === 200) {
-                toast.success("Đổi mật khẩu thành công!");
-                setIsPassDialogOpen(false);
-                setOldPassword("");
-                setNewPassword("");
-                setConfirmPassword("");
-            } else {
-                toast.error(res.message || "Đổi mật khẩu thất bại");
-            }
+            await changePasswordMutation.mutateAsync({ oldPassword, newPassword });
+            setIsPassDialogOpen(false);
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
         } catch (error: any) {
-            toast.error(error.message || "Mật khẩu cũ không chính xác");
+            // Already handled by useChangePassword hook
         } finally {
             setIsPassPending(false);
         }

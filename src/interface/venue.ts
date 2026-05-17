@@ -81,6 +81,7 @@ export interface ISlot {
   startTime: string;
   endTime: string;
   status: "AVAILABLE" | "BOOKED" | "LOCKED" | string;
+  userId?: string;
 }
 
 export interface IAvailability {

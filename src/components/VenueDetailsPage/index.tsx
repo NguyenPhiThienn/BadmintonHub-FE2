@@ -6,6 +6,8 @@ import { useMe } from "@/hooks/useAuth";
 import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
 import {
   useAvailability,
+  useLockSlot,
+  useUnlockSlot,
   useVenueDetails,
   useVenuePricing
 } from "@/hooks/useVenue";
@@ -16,7 +18,7 @@ import {
 } from "@mdi/js";
 import { addDays, format, getDay, startOfToday } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -45,9 +47,23 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const [customerEmail, setCustomerEmail] = useState("");
   const [isWeekly, setIsWeekly] = useState(false);
 
+  // Generate stable session ID for lock mechanism
+  const [sessionId] = useState(() => {
+    if (typeof window !== "undefined") {
+      let id = sessionStorage.getItem("booking_session_id");
+      if (!id) {
+        id = Math.random().toString(36).substring(2, 15);
+        sessionStorage.setItem("booking_session_id", id);
+      }
+      return id;
+    }
+    return "guest";
+  });
+
   // Auth Hook
   const { data: meRes } = useMe();
   const me = meRes?.data;
+  const userId = me?._id || sessionId;
 
   useEffect(() => {
     if (me) {
@@ -62,11 +78,14 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const { data: pricingRes } = useVenuePricing(id);
   const { mutate: createBooking, isPending: isBookingLoading } = useCreateBooking();
   const { mutate: createPaymentUrl, isPending: isPaymentLoading } = useCreatePaymentUrl();
+  const { mutateAsync: lockSlot } = useLockSlot();
+  const { mutateAsync: unlockSlot } = useUnlockSlot();
 
   // FETCH ALL AVAILABILITY AT ONCE
   const { data: availabilityRes, isLoading: isAvailabilityLoading } = useAvailability({
     venueId: id,
-    date: format(selectedDate, 'yyyy-MM-dd')
+    date: format(selectedDate, 'yyyy-MM-dd'),
+    userId
   });
 
   const venue = venueRes?.data;
@@ -83,12 +102,37 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
     return Array.from({ length: 14 }).map((_, i) => addDays(startOfToday(), i));
   }, []);
 
-  const toggleSlot = (courtId: string, time: string, price: number) => {
+  // Helper to release locks in backend
+  const releaseAllLocks = async (slotsToRelease: typeof selectedSlots, dateToRelease: Date) => {
+    if (slotsToRelease.length === 0) return;
+    const dateStr = format(dateToRelease, 'yyyy-MM-dd');
+
+    await Promise.all(
+      slotsToRelease.map(slot =>
+        unlockSlot({
+          courtId: slot.courtId,
+          date: dateStr,
+          startTime: slot.time,
+          userId
+        }).catch(err => console.error("Error releasing lock:", err))
+      )
+    );
+  };
+
+  const toggleSlot = async (courtId: string, time: string, price: number) => {
     const isSelected = selectedSlots.some(s => s.courtId === courtId && s.time === time);
-    if (isSelected) {
-      setSelectedSlots(selectedSlots.filter(s => !(s.courtId === courtId && s.time === time)));
-    } else {
-      setSelectedSlots([...selectedSlots, { courtId, time, price }]);
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+
+    try {
+      if (isSelected) {
+        await unlockSlot({ courtId, date: dateStr, startTime: time, userId });
+        setSelectedSlots(selectedSlots.filter(s => !(s.courtId === courtId && s.time === time)));
+      } else {
+        await lockSlot({ courtId, date: dateStr, startTime: time, userId });
+        setSelectedSlots([...selectedSlots, { courtId, time, price }]);
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Khung giờ này đang được chọn bởi người khác hoặc đã được đặt!");
     }
   };
 
@@ -138,9 +182,44 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
     });
   };
 
+  // Refs to track current selection for unmount cleanup
+  const latestSlotsRef = useRef(selectedSlots);
+  const latestDateRef = useRef(selectedDate);
+
+  // Update refs when selection or date changes
   useEffect(() => {
-    setSelectedSlots([]);
+    latestSlotsRef.current = selectedSlots;
+    latestDateRef.current = selectedDate;
+  }, [selectedSlots, selectedDate]);
+
+  // Ref to track previous date for date-change cleanup
+  const prevDateRef = useRef(selectedDate);
+
+  // Handle date change: release locks of previous date and clear selection
+  useEffect(() => {
+    if (selectedDate.getTime() !== prevDateRef.current.getTime()) {
+      const slotsToRelease = [...selectedSlots];
+      const oldDate = prevDateRef.current;
+
+      setSelectedSlots([]);
+      prevDateRef.current = selectedDate;
+
+      if (slotsToRelease.length > 0) {
+        releaseAllLocks(slotsToRelease, oldDate);
+      }
+    }
   }, [selectedDate]);
+
+  // Handle page unmount: release all locks currently held by the user
+  useEffect(() => {
+    return () => {
+      const slotsToRelease = latestSlotsRef.current;
+      const dateToRelease = latestDateRef.current;
+      if (slotsToRelease.length > 0) {
+        releaseAllLocks(slotsToRelease, dateToRelease);
+      }
+    };
+  }, []);
 
   if (isVenueLoading) return (
     <div className="h-screen bg-darkBackgroundV1 flex items-center justify-center">
@@ -185,6 +264,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           setCustomerEmail={setCustomerEmail}
           isWeekly={isWeekly}
           setIsWeekly={setIsWeekly}
+          userId={userId}
         />
 
         <ReviewSection />

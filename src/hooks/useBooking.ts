@@ -90,3 +90,10 @@ export const useBookingCalendar = (venueId: string, params: { date: string }) =>
     enabled: !!venueId && !!params.date,
   });
 };
+
+export const useMyStatistics = () => {
+  return useQuery({
+    queryKey: ["my-statistics"],
+    queryFn: () => bookingApi.getMyStatistics(),
+  });
+};

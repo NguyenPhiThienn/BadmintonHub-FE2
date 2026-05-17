@@ -38,6 +38,7 @@ interface BookingSectionProps {
   setCustomerEmail: (email: string) => void;
   isWeekly: boolean;
   setIsWeekly: (isWeekly: boolean) => void;
+  userId: string;
 }
 
 const CourtTimeGrid = ({
@@ -45,13 +46,15 @@ const CourtTimeGrid = ({
   courtAvailability,
   currentPrice,
   selectedSlots,
-  onToggle
+  onToggle,
+  userId
 }: {
   court: ICourt,
   courtAvailability?: IAvailability,
   currentPrice: number,
   selectedSlots: { courtId: string, time: string }[],
-  onToggle: (time: string, price: number) => void
+  onToggle: (time: string, price: number) => void,
+  userId: string
 }) => {
   const slots = courtAvailability?.slots || [];
 
@@ -64,7 +67,7 @@ const CourtTimeGrid = ({
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 gap-4">
         {slots.map((slot: ISlot) => {
-          const isBooked = slot.status !== "AVAILABLE";
+          const isBooked = slot.status !== "AVAILABLE" && !(slot.status === "LOCKED" && slot.userId === userId);
           const isSelected = selectedSlots.some(s => s.courtId === court._id && s.time === slot.startTime);
 
           return (
@@ -123,7 +126,8 @@ export const BookingSection = ({
   customerEmail,
   setCustomerEmail,
   isWeekly,
-  setIsWeekly
+  setIsWeekly,
+  userId
 }: BookingSectionProps) => {
   const { data: aiRecRes, isLoading: isAiLoading } = useAiBookingRecommendation(venueId);
   const [showAiRec, setShowAiRec] = useState(true);
@@ -308,6 +312,7 @@ export const BookingSection = ({
                     currentPrice={currentPrice}
                     selectedSlots={selectedSlots}
                     onToggle={(time, price) => onToggleSlot(courtAvail.courtId, time, price)}
+                    userId={userId}
                   />
                 ))}
               </div>

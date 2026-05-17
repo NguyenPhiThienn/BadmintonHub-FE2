@@ -25,8 +25,14 @@ export const venueApi = {
   getCourts: (venueId: string) =>
     sendGet(`/venues/${venueId}/courts`),
 
-  getAvailability: (params: { courtId?: string; venueId?: string; date: string }) =>
+  getAvailability: (params: { courtId?: string; venueId?: string; date: string; userId?: string }) =>
     sendGet("/availability", params),
+
+  lockSlot: (data: { courtId: string; date: string; startTime: string; userId: string }) =>
+    sendPost("/availability/lock", data),
+
+  unlockSlot: (data: { courtId: string; date: string; startTime: string; userId: string }) =>
+    sendPost("/availability/unlock", data),
 
   getPricing: (venueId: string) =>
     sendGet(`/venues/${venueId}/pricing`),

@@ -1,4 +1,5 @@
 import { authApi } from "@/api/auth";
+import { usersApi } from "@/api/users";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
@@ -111,5 +112,16 @@ export const useLoginPartnerCheck = () => {
 export const useFirebaseLoginPartner = () => {
   return useMutation({
     mutationFn: (data: { idToken: string }) => authApi.firebaseLoginPartner(data),
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { fullName: string; phone: string; avatarUrl: string }) =>
+      usersApi.updateProfile(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
   });
 };

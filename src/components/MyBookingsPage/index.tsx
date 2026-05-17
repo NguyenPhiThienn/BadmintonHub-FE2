@@ -1,6 +1,6 @@
 "use client";
 
-import { bookingApi } from "@/api/booking";
+
 import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
 import {
@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/context/useUserContext";
-import { useMyBookings, useUpdateBookingStatus } from "@/hooks/useBooking";
+import { useMyBookings, useMyStatistics, useUpdateBookingStatus } from "@/hooks/useBooking";
 import {
     mdiCalendarCheckOutline,
     mdiClose,
@@ -52,8 +52,8 @@ export default function MyBookingsPage() {
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [searchQuery, setSearchQuery] = useState("");
 
-    const [isStatsLoading, setIsStatsLoading] = useState(true);
-    const [stats, setStats] = useState<UserStats | null>(null);
+    const { data: statsRes, isLoading: isStatsLoading } = useMyStatistics();
+    const stats = statsRes?.data || null;
 
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
 
@@ -81,24 +81,7 @@ export default function MyBookingsPage() {
     const totalItems = bookingsRes?.data?.pagination?.total || 0;
     const totalPages = bookingsRes?.data?.pagination?.totalPages || 1;
 
-    useEffect(() => {
-        const loadStats = async () => {
-            try {
-                const statsRes = await bookingApi.getMyStatistics();
-                if (statsRes.success) {
-                    setStats(statsRes.data);
-                }
-            } catch (error) {
-                console.error("Error fetching stats:", error);
-            } finally {
-                setIsStatsLoading(false);
-            }
-        };
 
-        if (user) {
-            loadStats();
-        }
-    }, [user]);
 
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
