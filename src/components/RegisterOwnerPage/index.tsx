@@ -2,6 +2,8 @@
 
 import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
+import { motion } from "framer-motion";
+
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -19,13 +21,13 @@ import { useCreateOwnerRequest, useMyOwnerRequest } from "@/hooks/useOwnerReques
 import { useUploadImage } from "@/hooks/useUpload";
 import {
     mdiAlertCircleOutline,
+    mdiCheckCircle,
     mdiCheckCircleOutline,
-    mdiClockOutline,
     mdiCloudUploadOutline,
-    mdiDeleteOutline,
     mdiFileDocumentOutline,
     mdiInvoiceTextSend,
-    mdiStorefrontOutline
+    mdiStorefrontOutline,
+    mdiTrashCanOutline
 } from "@mdi/js";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -91,7 +93,9 @@ export default function RegisterOwnerPage() {
             setCourtImages(uploadedUrls);
             toast.success("Tải ảnh sân lên thành công!");
         } catch (error: any) {
-            console.error("Upload error:", error);
+            console.error("Upload error details:", error);
+            const errMsg = error?.response?.data?.message || error?.message || error?.data?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
+            toast.error(`Lỗi tải ảnh sân: ${errMsg}`);
         }
     };
 
@@ -106,7 +110,9 @@ export default function RegisterOwnerPage() {
                 toast.success("Tải ảnh giấy phép kinh doanh thành công!");
             }
         } catch (error: any) {
-            console.error("Upload error:", error);
+            console.error("Upload error details:", error);
+            const errMsg = error?.response?.data?.message || error?.message || error?.data?.message || (typeof error === "object" ? JSON.stringify(error) : String(error));
+            toast.error(`Lỗi tải ảnh giấy phép: ${errMsg}`);
         }
     };
 
@@ -186,12 +192,51 @@ export default function RegisterOwnerPage() {
                     /* PENDING STATUS CARD */
                     <div className="space-y-4">
                         <div className="bg-darkCardV1 border border-accent/20 rounded-2xl p-6 flex flex-col items-center text-center space-y-4 shadow-xl">
-                            <div className="h-16 w-16 bg-accent/10 text-accent rounded-full flex items-center justify-center">
-                                <Icon path={mdiClockOutline} size={1.2} className="animate-pulse" />
+                            <div className="relative w-24 h-24">
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: [0, 1.1, 1] }}
+                                    transition={{
+                                        duration: 2,
+                                        times: [0, 0.2, 0.5],
+                                        repeat: Infinity,
+                                        repeatDelay: 1
+                                    }}
+                                    className="w-full h-full bg-accent/20 rounded-full flex items-center justify-center relative z-10"
+                                >
+                                    <Icon path={mdiCheckCircle} size={0.8} className="text-accent scale-[2.5]" />
+                                </motion.div>
+
+                                {/* Celebration Dots */}
+                                {[...Array(8)].map((_, i) => {
+                                    const angle = (i * 45 * Math.PI) / 180;
+                                    const targetX = Math.cos(angle) * 80;
+                                    const targetY = Math.sin(angle) * 80;
+
+                                    return (
+                                        <div key={i} className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <motion.div
+                                                animate={{
+                                                    scale: [0, 1, 0],
+                                                    x: [0, targetX],
+                                                    y: [0, targetY],
+                                                }}
+                                                transition={{
+                                                    duration: 0.8,
+                                                    repeat: Infinity,
+                                                    repeatDelay: 2.2,
+                                                    ease: "easeOut",
+                                                    delay: 0.4 + (i * 0.05), // Starts exactly when the checkmark reaches its peak
+                                                }}
+                                                className="w-2 h-2 rounded-full bg-accent"
+                                            />
+                                        </div>
+                                    );
+                                })}
                             </div>
                             <div className="space-y-2">
-                                <h2 className="text-2xl font-bold text-white">Đơn đăng ký của bạn đang được xét duyệt</h2>
-                                <p className="text-neutral-400 text-sm max-w-xl">
+                                <h1 className="text-3xl font-semibold text-accent">Đơn đăng ký của bạn đang được xét duyệt</h1>
+                                <p className="text-neutral-400 text-base max-w-xl">
                                     Hệ thống đã nhận được hồ sơ của bạn. Ban quản trị BadmintonHub đang kiểm tra tính xác thực của thông tin. Chúng tôi sẽ gửi thông báo kết quả duyệt hoặc từ chối qua email <span className="text-accent font-semibold">{user.email}</span> của bạn sớm nhất!
                                 </p>
                             </div>
@@ -199,26 +244,26 @@ export default function RegisterOwnerPage() {
 
                         {/* REVIEW SUBMITTED DETAILS */}
                         <div className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4 shadow-xl">
-                            <h3 className="text-lg font-bold text-white border-b border-darkBorderV1 pb-2 flex items-center gap-2">
+                            <h3 className="text-accent font-semibold flex items-center gap-2">
                                 <Icon path={mdiFileDocumentOutline} size={0.8} className="text-accent" />
                                 Thông tin đã gửi xét duyệt
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <Label className="text-neutral-400">Số Căn cước công dân</Label>
-                                    <p className="text-white font-medium text-sm bg-darkBackgroundV1/50 p-3 rounded-lg border border-darkBorderV1">{myRequest.identityCard}</p>
+                                    <Label>Số Căn cước công dân</Label>
+                                    <p className="text-white font-medium text-sm bg-darkBorderV1 p-3 rounded-lg border border-darkBorderV1">{myRequest.identityCard}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label className="text-neutral-400">Địa chỉ sân hoạt động</Label>
-                                    <p className="text-white font-medium text-sm bg-darkBackgroundV1/50 p-3 rounded-lg border border-darkBorderV1">{myRequest.courtAddress}</p>
+                                    <Label>Địa chỉ sân hoạt động</Label>
+                                    <p className="text-white font-medium text-sm bg-darkBorderV1 p-3 rounded-lg border border-darkBorderV1">{myRequest.courtAddress}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-neutral-400">Ảnh sân thực tế</Label>
+                                <Label>Ảnh sân thực tế</Label>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {myRequest.courtImages?.map((url: string, index: number) => (
-                                        <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBackgroundV1/50">
+                                        <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBorderV1">
                                             <Image src={url} alt={`Court ${index + 1}`} fill className="object-cover" />
                                         </div>
                                     ))}
@@ -226,8 +271,8 @@ export default function RegisterOwnerPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-neutral-400">Giấy phép hoạt động kinh doanh</Label>
-                                <div className="relative aspect-video max-w-sm rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBackgroundV1/50">
+                                <Label>Giấy phép hoạt động kinh doanh</Label>
+                                <div className="relative aspect-video max-w-sm rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBorderV1">
                                     <Image src={myRequest.businessLicense} alt="Business License" fill className="object-cover" />
                                 </div>
                             </div>
@@ -348,7 +393,7 @@ export default function RegisterOwnerPage() {
                                                             onClick={() => removeCourtImage(index)}
                                                             className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-red-500"
                                                         >
-                                                            <Icon path={mdiDeleteOutline} size={0.8} />
+                                                            <Icon path={mdiTrashCanOutline} size={0.8} />
                                                         </button>
                                                     </div>
                                                 ))}
@@ -366,7 +411,7 @@ export default function RegisterOwnerPage() {
                                                     onClick={removeBusinessLicense}
                                                     className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-red-500"
                                                 >
-                                                    <Icon path={mdiDeleteOutline} size={0.8} />
+                                                    <Icon path={mdiTrashCanOutline} size={1} />
                                                 </button>
                                             </div>
                                         ) : (

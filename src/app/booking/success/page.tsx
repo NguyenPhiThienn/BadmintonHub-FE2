@@ -368,7 +368,7 @@ const SuccessContent = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-4xl font-semibold text-accent uppercase"
+            className="text-3xl font-semibold text-accent"
           >
             Đặt sân thành công!
           </motion.h1>
