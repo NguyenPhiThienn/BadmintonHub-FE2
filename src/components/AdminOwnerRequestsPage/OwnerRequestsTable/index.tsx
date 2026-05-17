@@ -102,10 +102,26 @@ export const OwnerRequestsTable = memo(({
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-semibold text-white">{fullName}</TableCell>
-                                    <TableCell className="text-neutral-300">{userObj.email || "-"}</TableCell>
-                                    <TableCell className="text-neutral-300">{phone}</TableCell>
-                                    <TableCell className="text-neutral-300">{request.identityCard}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="neutral">
+                                            {fullName}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="neutral">
+                                            {userObj.email || "-"}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="neutral">
+                                            {phone}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="neutral">
+                                            {request.identityCard}
+                                        </Badge>
+                                    </TableCell>
                                     <TableCell className="max-w-[200px] truncate text-neutral-300" title={request.courtAddress}>
                                         {request.courtAddress}
                                     </TableCell>

@@ -34,9 +34,9 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 // Split sub-components
-import { OwnerRequestsTable } from "./OwnerRequestsTable";
-import { OwnerRequestDetailsDialog } from "./OwnerRequestDetailsDialog";
 import { ImagePreviewDialog } from "./ImagePreviewDialog";
+import { OwnerRequestDetailsDialog } from "./OwnerRequestDetailsDialog";
+import { OwnerRequestsTable } from "./OwnerRequestsTable";
 
 export default function AdminOwnerRequestsPage() {
     const [currentPage, setCurrentPage] = useState(1);

@@ -6,10 +6,12 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
     mdiAlertCircleOutline,
     mdiCheckBold,
+    mdiClose,
     mdiCloseOctagonOutline,
     mdiFaceManProfile,
     mdiFileDocumentOutline
@@ -46,19 +48,24 @@ export const OwnerRequestDetailsDialog = ({
 }: OwnerRequestDetailsDialogProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent size="medium" className="bg-darkCardV1 border-darkBorderV1 text-white">
-                <DialogHeader className="bg-darkBackgroundV1 border-b border-darkBorderV1">
-                    <DialogTitle className="text-white text-lg flex items-center gap-2">
-                        <Icon path={mdiFileDocumentOutline} size={0.9} className="text-accent" />
-                        Chi tiết hồ sơ đăng ký chủ sân
+            <DialogContent size="medium">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-accent">
+                        <Icon path={mdiFileDocumentOutline} size={0.8} />
+                        <span>Chi tiết hồ sơ đăng ký chủ sân</span>
                     </DialogTitle>
                 </DialogHeader>
 
                 {selectedRequest && (
-                    <div className="p-4 md:p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                        {/* User Account info */}
+                    <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
+                        {/* Section 1: Account Info */}
+                        <div className="flex items-center gap-4">
+                            <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin tài khoản</h3>
+                            <div className="flex-1 border-b border-dashed border-accent mr-4" />
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-darkBackgroundV1/40 p-4 rounded-xl border border-darkBorderV1">
-                            <div className="flex items-center gap-3 md:col-span-2">
+                            <div className="flex items-center gap-4 md:col-span-2">
                                 <div className="w-12 h-12 rounded-full overflow-hidden border border-darkBorderV1 bg-darkCardV1 flex items-center justify-center">
                                     {selectedRequest.userId?.avatarUrl ? (
                                         <img src={selectedRequest.userId.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
@@ -66,38 +73,48 @@ export const OwnerRequestDetailsDialog = ({
                                         <Icon path={mdiFaceManProfile} size={0.8} className="text-neutral-400" />
                                     )}
                                 </div>
-                                <div>
+                                <div className="space-y-4">
                                     <h4 className="font-bold text-white text-base">{selectedRequest.userId?.fullName}</h4>
-                                    <p className="text-xs text-neutral-400">{selectedRequest.userId?.email}</p>
+                                    <p className="text-sm text-neutral-400">{selectedRequest.userId?.email}</p>
                                 </div>
                             </div>
-                            <div className="flex md:flex-col justify-between md:justify-center md:items-end gap-1 border-t md:border-t-0 md:border-l border-darkBorderV1 pt-3 md:pt-0 md:pl-4">
-                                <span className="text-xs text-neutral-400">Số điện thoại:</span>
+                            <div className="flex md:flex-col justify-between md:justify-center md:items-end gap-4 border-t md:border-t-0 md:border-l border-darkBorderV1 pt-4 md:pt-0 md:pl-4">
+                                <span className="text-sm text-neutral-400">Số điện thoại:</span>
                                 <span className="text-sm font-semibold text-white">{selectedRequest.userId?.phone || "-"}</span>
                             </div>
                         </div>
 
-                        {/* Submitted Documents Details */}
+                        {/* Section 2: Registration Info */}
+                        <div className="flex items-center gap-4">
+                            <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin hồ sơ</h3>
+                            <div className="flex-1 border-b border-dashed border-accent mr-4" />
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <span className="text-xs text-neutral-400 block font-bold">Số Căn cước công dân (CCCD)</span>
-                                <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-3 rounded-lg">
+                            <div className="space-y-4">
+                                <span className="text-sm text-neutral-400 block font-bold">Số Căn cước công dân (CCCD)</span>
+                                <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-lg">
                                     {selectedRequest.identityCard}
                                 </p>
                             </div>
 
-                            <div className="space-y-1">
-                                <span className="text-xs text-neutral-400 block font-bold">Địa chỉ cơ sở đăng ký</span>
-                                <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-3 rounded-lg">
+                            <div className="space-y-4">
+                                <span className="text-sm text-neutral-400 block font-bold">Địa chỉ cơ sở đăng ký</span>
+                                <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-lg">
                                     {selectedRequest.courtAddress}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Real Court Images */}
-                        <div className="space-y-2">
-                            <span className="text-xs text-neutral-400 block font-bold">Hình ảnh sân cầu lông thực tế</span>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {/* Section 3: Documents and Images */}
+                        <div className="flex items-center gap-4">
+                            <h3 className="text-accent font-semibold whitespace-nowrap">Tài liệu đính kèm</h3>
+                            <div className="flex-1 border-b border-dashed border-accent mr-4" />
+                        </div>
+
+                        <div className="space-y-4">
+                            <span className="text-sm text-neutral-400 block font-bold">Hình ảnh sân cầu lông thực tế</span>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {selectedRequest.courtImages?.map((url: string, idx: number) => (
                                     <div
                                         key={idx}
@@ -110,9 +127,8 @@ export const OwnerRequestDetailsDialog = ({
                             </div>
                         </div>
 
-                        {/* Business License */}
-                        <div className="space-y-2">
-                            <span className="text-xs text-neutral-400 block font-bold">Giấy phép hoạt động kinh doanh</span>
+                        <div className="space-y-4">
+                            <span className="text-sm text-neutral-400 block font-bold">Giấy phép hoạt động kinh doanh</span>
                             <div
                                 className="relative aspect-video max-w-sm rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBackgroundV1/50 cursor-zoom-in hover:opacity-80 transition-opacity"
                                 onClick={() => onPreviewImage(selectedRequest.businessLicense)}
@@ -121,50 +137,48 @@ export const OwnerRequestDetailsDialog = ({
                             </div>
                         </div>
 
-                        {/* Status and rejection reasons */}
+                        {/* Section 4: Status feedback */}
                         {selectedRequest.status === "REJECTED" && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl p-4 flex gap-3">
-                                <Icon path={mdiAlertCircleOutline} size={0.9} className="flex-shrink-0 mt-0.5" />
-                                <div>
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl p-4 flex gap-4">
+                                <Icon path={mdiAlertCircleOutline} size={0.8} className="flex-shrink-0 mt-4" />
+                                <div className="space-y-4">
                                     <p className="font-bold text-sm">Lý do từ chối hồ sơ</p>
-                                    <p className="text-xs text-neutral-300 italic mt-1">"{selectedRequest.rejectReason}"</p>
+                                    <p className="text-sm text-neutral-300 italic mt-4">"{selectedRequest.rejectReason}"</p>
                                 </div>
                             </div>
                         )}
 
                         {/* Rejection input form */}
                         {showRejectForm && (
-                            <form onSubmit={handleRejectSubmit} className="space-y-3 bg-red-500/5 border border-red-500/10 p-4 rounded-xl">
-                                <div className="space-y-1">
-                                    <label htmlFor="rejectReason" className="text-xs text-red-400 font-bold block">
+                            <form onSubmit={handleRejectSubmit} className="space-y-4 bg-red-500/5 border border-red-500/10 p-4 rounded-xl">
+                                <div className="space-y-4">
+                                    <Label htmlFor="rejectReason">
                                         Nhập lý do từ chối <span className="text-red-500">*</span>
-                                    </label>
+                                    </Label>
                                     <Textarea
                                         id="rejectReason"
                                         placeholder="Ví dụ: Giấy phép kinh doanh mờ, không khớp thông tin cơ sở..."
                                         value={rejectReason}
                                         onChange={(e) => setRejectReason(e.target.value)}
                                         rows={3}
-                                        className="bg-darkBackgroundV1 border-red-500/30 text-white focus:border-red-500"
                                         required
                                     />
                                 </div>
-                                <div className="flex justify-end gap-2">
+                                <div className="flex justify-end gap-4">
                                     <Button
                                         type="button"
-                                        size="sm"
-                                        variant="ghost"
+                                        variant="outline"
                                         onClick={() => setShowRejectForm(false)}
-                                        className="text-neutral-400"
                                     >
+                                        <Icon path={mdiClose} size={0.8} />
                                         Hủy
                                     </Button>
                                     <Button
                                         type="submit"
-                                        size="sm"
-                                        className="bg-red-500 hover:bg-red-600 text-white"
+                                        variant="destructive"
                                         disabled={isReviewing}
                                     >
+                                        <Icon path={mdiCloseOctagonOutline} size={0.8} />
                                         Xác nhận từ chối
                                     </Button>
                                 </div>
@@ -173,32 +187,32 @@ export const OwnerRequestDetailsDialog = ({
                     </div>
                 )}
 
-                <DialogFooter className="bg-darkBackgroundV1 border-t border-darkBorderV1">
+                <DialogFooter>
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         onClick={onClose}
-                        className="text-neutral-400 hover:text-white"
+                        disabled={isReviewing}
                     >
+                        <Icon path={mdiClose} size={0.8} />
                         Đóng
                     </Button>
 
                     {selectedRequest && selectedRequest.status === "PENDING" && !showRejectForm && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-4">
                             <Button
                                 variant="destructive"
                                 onClick={() => setShowRejectForm(true)}
-                                className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20"
                                 disabled={isReviewing}
                             >
-                                <Icon path={mdiCloseOctagonOutline} size={0.7} className="mr-1.5" />
+                                <Icon path={mdiCloseOctagonOutline} size={0.8} />
                                 Từ chối
                             </Button>
                             <Button
+                                variant="green"
                                 onClick={handleApprove}
-                                className="bg-green-600 text-white hover:bg-green-700 font-bold shadow-lg shadow-green-600/10"
                                 disabled={isReviewing}
                             >
-                                <Icon path={mdiCheckBold} size={0.7} className="mr-1.5" />
+                                <Icon path={mdiCheckBold} size={0.8} />
                                 Duyệt hồ sơ
                             </Button>
                         </div>
