@@ -52,9 +52,24 @@ export default function MyBookingsPage() {
     const [isStatsLoading, setIsStatsLoading] = useState(true);
     const [stats, setStats] = useState<UserStats | null>(null);
 
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearchQuery, statusFilter]);
+
     const { data: bookingsRes, isLoading, isFetching, refetch } = useMyBookings({
         page: currentPage,
         limit: pageSize,
+        status: statusFilter === "all" ? undefined : statusFilter,
+        search: debouncedSearchQuery || undefined,
     });
 
     const updateStatusMutation = useUpdateBookingStatus();
@@ -89,6 +104,7 @@ export default function MyBookingsPage() {
         setCurrentPage(1);
         setStatusFilter("all");
         setSearchQuery("");
+        setDebouncedSearchQuery("");
         refetch();
     };
 
@@ -145,7 +161,7 @@ export default function MyBookingsPage() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Lịch của tôi</BreadcrumbPage>
+                            <BreadcrumbPage>Lịch sử đặt sân</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>

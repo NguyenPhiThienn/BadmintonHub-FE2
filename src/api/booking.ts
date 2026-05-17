@@ -12,7 +12,7 @@ export const bookingApi = {
     sendPost("/bookings", data),
   getBookingDetails: (id: string) =>
     sendGet(`/bookings/${id}`),
-  getMyBookings: (params: { page?: number; limit?: number }) =>
+  getMyBookings: (params: { page?: number; limit?: number; status?: string; search?: string }) =>
     sendGet("/bookings/my-bookings", params),
   getVenueBookings: (venueId: string, params: { page?: number; limit?: number }) =>
     sendGet(`/bookings/venue/${venueId}`, params),

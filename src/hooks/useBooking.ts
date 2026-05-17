@@ -21,7 +21,7 @@ export const useBookingDetails = (id: string) => {
   });
 };
 
-export const useMyBookings = (params: { page?: number; limit?: number }) => {
+export const useMyBookings = (params: { page?: number; limit?: number; status?: string; search?: string }) => {
   return useQuery({
     queryKey: ["my-bookings", params],
     queryFn: () => bookingApi.getMyBookings(params),

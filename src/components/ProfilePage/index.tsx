@@ -2,7 +2,6 @@
 
 import { authApi } from "@/api/auth";
 import { bookingApi } from "@/api/booking";
-import { uploadApi } from "@/api/upload";
 import { usersApi } from "@/api/users";
 import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
@@ -27,10 +26,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { useUser } from "@/context/useUserContext";
+import { useUpdateMe } from "@/hooks/useAuth";
+import { useUploadImage } from "@/hooks/useUpload";
 import {
-    mdiAccountEditOutline,
     mdiAccountOutline,
     mdiCalendarCheckOutline,
+    mdiCameraPlusOutline,
     mdiCash,
     mdiCheck,
     mdiClockOutline,
@@ -63,6 +64,10 @@ export default function ProfilePage() {
     const [fullName, setFullName] = useState("");
     const [phone, setPhone] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
+
+    // Mutation hooks
+    const uploadImageMutation = useUploadImage();
+    const updateMeMutation = useUpdateMe();
 
     // Change Password states
     const [isPassDialogOpen, setIsPassDialogOpen] = useState(false);
@@ -124,13 +129,21 @@ export default function ProfilePage() {
 
         try {
             setIsPending(true);
-            const res = await uploadApi.uploadImage(file);
-            if (res.statusCode === 200) {
-                setAvatarUrl(res.data.url);
-                toast.success("Tải ảnh lên thành công! Nhấn lưu để cập nhật hồ sơ.");
+            const res = await uploadImageMutation.mutateAsync(file);
+            if (res.data?.url) {
+                const newAvatarUrl = res.data.url;
+                setAvatarUrl(newAvatarUrl);
+
+                await updateMeMutation.mutateAsync({
+                    fullName,
+                    phone,
+                    avatarUrl: newAvatarUrl
+                });
+
+                fetchUserProfile();
             }
         } catch (error) {
-            toast.error("Lỗi khi tải ảnh lên!");
+            console.error("Error uploading/updating avatar:", error);
         } finally {
             setIsPending(false);
         }
@@ -200,14 +213,14 @@ export default function ProfilePage() {
                     <div className="lg:col-span-4 space-y-4">
                         <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 flex flex-col items-center text-center space-y-4 shadow-xl">
                             <div className="relative group">
-                                <Avatar className="h-40 w-40 border-4 border-accent rounded-full shadow-2xl transition-transform group-hover:scale-105">
+                                <Avatar className="h-40 w-40 border-4 border-accent rounded-full shadow-2xl">
                                     <AvatarImage
                                         src={avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
                                         alt={user.fullName}
                                     />
                                 </Avatar>
-                                <label className="absolute bottom-2 right-2 p-3 bg-accent text-white rounded-full shadow-lg hover:bg-secondary transition-all hover:scale-110 cursor-pointer">
-                                    <Icon path={mdiAccountEditOutline} size={0.6} />
+                                <label className="absolute bottom-2 right-2 p-3 bg-accent text-white rounded-full shadow-lg hover:bg-green-600 cursor-pointer">
+                                    <Icon path={mdiCameraPlusOutline} size={0.8} />
                                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={isPending} />
                                 </label>
                             </div>

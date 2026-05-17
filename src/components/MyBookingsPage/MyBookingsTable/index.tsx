@@ -81,9 +81,9 @@ export const MyBookingsTable = memo(({
                         <TableRow>
                             <TableCell colSpan={7}>
                                 <div className="text-center text-neutral-400 text-base py-12 italic flex flex-col items-center justify-center gap-4">
-                                    <Icon path={mdiPlaylistRemove} size={2} className="opacity-20" />
+                                    <Icon path={mdiPlaylistRemove} size={2} />
                                     <span>Bạn chưa có lịch đặt sân nào.</span>
-                                    <Button variant="outline" asChild>
+                                    <Button variant="outline">
                                         <Link href="/venues">Đặt sân ngay</Link>
                                     </Button>
                                 </div>
@@ -107,11 +107,13 @@ export const MyBookingsTable = memo(({
                                         <Badge variant="neutral">{formatDateWithTime(booking.createdAt)}</Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {booking.details.map((d, i) => (
-                                            <Badge key={i} variant="neutral">
-                                                {d.startTime}-{d.endTime}
-                                            </Badge>
-                                        ))}
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {booking.details.map((d, i) => (
+                                                <Badge key={i} variant="neutral">
+                                                    {d.startTime}-{d.endTime}
+                                                </Badge>
+                                            ))}
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="green">
@@ -127,7 +129,7 @@ export const MyBookingsTable = memo(({
                                                 asChild
                                                 title="Xem chi tiết"
                                             >
-                                                <Link href={`/booking/success?bookingId=${booking._id}`}>
+                                                <Link href={`/booking/success?bookingId=${booking._id}`} target="_blank">
                                                     <Icon path={mdiEyeOutline} size={0.8} />
                                                     Xem chi tiết
                                                 </Link>

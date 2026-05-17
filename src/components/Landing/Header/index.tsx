@@ -22,7 +22,8 @@ import { useState } from "react"
 const navLinks = [
     { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
     { label: "Đặt sân", href: "/venues", icon: mdiMapMarkerOutline },
-    { label: "Lịch của tôi", href: "/my-bookings", icon: mdiCalendarMonthOutline },
+    { label: "Lịch sử đặt sân", href: "/my-bookings", icon: mdiCalendarMonthOutline },
+    { label: "Trang cá nhân", href: "/profile", icon: mdiAccountOutline },
 ];
 
 export function Header() {
@@ -49,14 +50,30 @@ export function Header() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden items-center gap-1 md:flex">
-                    {navLinks.map((link) => (
-                        <Button key={link.href} variant="ghost2" asChild>
-                            <Link href={link.href} className="flex items-center gap-2">
-                                <Icon path={link.icon} size={0.8} />
-                                {link.label}
-                            </Link>
-                        </Button>
-                    ))}
+                    {navLinks.map((link) => {
+                        const isProtectedRoute = link.href === "/my-bookings" || link.href === "/profile";
+                        if (isProtectedRoute && !user) {
+                            return (
+                                <Button
+                                    key={link.href}
+                                    variant="ghost2"
+                                    className="flex items-center gap-2"
+                                    onClick={() => setAuthMode("login")}
+                                >
+                                    <Icon path={link.icon} size={0.8} />
+                                    {link.label}
+                                </Button>
+                            );
+                        }
+                        return (
+                            <Button key={link.href} variant="ghost2" asChild>
+                                <Link href={link.href} className="flex items-center gap-2">
+                                    <Icon path={link.icon} size={0.8} />
+                                    {link.label}
+                                </Link>
+                            </Button>
+                        );
+                    })}
                 </nav>
 
                 {/* CTA + Mobile toggle */}
@@ -66,7 +83,6 @@ export function Header() {
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="h-10 w-10 border border-primary rounded-full cursor-pointer ">
                                     <AvatarImage
-                                        // src={user.avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
                                         src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
                                         alt={user.fullName}
                                         className="bg-darkBorderV1"
@@ -91,7 +107,7 @@ export function Header() {
                                 <DropdownMenuItem asChild>
                                     <Link href="/my-bookings" className="cursor-pointer text-secondary">
                                         <Icon path={mdiCalendarMonthOutline} size={0.8} />
-                                        <span>Quản lý đặt sân</span>
+                                        <span>Lịch sử đặt sân</span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
@@ -136,20 +152,39 @@ export function Header() {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                         <div className="flex flex-col gap-1">
-                            {navLinks.map((link) => (
-                                <Button
-                                    key={link.href}
-                                    variant="ghost-badminton"
-                                    className="justify-start hover:text-primary gap-3 px-4"
-                                    asChild
-                                    onClick={() => setMobileOpen(false)}
-                                >
-                                    <Link href={link.href}>
-                                        <Icon path={link.icon} size={0.8} />
-                                        {link.label}
-                                    </Link>
-                                </Button>
-                            ))}
+                            {navLinks.map((link) => {
+                                const isProtectedRoute = link.href === "/my-bookings" || link.href === "/profile";
+                                if (isProtectedRoute && !user) {
+                                    return (
+                                        <Button
+                                            key={link.href}
+                                            variant="ghost-badminton"
+                                            className="justify-start hover:text-primary gap-3 px-4"
+                                            onClick={() => {
+                                                setMobileOpen(false);
+                                                setAuthMode("login");
+                                            }}
+                                        >
+                                            <Icon path={link.icon} size={0.8} />
+                                            {link.label}
+                                        </Button>
+                                    );
+                                }
+                                return (
+                                    <Button
+                                        key={link.href}
+                                        variant="ghost-badminton"
+                                        className="justify-start hover:text-primary gap-3 px-4"
+                                        asChild
+                                        onClick={() => setMobileOpen(false)}
+                                    >
+                                        <Link href={link.href}>
+                                            <Icon path={link.icon} size={0.8} />
+                                            {link.label}
+                                        </Link>
+                                    </Button>
+                                );
+                            })}
                             <Button
                                 variant="badminton"
                                 className="mt-2 bg-primary hover:bg-secondary text-secondary"

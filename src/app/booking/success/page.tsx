@@ -410,12 +410,22 @@ const SuccessContent = () => {
                 {booking.status === 'CONFIRMED' ? (
                   <Badge variant="green">
                     <Icon path={mdiCheckCircle} size={0.6} />
-                    Đã xác nhận
+                    Đặt sân thành công
                   </Badge>
                 ) : booking.status === 'PENDING' ? (
                   <Badge variant="amber">
                     <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                    Chờ thanh toán
+                    Đơn đặt sân đang được giữ chỗ
+                  </Badge>
+                ) : booking.status === 'COMPLETED' ? (
+                  <Badge variant="neutral" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                    <Icon path={mdiCheckCircle} size={0.6} />
+                    Đơn đặt sân đã hoàn tất
+                  </Badge>
+                ) : booking.status === 'CANCELLED' ? (
+                  <Badge variant="destructive">
+                    <Icon path={mdiPlaylistRemove} size={0.6} />
+                    Đơn đặt sân bị hủy
                   </Badge>
                 ) : (
                   <Badge variant="destructive">
