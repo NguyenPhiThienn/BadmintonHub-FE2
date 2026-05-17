@@ -5,6 +5,7 @@ import {
   mdiAccountMultipleOutline,
   mdiCalendarClock,
   mdiSoccerField,
+  mdiStorefrontOutline,
   mdiViewDashboardOutline
 } from "@mdi/js";
 
@@ -58,6 +59,12 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       name: "Quản lý người dùng",
       path: "/admin/users",
       icon: mdiAccountGroupOutline,
+    },
+    {
+      id: "owner-request-management",
+      name: "Duyệt đăng ký chủ sân",
+      path: "/admin/owner-requests",
+      icon: mdiStorefrontOutline,
     },
     {
       id: "venue-management",

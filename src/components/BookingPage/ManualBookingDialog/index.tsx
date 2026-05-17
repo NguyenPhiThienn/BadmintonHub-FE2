@@ -135,7 +135,7 @@ export const ManualBookingDialog = ({
                 </div>
 
                 <Form {...form}>
-                    <form id="manual-booking-form" onSubmit={form.handleSubmit(onSubmit)} className="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 md:p-4 space-y-6">
+                    <form id="manual-booking-form" onSubmit={form.handleSubmit(onSubmit)} className="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 md:p-4 space-y-4">
                         {/* Section: Cơ sở & Sân */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-3 md:gap-4">

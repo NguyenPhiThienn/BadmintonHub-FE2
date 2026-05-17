@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Icon } from "@/components/ui/mdi-icon"
 import { useUser } from "@/context/useUserContext"
-import { mdiAccountOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, mdiLogout, mdiMapMarkerOutline, mdiMenu } from "@mdi/js"
+import { mdiAccountOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, mdiLogout, mdiMapMarkerOutline, mdiMenu, mdiStorefrontOutline } from "@mdi/js"
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
@@ -110,6 +110,16 @@ export function Header() {
                                         <span>Lịch sử đặt sân</span>
                                     </Link>
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                {user.role === "PLAYER" && (
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/register-owner" className="cursor-pointer text-secondary">
+                                            <Icon path={mdiStorefrontOutline} size={0.8} />
+                                            <span>Đăng ký chủ sân</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
                                     <Icon path={mdiLogout} size={0.8} />
                                     <span>Đăng xuất</span>
