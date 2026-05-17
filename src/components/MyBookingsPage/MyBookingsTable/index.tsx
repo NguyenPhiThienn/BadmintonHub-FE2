@@ -99,8 +99,8 @@ export const MyBookingsTable = memo(({
                                     <TableCell className="text-center font-medium">{rowNumber}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <Link href={`/venue/${typeof booking.venueId === "object" ? booking.venueId._id : booking.venueId}`}><span className="hover:underline text-accent">{venueName}</span></Link>
-                                            <span className="text-sm text-neutral-400 line-clamp-2">{venueAddress}</span>
+                                            <Link target="_blank" href={`/venues/${typeof booking.venueId === "object" ? booking.venueId._id : booking.venueId}`}><span className="hover:underline text-accent">{venueName}</span></Link>
+                                            <span className="text-sm text-neutral-300 line-clamp-2">{venueAddress}</span>
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -127,11 +127,11 @@ export const MyBookingsTable = memo(({
                                         <div className="flex justify-end gap-2">
                                             <Button
                                                 asChild
-                                                title="Xem chi tiết"
+                                                title="Chi tiết đơn đặt sân"
                                             >
                                                 <Link href={`/booking/success?bookingId=${booking._id}`} target="_blank">
                                                     <Icon path={mdiEyeOutline} size={0.8} />
-                                                    Xem chi tiết
+                                                    Chi tiết đơn đặt sân
                                                 </Link>
                                             </Button>
                                             {booking.status === "PENDING" && (

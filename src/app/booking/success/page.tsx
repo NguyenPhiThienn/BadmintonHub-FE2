@@ -560,32 +560,34 @@ const SuccessContent = () => {
       </motion.div>
 
       {/* 3. Instruction Card */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1 }}
-        className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl p-4 flex gap-4 items-start"
-      >
-        <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/10">
-          <Icon path={mdiQrcodeScan} size={1} className="text-accent" />
-        </div>
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center w-full">
-          <div className="space-y-4 flex-1">
-            <h3 className="text-white text-lg font-semibold">Hướng dẫn nhận sân</h3>
-            <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
-              Vui lòng đến sân đúng giờ. Bạn có thể xuất trình **mã đơn hàng** hoặc **mã QR** trong mục chi tiết vé cho nhân viên trực sân để được hỗ trợ check-in và nhận sân nhanh nhất.
-            </p>
+      {booking.status !== "CANCELLED" && (
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1 }}
+          className="bg-accent/5 border border-dashed border-accent/40 rounded-2xl p-4 flex gap-4 items-start"
+        >
+          <div className="h-12 w-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0 border border-accent/10">
+            <Icon path={mdiQrcodeScan} size={1} className="text-accent" />
           </div>
-          <div ref={qrRef} className="bg-white p-2 rounded-xl border-4 border-accent/20">
-            <QRCodeSVG
-              value={`${window.location.origin}/booking/success?bookingId=${booking._id}`}
-              size={120}
-              level="H"
-              includeMargin={false}
-            />
+          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center w-full">
+            <div className="space-y-4 flex-1">
+              <h3 className="text-white text-lg font-semibold">Hướng dẫn nhận sân</h3>
+              <p className="text-neutral-400 text-sm md:text-base leading-relaxed">
+                Vui lòng đến sân đúng giờ. Bạn có thể xuất trình **mã đơn hàng** hoặc **mã QR** trong mục chi tiết vé cho nhân viên trực sân để được hỗ trợ check-in và nhận sân nhanh nhất.
+              </p>
+            </div>
+            <div ref={qrRef} className="bg-white p-2 rounded-xl border-4 border-accent/20">
+              <QRCodeSVG
+                value={`${window.location.origin}/booking/success?bookingId=${booking._id}`}
+                size={120}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* 4. Secondary Actions */}
       <motion.div
@@ -609,22 +611,26 @@ const SuccessContent = () => {
           <Icon path={mdiClock} size={0.8} />
           Đến trang quản lý đơn đặt sân
         </Button>
-        <Button
-          className="flex-1"
-          onClick={handleDownloadPDF}
-          disabled={isDownloading}
-        >
-          {isDownloading ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiDownload} size={0.8} />}
-          {isDownloading ? "Đang xử lý..." : "Tải hóa đơn PDF"}
-        </Button>
-        <Button
-          className="flex-1 bg-white text-black hover:bg-neutral-200"
-          onClick={handleDownloadQR}
-          disabled={isDownloadingQR}
-        >
-          {isDownloadingQR ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiQrcodeScan} size={0.8} />}
-          {isDownloadingQR ? "Đang xử lý..." : "Tải ảnh QR"}
-        </Button>
+        {booking.status !== "CANCELLED" && (
+          <>
+            <Button
+              className="flex-1"
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+            >
+              {isDownloading ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiDownload} size={0.8} />}
+              {isDownloading ? "Đang xử lý..." : "Tải hóa đơn PDF"}
+            </Button>
+            <Button
+              className="flex-1 bg-white text-black hover:bg-neutral-200"
+              onClick={handleDownloadQR}
+              disabled={isDownloadingQR}
+            >
+              {isDownloadingQR ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiQrcodeScan} size={0.8} />}
+              {isDownloadingQR ? "Đang xử lý..." : "Tải ảnh QR"}
+            </Button>
+          </>
+        )}
       </motion.div>
 
       {/* Footer Branding */}
