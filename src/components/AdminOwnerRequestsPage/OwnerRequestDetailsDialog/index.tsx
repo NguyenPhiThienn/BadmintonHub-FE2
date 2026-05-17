@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
     Dialog,
     DialogContent,
@@ -18,6 +19,7 @@ import {
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import Image from "next/image";
+import { useState } from "react";
 
 interface OwnerRequestDetailsDialogProps {
     isOpen: boolean;
@@ -46,6 +48,7 @@ export const OwnerRequestDetailsDialog = ({
     handleRejectSubmit,
     onPreviewImage,
 }: OwnerRequestDetailsDialogProps) => {
+    const [isConfirmApproveOpen, setIsConfirmApproveOpen] = useState(false);
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent size="medium">
@@ -73,7 +76,7 @@ export const OwnerRequestDetailsDialog = ({
                                         <Icon path={mdiFaceManProfile} size={0.8} className="text-neutral-400" />
                                     )}
                                 </div>
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     <h4 className="font-bold text-white text-base">{selectedRequest.userId?.fullName}</h4>
                                     <p className="text-sm text-neutral-400">{selectedRequest.userId?.email}</p>
                                 </div>
@@ -91,15 +94,15 @@ export const OwnerRequestDetailsDialog = ({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-4">
-                                <span className="text-sm text-neutral-400 block font-bold">Số Căn cước công dân (CCCD)</span>
+                            <div className="space-y-2">
+                                <Label>Số Căn cước công dân (CCCD)</Label>
                                 <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-lg">
                                     {selectedRequest.identityCard}
                                 </p>
                             </div>
 
-                            <div className="space-y-4">
-                                <span className="text-sm text-neutral-400 block font-bold">Địa chỉ cơ sở đăng ký</span>
+                            <div className="space-y-2">
+                                <Label>Địa chỉ cơ sở đăng ký</Label>
                                 <p className="text-sm text-white bg-darkBackgroundV1/50 border border-darkBorderV1 p-4 rounded-lg">
                                     {selectedRequest.courtAddress}
                                 </p>
@@ -112,8 +115,8 @@ export const OwnerRequestDetailsDialog = ({
                             <div className="flex-1 border-b border-dashed border-accent mr-4" />
                         </div>
 
-                        <div className="space-y-4">
-                            <span className="text-sm text-neutral-400 block font-bold">Hình ảnh sân cầu lông thực tế</span>
+                        <div className="space-y-2">
+                            <Label>Hình ảnh sân cầu lông thực tế</Label>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {selectedRequest.courtImages?.map((url: string, idx: number) => (
                                     <div
@@ -127,8 +130,8 @@ export const OwnerRequestDetailsDialog = ({
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <span className="text-sm text-neutral-400 block font-bold">Giấy phép hoạt động kinh doanh</span>
+                        <div className="space-y-2">
+                            <Label>Giấy phép hoạt động kinh doanh</Label>
                             <div
                                 className="relative aspect-video max-w-sm rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBackgroundV1/50 cursor-zoom-in hover:opacity-80 transition-opacity"
                                 onClick={() => onPreviewImage(selectedRequest.businessLicense)}
@@ -141,7 +144,7 @@ export const OwnerRequestDetailsDialog = ({
                         {selectedRequest.status === "REJECTED" && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl p-4 flex gap-4">
                                 <Icon path={mdiAlertCircleOutline} size={0.8} className="flex-shrink-0 mt-4" />
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     <p className="font-bold text-sm">Lý do từ chối hồ sơ</p>
                                     <p className="text-sm text-neutral-300 italic mt-4">"{selectedRequest.rejectReason}"</p>
                                 </div>
@@ -151,7 +154,7 @@ export const OwnerRequestDetailsDialog = ({
                         {/* Rejection input form */}
                         {showRejectForm && (
                             <form onSubmit={handleRejectSubmit} className="space-y-4 bg-red-500/5 border border-red-500/10 p-4 rounded-xl">
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     <Label htmlFor="rejectReason">
                                         Nhập lý do từ chối <span className="text-red-500">*</span>
                                     </Label>
@@ -198,7 +201,7 @@ export const OwnerRequestDetailsDialog = ({
                     </Button>
 
                     {selectedRequest && selectedRequest.status === "PENDING" && !showRejectForm && (
-                        <div className="flex gap-4">
+                        <>
                             <Button
                                 variant="destructive"
                                 onClick={() => setShowRejectForm(true)}
@@ -208,17 +211,32 @@ export const OwnerRequestDetailsDialog = ({
                                 Từ chối
                             </Button>
                             <Button
-                                variant="green"
-                                onClick={handleApprove}
+                                onClick={() => setIsConfirmApproveOpen(true)}
                                 disabled={isReviewing}
                             >
                                 <Icon path={mdiCheckBold} size={0.8} />
                                 Duyệt hồ sơ
                             </Button>
-                        </div>
+                        </>
                     )}
                 </DialogFooter>
             </DialogContent>
+
+            {selectedRequest && (
+                <ConfirmDialog
+                    isOpen={isConfirmApproveOpen}
+                    onClose={() => setIsConfirmApproveOpen(false)}
+                    onConfirm={() => {
+                        setIsConfirmApproveOpen(false);
+                        handleApprove();
+                    }}
+                    title="Duyệt hồ sơ đăng ký"
+                    description={`Bạn có chắc chắn muốn duyệt đăng ký chủ sân cho người dùng: ${selectedRequest.userId?.fullName}?`}
+                    confirmText="Duyệt"
+                    cancelText="Hủy"
+                    isPending={isReviewing}
+                />
+            )}
         </Dialog>
     );
 };

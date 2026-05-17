@@ -16,6 +16,7 @@ export const useMyOwnerRequest = (enabled: boolean = true) => {
     queryKey: ["my-owner-request"],
     queryFn: () => ownerRequestApi.getMyRequest(),
     enabled,
+    refetchInterval: 4000,
   });
 };
 

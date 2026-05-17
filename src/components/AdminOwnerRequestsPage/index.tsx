@@ -89,10 +89,6 @@ export default function AdminOwnerRequestsPage() {
 
     const handleApprove = async () => {
         if (!selectedRequest) return;
-        const confirmApprove = window.confirm(
-            `Bạn có chắc chắn muốn duyệt đăng ký chủ sân cho người dùng: ${selectedRequest.userId?.fullName}?`
-        );
-        if (!confirmApprove) return;
 
         setIsReviewing(true);
         const toastId = toast.loading("Đang duyệt hồ sơ và nâng cấp tài khoản...");
@@ -234,7 +230,7 @@ export default function AdminOwnerRequestsPage() {
             >
                 {/* Search/Filters bar */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="relative w-full md:flex-1 max-w-md">
+                    <div className="relative w-full flex-1">
                         <Input
                             placeholder="Tìm kiếm theo tên, email, sđt, địa chỉ..."
                             value={searchQuery}
