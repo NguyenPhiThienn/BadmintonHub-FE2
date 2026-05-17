@@ -38,21 +38,16 @@ const statsStagger: Variants = {
 export function HeroSection() {
     return (
         <section className="relative min-h-screen overflow-hidden">
-            {/* Background image */}
             <Image
-                src="/images/hero-badminton.jpg"
+                src="/images/hero-badminton.png"
                 alt=""
                 fill
                 className="object-cover"
                 priority
                 aria-hidden="true"
             />
-            {/* Dark overlay for text contrast */}
             <div className="absolute inset-0 bg-black/60" />
-            {/* Subtle green tint overlay */}
             <div className="absolute inset-0 bg-primary/20" />
-
-            {/* SVG decorative elements */}
             <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
                 <defs>
                     <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
@@ -62,12 +57,9 @@ export function HeroSection() {
                 <rect width="100%" height="100%" fill="url(#hero-grid)" />
             </svg>
 
-            {/* Bottom fade */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
-
             <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 lg:px-8 mt-4">
                 <div className="w-full flex flex-col items-center lg:flex-row lg:items-center lg:gap-4">
-                    {/* Left: text content */}
                     <motion.div
                         className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left space-y-4"
                         initial="hidden"
@@ -122,7 +114,6 @@ export function HeroSection() {
                         </motion.div>
                     </motion.div>
 
-                    {/* Right: floating stat card */}
                     <motion.div
                         className="relative"
                         variants={scaleIn}
@@ -153,7 +144,6 @@ export function HeroSection() {
                     </motion.div>
                 </div>
 
-                {/* Stats strip */}
                 <motion.div
                     className="mt-20 grid w-full grid-cols-2 gap-8 lg:grid-cols-4"
                     initial="hidden"

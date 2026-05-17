@@ -74,19 +74,19 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
         </div>
 
         {/* Card body */}
-        <div className="p-4 flex flex-col flex-1">
+        <div className="p-4 flex flex-col flex-1 bg-darkBackgroundV1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-xl font-semibold text-primary line-clamp-2">
+            <h3 className="text-xl font-semibold text-secondary line-clamp-2">
               {venue.name}
             </h3>
-            <div className="flex shrink-0 items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5">
-              <Icon path={mdiStar} size={0.6} className="text-amber-500" />
-              <span className="text-sm font-semibold text-amber-700">{venue.averageRating ? venue.averageRating.toFixed(1) : "4.5"}</span>
-            </div>
+            <Badge variant="amber">
+              <Icon path={mdiStar} size={0.6} />
+              {venue.averageRating ? venue.averageRating.toFixed(1) : "4.5"}
+            </Badge>
           </div>
 
-          <div className="mt-2 flex items-center gap-1 text-sm text-gray-500 font-semibold">
-            <Icon path={mdiMap} size={0.6} className="flex-shrink-0" />
+          <div className="my-2 flex items-center gap-1 text-sm text-neutral-400 font-semibold">
+            <Icon path={mdiMap} size={0.8} className="flex-shrink-0" />
             <span className="line-clamp-1">{venue.address}</span>
           </div>
           {/* AI Analysis or Description */}
@@ -102,17 +102,20 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             </div>
           ) : (
             venue.description && (
-              <p className="mt-2 text-sm text-gray-600 font-medium line-clamp-2 leading-relaxed">
-                {venue.description}
-              </p>
+              <div className="p-3 bg-darkBorderV1 rounded-md">
+                <p className="text-base text-neutral-400 italic line-clamp-2">
+                  {venue.description}
+                </p>
+              </div>
+
             )
           )}
           {/* Bottom action row */}
-          <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/50">
-            <span className="flex items-center gap-1 text-base font-semibold text-primary">
+          <div className="mt-auto pt-4 flex items-center justify-between">
+            <span className="flex items-center gap-1 text-base font-semibold text-accent">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
               </span>
               {venue.available || 5} sân trống
             </span>
