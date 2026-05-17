@@ -102,7 +102,7 @@ const VenueListExplorer = ({
               )}
 
               {venues.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-neutral-500">
+                <div className="flex flex-col items-center justify-center py-20 text-gray-500">
                   <p>Không thấy sân nào ở khu vực này</p>
                   <p className="text-sm">Thử di chuyển bản đồ đến vùng khác</p>
                 </div>

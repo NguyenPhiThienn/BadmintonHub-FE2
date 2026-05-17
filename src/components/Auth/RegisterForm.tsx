@@ -1,30 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Icon } from "@/components/ui/mdi-icon";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  mdiAccountOutline,
-  mdiEmailOutline,
-  mdiPhoneOutline,
-  mdiLockOutline,
-  mdiEye,
-  mdiEyeOff,
-  mdiAccountPlus,
-  mdiLoading
-} from "@mdi/js";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Label } from "@/components/ui/label";
+import { Icon } from "@/components/ui/mdi-icon";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRegister } from "@/hooks/useAuth";
+import {
+  mdiAccountOutline,
+  mdiAccountPlus,
+  mdiEmailOutline,
+  mdiEye,
+  mdiEyeOff,
+  mdiLoading,
+  mdiLockOutline,
+  mdiPhoneOutline
+} from "@mdi/js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 interface RegisterFormProps {
@@ -157,7 +157,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
             Quay lại
           </Button>
 
-          <p className="text-center text-xs text-neutral-500">
+          <p className="text-center text-xs text-gray-500">
             Không nhận được mã?{" "}
             <button
               type="button"

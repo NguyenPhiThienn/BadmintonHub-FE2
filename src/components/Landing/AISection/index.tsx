@@ -1,10 +1,9 @@
 "use client"
 
-import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiBrain, mdiChip, mdiChartLine, mdiLightbulbOn } from "@mdi/js"
+import { mdiBrain, mdiChartLine, mdiChip } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -69,13 +68,13 @@ export function AISection() {
                     <motion.div custom={0} variants={fadeUp} className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-secondary shadow-lg shadow-primary/25">
                         <Icon path={mdiBrain} size={1} />
                     </motion.div>
-                    <motion.p custom={0} variants={fadeUp} className="text-xl font-semibold uppercase  text-primary">
+                    <motion.p custom={0} variants={fadeUp} className="text-xl font-semibold text-primary">
                         Đột phá công nghệ
                     </motion.p>
                     <motion.h2 custom={1} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Trí tuệ nhân tạo, sức mạnh vượt trội
                     </motion.h2>
-                    <motion.p custom={2} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
+                    <motion.p custom={2} variants={fadeUp} className="text-xl leading-relaxed text-gray-500">
                         Công nghệ AI tiên tiến giúp tối ưu hóa mọi trải nghiệm từ người chơi đến chủ sân.
                     </motion.p>
                 </motion.div>
@@ -106,33 +105,6 @@ export function AISection() {
                             </div>
                         </div>
                     </div>
-                </motion.div>
-
-                <motion.div
-                    className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                >
-                    {aiFeatures.map((feature, i) => (
-                        <motion.div key={feature.title} custom={i} variants={fadeUp}>
-                            <Card
-                                className="h-full border-accent/20 bg-primary/5 transition-all hover:border-secondary/40 hover:shadow-lg hover:shadow-primary/5"
-                            >
-                                <CardHeader>
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-secondary shadow-md">
-                                        <Icon path={feature.icon} size={1} />
-                                    </div>
-                                    <CardTitle className="text-xl text-primary">{feature.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <CardDescription className="text-lg leading-relaxed">
-                                        {feature.description}
-                                    </CardDescription>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    ))}
                 </motion.div>
             </div>
         </section>

@@ -212,7 +212,7 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbPage className="text-neutral-500">Dashboard</BreadcrumbPage>
+                                <BreadcrumbPage className="text-gray-500">Dashboard</BreadcrumbPage>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator>
                                 <Icon path={mdiChevronRight} size={0.6} />

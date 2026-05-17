@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
-import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
 import { useMe } from "@/hooks/useAuth";
+import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
 import {
   useAvailability,
   useVenueDetails,
@@ -150,7 +150,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
 
   if (!venue) return (
     <div className="h-screen bg-darkBackgroundV1 flex flex-col items-center justify-center gap-4 text-neutral-400">
-      <Icon path={mdiInformationOutline} size={0.8} className="text-neutral-500" />
+      <Icon path={mdiInformationOutline} size={0.8} className="text-gray-500" />
       <p className="text-lg font-medium">Không tìm thấy thông tin sân này.</p>
       <Button onClick={() => router.push("/venues")} variant="outline">
         <Icon path={mdiChevronLeft} size={0.8} />

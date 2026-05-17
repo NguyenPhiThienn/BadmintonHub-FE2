@@ -386,7 +386,7 @@ const MapExplorer = () => {
           )}
 
           {venues.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center py-20 text-neutral-500 text-center">
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500 text-center">
               <Icon path={mdiMagnify} size={1.5} className="mb-2 opacity-20" />
               <p>Không thấy sân nào ở khu vực này</p>
               <p className="text-sm">Hãy thử thu nhỏ hoặc di chuyển bản đồ</p>

@@ -58,7 +58,7 @@ export function CTASection() {
                     </motion.p>
 
                     {/* Registration form */}
-                    <motion.div custom={2} variants={fadeUp} className="mx-auto mt-10 max-w-md">
+                    <motion.div custom={2} variants={fadeUp} className="mx-auto my-8 max-w-md">
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <Input
                                 type="email"
@@ -70,24 +70,21 @@ export function CTASection() {
                                 <Icon path={mdiArrowRight} size={0.8} />
                             </Button>
                         </div>
-                        <p className="mt-4 text-lg text-neutral-400">
-                            Miễn phí. Không cần thẻ tín dụng. Hủy bất cứ lúc nào.
-                        </p>
                     </motion.div>
 
                     {/* Trust signals */}
                     <motion.div custom={3} variants={fadeUp} className="mt-4 flex flex-wrap items-center justify-center gap-8 text-neutral-400">
                         <div className="flex items-center gap-2">
-                            <Icon path={mdiShieldCheck} size={1} />
-                            <span className="text-lg">Bảo mật toàn diện</span>
+                            <Icon path={mdiShieldCheck} size={0.8} />
+                            <span className="text-base">Bảo mật toàn diện</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Icon path={mdiFlash} size={1} />
-                            <span className="text-lg">Cài đặt trong 30 giây</span>
+                            <Icon path={mdiFlash} size={0.8} />
+                            <span className="text-base">Cài đặt trong 30 giây</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Icon path={mdiHeart} size={1} />
-                            <span className="text-lg">50,000+ người dùng</span>
+                            <Icon path={mdiHeart} size={0.8} />
+                            <span className="text-base">50,000+ người dùng</span>
                         </div>
                     </motion.div>
                 </div>

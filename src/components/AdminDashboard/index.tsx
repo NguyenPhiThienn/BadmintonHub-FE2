@@ -196,7 +196,7 @@ const ActiveUsersMap = () => {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <h4 className="text-4xl font-semibold text-accent">152</h4>
-              <p className="text-xs text-neutral-500 uppercase font-semibold">Online Now</p>
+              <p className="text-xs text-gray-500 uppercase font-semibold">Online Now</p>
             </div>
           </div>
         </div>

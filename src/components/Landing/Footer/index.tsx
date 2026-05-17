@@ -63,7 +63,7 @@ export function Footer() {
                                 className="h-8 w-auto object-contain"
                             />
                         </Link>
-                        <p className="mt-4 text-justify text-lg leading-relaxed text-neutral-500">
+                        <p className="mt-4 text-justify text-lg leading-relaxed text-gray-500">
                             Nền tảng đặt sân cầu lông thông minh #1 Việt Nam. Kết nối người chơi và chủ sân.
                         </p>
                     </div>
@@ -85,7 +85,7 @@ export function Footer() {
 
                 {/* Bottom bar */}
                 <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
-                    <p className="text-base text-neutral-500">
+                    <p className="text-base text-gray-500">
                         &copy; 2026 BadmintonHub. Bản quyền thuộc về BadmintonHub.
                     </p>
                     <div className="flex items-center gap-4">

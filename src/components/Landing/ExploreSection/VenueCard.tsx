@@ -85,7 +85,7 @@ export const VenueCard = ({ venue, isAI, index = 0 }: VenueCardProps) => {
             </div>
           </div>
 
-          <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500 font-semibold">
+          <div className="mt-2 flex items-center gap-1 text-sm text-gray-500 font-semibold">
             <Icon path={mdiMap} size={0.6} className="flex-shrink-0" />
             <span className="line-clamp-1">{venue.address}</span>
           </div>

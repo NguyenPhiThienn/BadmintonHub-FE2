@@ -212,7 +212,7 @@ export const ForgotPasswordForm = ({ onSwitchLogin, isDialog }: ForgotPasswordFo
             Quay lại
           </Button>
 
-          <p className="text-center text-xs text-neutral-500">
+          <p className="text-center text-xs text-gray-500">
             Không nhận được mã?{" "}
             <button
               type="button"

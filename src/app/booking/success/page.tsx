@@ -644,7 +644,7 @@ const SuccessContent = () => {
             className="h-8 w-auto object-contain"
           />
         </Link>
-        <p className="text-sm text-neutral-500 font-medium uppercase">@BadmintonHub Smart Booking System</p>
+        <p className="text-sm text-gray-500 font-medium uppercase">@BadmintonHub Smart Booking System</p>
       </div>
     </div>
   );

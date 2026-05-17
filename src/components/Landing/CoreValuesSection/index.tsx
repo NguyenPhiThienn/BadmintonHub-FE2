@@ -16,20 +16,20 @@ import { motion, Variants } from "framer-motion"
 import Image from "next/image"
 
 const fadeUp: Variants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
         opacity: 1,
         y: 0,
-        transition: { duration: 0.7, delay: i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] as const },
+        transition: { duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] as const },
     }),
 }
 
 const scaleIn: Variants = {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, scale: 0.95 },
     visible: (i: number) => ({
         opacity: 1,
         scale: 1,
-        transition: { duration: 0.6, delay: i * 0.15, ease: [0.25, 0.46, 0.45, 0.94] as const },
+        transition: { duration: 0.5, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] as const },
     }),
 }
 
@@ -38,29 +38,21 @@ const coreValues = [
         icon: mdiLightbulbOn,
         title: "Thông minh",
         description: "AI phân tích và gợi ý phù hợp nhất cho từng cá nhân, từng thời điểm.",
-        primary: "text-primary",
-        bg: "bg-primary",
     },
     {
         icon: mdiFlash,
         title: "Tốc độ",
         description: "Đặt sân chỉ trong 30 giây. Không cần gọi điện, không cần chờ đợi.",
-        primary: "text-primary",
-        bg: "bg-primary",
     },
     {
         icon: mdiHandshakeOutline,
         title: "Kết nối",
         description: "Xây dựng cộng đồng cầu lông sôi động, kết nối người chơi và chủ sân.",
-        primary: "text-primary",
-        bg: "bg-primary",
     },
     {
         icon: mdiShieldCheck,
         title: "Tin cậy",
         description: "Hệ thống bảo mật, thanh toán an toàn, thông tin minh bạch 100%.",
-        primary: "text-primary",
-        bg: "bg-primary",
     },
 ]
 
@@ -102,62 +94,56 @@ const ownerBenefits = [
 
 export function CoreValuesSection() {
     return (
-        <section id="features" className="relative overflow-hidden bg-background py-20">
-            {/* SVG Background - Ultra-curvy organic blobs */}
-            <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" className="h-full w-full opacity-80" preserveAspectRatio="xMidYMid slice" style={{ overflow: 'visible' }}>
+        <section id="features" className="relative overflow-hidden bg-background py-24 border-t border-neutral-900">
+            {/* Minimal Dotted Grid Pattern (100% Flat, No Gradient) */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.03]" aria-hidden="true">
+                <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
                     <defs>
-                        <radialGradient id="blob-gradient-1" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#141F1B" stopOpacity="0.4" />
-                            <stop offset="100%" stopColor="#141F1B" stopOpacity="0" />
-                        </radialGradient>
-                        <radialGradient id="blob-gradient-2" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#141F1B" stopOpacity="0.4" />
-                            <stop offset="100%" stopColor="#141F1B" stopOpacity="0" />
-                        </radialGradient>
-                        <radialGradient id="blob-gradient-3" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#141F1B" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="#141F1B" stopOpacity="0" />
-                        </radialGradient>
+                        <pattern id="dotGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                            <circle cx="1" cy="1" r="1" className="fill-primary" />
+                        </pattern>
                     </defs>
-                    <path
-                        d="M800,400C800,620,630,780,400,780C170,780,0,620,0,400C0,180,170,20,400,20C630,20,800,180,800,400Z"
-                        fill="url(#blob-gradient-2)"
-                        transform="translate(420, 220) scale(1.1)"
-                    />
-                    <path
-                        d="M600,300C600,480,470,580,300,580C130,580,0,480,0,300C0,120,130,20,300,20C470,20,600,120,600,300Z"
-                        fill="url(#blob-gradient-3)"
-                        transform="translate(80, 450) scale(1)"
-                    />
+                    <rect width="100%" height="100%" fill="url(#dotGrid)" />
                 </svg>
             </div>
 
             <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
-                {/* Section header */}
+                {/* Section Header */}
                 <motion.div
-                    className="mx-auto max-w-3xl text-center flex flex-col gap-2"
+                    className="mx-auto max-w-3xl text-center flex flex-col items-center gap-4"
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                 >
-                    <motion.div custom={0} variants={fadeUp} className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-secondary shadow-lg shadow-primary/25">
-                        <Icon path={mdiLightbulbOn} size={1} />
-                    </motion.div>
-                    <motion.p custom={1} variants={fadeUp} className="text-xl font-semibold uppercase  text-primary">
+                    <motion.div
+                        custom={0}
+                        variants={fadeUp}
+                        className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary"
+                    >
+                        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                         Giá trị cốt lõi
-                    </motion.p>
-                    <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
+                    </motion.div>
+                    
+                    <motion.h2 
+                        custom={1} 
+                        variants={fadeUp} 
+                        className="text-balance text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
+                    >
                         Lợi ích nhân đôi cho mọi người
                     </motion.h2>
-                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-500">
+                    
+                    <motion.p 
+                        custom={2} 
+                        variants={fadeUp} 
+                        className="text-base sm:text-lg leading-relaxed text-neutral-400 max-w-2xl"
+                    >
                         Dù bạn là người chơi hay chủ sân, BadmintonHub mang đến giải pháp toàn diện giúp nâng cao trải nghiệm cầu lông.
                     </motion.p>
                 </motion.div>
 
-                {/* Core values - horizontal cards */}
+                {/* Core Values - Flat 4-Column Bento-like Grid */}
                 <motion.div
-                    className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                    className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-50px" }}
@@ -167,61 +153,57 @@ export function CoreValuesSection() {
                             key={value.title}
                             custom={i}
                             variants={scaleIn}
-                            className="group relative overflow-hidden rounded-2xl border border-primary/15 bg-card p-4 transition-all duration-500 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-xl hover:shadow-primary/10"
+                            className="group relative overflow-hidden rounded-xl border border-neutral-800 bg-[#0a0f0d] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-[#0c1512]"
                         >
-                            {/* Top primary line */}
-                            <div className={`absolute inset-x-0 top-0 h-1 rounded-t-2xl ${value.bg}`} />
-                            {/* Hover glow */}
-                            <div className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 ${value.bg}/20`} />
-
-                            <div className="relative">
-                                <div
-                                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 bg-primary/50`}
-                                >
-                                    <Icon path={value.icon} size={1} className="text-white" />
+                            <div className="relative flex flex-col h-full justify-between">
+                                <div>
+                                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
+                                        <Icon path={value.icon} size={1} />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-white transition-colors group-hover:text-primary">
+                                        {value.title}
+                                    </h3>
+                                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+                                        {value.description}
+                                    </p>
                                 </div>
-                                <h3 className="text-xl font-semibold text-primary">
-                                    {value.title}
-                                </h3>
-                                <p className="mt-2 text-lg font-normal leading-relaxed text-neutral-500">
-                                    {value.description}
-                                </p>
                             </div>
                         </motion.div>
                     ))}
                 </motion.div>
 
-                {/* Two-column benefits */}
-                <div className="mt-24 grid gap-8 lg:grid-cols-2">
-                    {/* Player column */}
+                {/* Two-Column Benefits */}
+                <div className="mt-24 grid gap-12 lg:grid-cols-2">
+                    {/* Player Column */}
                     <motion.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-50px" }}
+                        className="flex flex-col"
                     >
-                        <motion.div custom={0} variants={fadeUp} className="relative mb-8 overflow-hidden rounded-2xl">
+                        <motion.div 
+                            custom={0} 
+                            variants={fadeUp} 
+                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-800"
+                        >
                             <Image
                                 src="/images/players-group.jpg"
                                 alt="Nhóm người chơi cầu lông vui vẻ"
                                 width={600}
                                 height={340}
-                                className="h-56 w-full object-cover"
+                                className="h-56 w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                            <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-primary backdrop-blur-sm">
-                                        <Icon path={mdiAccountGroup} size={0.8} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-secondary">
-                                            Dành cho Người chơi
-                                        </h3>
-                                        <p className="text-lg text-secondary/80">Trải nghiệm đặt sân hoàn hảo</p>
-                                    </div>
-                                </div>
-                            </div>
                         </motion.div>
+
+                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-800 pb-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/5 border border-primary/20 text-primary">
+                                <Icon path={mdiAccountGroup} size={0.8} />
+                            </div>
+                            <div>
+                                <span className="text-xs font-bold uppercase tracking-wider text-primary">Dành cho</span>
+                                <h3 className="text-xl font-extrabold text-white">Người chơi</h3>
+                            </div>
+                        </div>
 
                         <div className="flex flex-col gap-4">
                             {playerBenefits.map((benefit, i) => (
@@ -229,16 +211,16 @@ export function CoreValuesSection() {
                                     key={benefit.title}
                                     custom={i + 1}
                                     variants={fadeUp}
-                                    className="group flex gap-4 rounded-xl border border-transparent bg-secondary p-4 transition-all duration-300"
+                                    className="group flex gap-4 rounded-xl border border-neutral-800 bg-[#0a0f0d]/40 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-[#0a0f0d]"
                                 >
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-secondary shadow-md shadow-primary/20 transition-transform duration-300 group-hover:scale-110">
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
                                         <Icon path={benefit.icon} size={0.8} />
                                     </div>
                                     <div>
-                                        <h4 className="text-xl font-semibold text-primary">
+                                        <h4 className="text-base font-bold text-white mb-1 group-hover:text-primary transition-colors">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-lg leading-relaxed text-neutral-400">
+                                        <p className="text-sm leading-relaxed text-neutral-400">
                                             {benefit.description}
                                         </p>
                                     </div>
@@ -247,35 +229,36 @@ export function CoreValuesSection() {
                         </div>
                     </motion.div>
 
-                    {/* Owner column */}
+                    {/* Owner Column */}
                     <motion.div
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-50px" }}
+                        className="flex flex-col"
                     >
-                        <motion.div custom={0} variants={fadeUp} className="relative mb-8 overflow-hidden rounded-2xl">
+                        <motion.div 
+                            custom={0} 
+                            variants={fadeUp} 
+                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-800"
+                        >
                             <Image
                                 src="/images/owner-dashboard.jpg"
                                 alt="Giao diện quản lý sân cầu lông trên laptop"
                                 width={600}
                                 height={340}
-                                className="h-56 w-full object-cover"
+                                className="h-56 w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                            <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-primary backdrop-blur-sm">
-                                        <Icon path={mdiChartBar} size={0.8} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-secondary">
-                                            Dành cho Chủ sân
-                                        </h3>
-                                        <p className="text-lg text-secondary/80">Quản lý hiệu quả, tăng doanh thu</p>
-                                    </div>
-                                </div>
-                            </div>
                         </motion.div>
+
+                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-800 pb-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/5 border border-primary/20 text-primary">
+                                <Icon path={mdiChartBar} size={0.8} />
+                            </div>
+                            <div>
+                                <span className="text-xs font-bold uppercase tracking-wider text-primary">Dành cho</span>
+                                <h3 className="text-xl font-extrabold text-white">Chủ sân</h3>
+                            </div>
+                        </div>
 
                         <div className="flex flex-col gap-4">
                             {ownerBenefits.map((benefit, i) => (
@@ -283,16 +266,16 @@ export function CoreValuesSection() {
                                     key={benefit.title}
                                     custom={i + 1}
                                     variants={fadeUp}
-                                    className="group flex gap-4 rounded-xl border border-transparent bg-secondary p-4 transition-all duration-300"
+                                    className="group flex gap-4 rounded-xl border border-neutral-800 bg-[#0a0f0d]/40 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-[#0a0f0d]"
                                 >
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-secondary shadow-md shadow-primary/20 transition-transform duration-300 group-hover:scale-110">
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
                                         <Icon path={benefit.icon} size={0.8} />
                                     </div>
                                     <div>
-                                        <h4 className="text-xl font-semibold text-primary">
+                                        <h4 className="text-base font-bold text-white mb-1 group-hover:text-primary transition-colors">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-lg leading-relaxed text-neutral-400">
+                                        <p className="text-sm leading-relaxed text-neutral-400">
                                             {benefit.description}
                                         </p>
                                     </div>
