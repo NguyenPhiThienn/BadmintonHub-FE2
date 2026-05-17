@@ -40,10 +40,12 @@ import {
     mdiEmailOutline,
     mdiEye,
     mdiEyeOff,
+    mdiHome,
     mdiLoading,
     mdiLockOutline,
     mdiPhoneOutline
 } from "@mdi/js";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Badge } from "../ui/badge";
@@ -181,8 +183,11 @@ export default function ProfilePage() {
                 <main className="flex-1 flex flex-col items-center justify-center gap-4">
                     <Icon path={mdiAccountOutline} size={1.5} className="text-neutral-400 opacity-20" />
                     <p className="text-neutral-400 italic">Vui lòng đăng nhập để xem thông tin cá nhân.</p>
-                    <Button variant="accent" onClick={() => window.location.href = "/"}>
-                        Quay lại trang chủ
+                    <Button asChild>
+                        <Link href="/">
+                            <Icon path={mdiHome} size={0.8} />
+                            Quay lại trang chủ
+                        </Link>
                     </Button>
                 </main>
                 <Footer />
