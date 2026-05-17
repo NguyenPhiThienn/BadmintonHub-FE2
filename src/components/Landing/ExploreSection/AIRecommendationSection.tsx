@@ -13,7 +13,7 @@ export const AIRecommendationSection = ({ onTrigger, isLoading }: AIRecommendati
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-0 mb-4">
       <section
-        className="relative border border-neutral-800 rounded-lg p-6 py-8 overflow-hidden bg-cover bg-center"
+        className="relative border border-neutral-800 rounded-2xl p-6 py-8 overflow-hidden bg-cover bg-center"
         style={{ backgroundImage: "url('/images/ai-suggestion.png')" }}
       >
         {/* Overlay gradient for premium look and readability */}
@@ -21,7 +21,7 @@ export const AIRecommendationSection = ({ onTrigger, isLoading }: AIRecommendati
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="space-y-3">
-              <p className="text-neutral-300 text-2xl font-bold leading-tight">
+              <p className="text-neutral-300 text-xl font-bold leading-tight">
                 Tìm kiếm sân chơi lý tưởng từ trợ lý AI của chúng tôi
               </p>
               <p className="text-neutral-400 text-base">

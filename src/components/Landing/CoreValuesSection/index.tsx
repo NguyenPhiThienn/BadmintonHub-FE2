@@ -1,19 +1,19 @@
 "use client"
 
-import Image from "next/image"
 import { Icon } from "@/components/ui/mdi-icon"
 import {
-    mdiMapMarker,
-    mdiCalendar,
     mdiAccountGroup,
-    mdiTrendingUp,
+    mdiCalendar,
     mdiChartBar,
     mdiFlash,
-    mdiShieldCheck,
-    mdiLightbulbOn,
     mdiHandshakeOutline,
+    mdiLightbulbOn,
+    mdiMapMarker,
+    mdiShieldCheck,
+    mdiTrendingUp,
 } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 40 },
@@ -38,29 +38,29 @@ const coreValues = [
         icon: mdiLightbulbOn,
         title: "Thông minh",
         description: "AI phân tích và gợi ý phù hợp nhất cho từng cá nhân, từng thời điểm.",
-        accent: "text-accent",
-        bg: "bg-accent",
+        primary: "text-primary",
+        bg: "bg-primary",
     },
     {
         icon: mdiFlash,
         title: "Tốc độ",
         description: "Đặt sân chỉ trong 30 giây. Không cần gọi điện, không cần chờ đợi.",
-        accent: "text-accent",
-        bg: "bg-accent",
+        primary: "text-primary",
+        bg: "bg-primary",
     },
     {
         icon: mdiHandshakeOutline,
         title: "Kết nối",
         description: "Xây dựng cộng đồng cầu lông sôi động, kết nối người chơi và chủ sân.",
-        accent: "text-accent",
-        bg: "bg-accent",
+        primary: "text-primary",
+        bg: "bg-primary",
     },
     {
         icon: mdiShieldCheck,
         title: "Tin cậy",
         description: "Hệ thống bảo mật, thanh toán an toàn, thông tin minh bạch 100%.",
-        accent: "text-accent",
-        bg: "bg-accent",
+        primary: "text-primary",
+        bg: "bg-primary",
     },
 ]
 
@@ -150,7 +150,7 @@ export function CoreValuesSection() {
                     <motion.h2 custom={2} variants={fadeUp} className="text-balance text-3xl font-semibold tracking-tight text-primary sm:text-4xl lg:text-5xl">
                         Lợi ích nhân đôi cho mọi người
                     </motion.h2>
-                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-400">
+                    <motion.p custom={3} variants={fadeUp} className="text-xl leading-relaxed text-neutral-500">
                         Dù bạn là người chơi hay chủ sân, BadmintonHub mang đến giải pháp toàn diện giúp nâng cao trải nghiệm cầu lông.
                     </motion.p>
                 </motion.div>
@@ -167,23 +167,23 @@ export function CoreValuesSection() {
                             key={value.title}
                             custom={i}
                             variants={scaleIn}
-                            className="group relative overflow-hidden rounded-2xl border border-accent/15 bg-card p-4 transition-all duration-500 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-xl hover:shadow-accent/10"
+                            className="group relative overflow-hidden rounded-2xl border border-primary/15 bg-card p-4 transition-all duration-500 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-xl hover:shadow-primary/10"
                         >
-                            {/* Top accent line */}
+                            {/* Top primary line */}
                             <div className={`absolute inset-x-0 top-0 h-1 rounded-t-2xl ${value.bg}`} />
                             {/* Hover glow */}
                             <div className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 ${value.bg}/20`} />
 
                             <div className="relative">
                                 <div
-                                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${value.bg}/15 ${value.accent}`}
+                                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 bg-primary/50`}
                                 >
-                                    <Icon path={value.icon} size={1} />
+                                    <Icon path={value.icon} size={1} className="text-white" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-primary">
                                     {value.title}
                                 </h3>
-                                <p className="mt-2 text-lg font-normal leading-relaxed text-neutral-400">
+                                <p className="mt-2 text-lg font-normal leading-relaxed text-neutral-500">
                                     {value.description}
                                 </p>
                             </div>

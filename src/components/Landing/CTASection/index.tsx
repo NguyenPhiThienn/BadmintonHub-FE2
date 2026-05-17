@@ -1,11 +1,11 @@
 "use client"
 
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Icon } from "@/components/ui/mdi-icon"
-import { mdiArrowRight, mdiShieldCheck, mdiFlash, mdiHeart } from "@mdi/js"
+import { mdiArrowRight, mdiFlash, mdiHeart, mdiShieldCheck } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -65,18 +65,18 @@ export function CTASection() {
                                 placeholder="Nhập email của bạn..."
                                 className="h-12 border-white/20 bg-white/10 text-secondary placeholder:text-secondary/50 focus-visible:border-white focus-visible:ring-white/30 !text-lg"
                             />
-                            <Button size="xl">
+                            <Button>
                                 Đăng ký ngay
                                 <Icon path={mdiArrowRight} size={0.8} />
                             </Button>
                         </div>
-                        <p className="mt-4 text-lg text-secondary/58">
+                        <p className="mt-4 text-lg text-neutral-400">
                             Miễn phí. Không cần thẻ tín dụng. Hủy bất cứ lúc nào.
                         </p>
                     </motion.div>
 
                     {/* Trust signals */}
-                    <motion.div custom={3} variants={fadeUp} className="mt-12 flex flex-wrap items-center justify-center gap-8 text-secondary">
+                    <motion.div custom={3} variants={fadeUp} className="mt-4 flex flex-wrap items-center justify-center gap-8 text-neutral-400">
                         <div className="flex items-center gap-2">
                             <Icon path={mdiShieldCheck} size={1} />
                             <span className="text-lg">Bảo mật toàn diện</span>

@@ -65,16 +65,16 @@ export function HeroSection() {
             {/* Bottom fade */}
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
 
-            <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 lg:px-8">
-                <div className="w-full flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-8">
+            <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 lg:px-8 mt-4">
+                <div className="w-full flex flex-col items-center lg:flex-row lg:items-center lg:gap-4">
                     {/* Left: text content */}
                     <motion.div
-                        className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left"
+                        className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left space-y-4"
                         initial="hidden"
                         animate="visible"
                     >
                         <motion.div custom={0} variants={fadeUp}>
-                            <Badge variant="outline2" className="mb-6 ">
+                            <Badge variant="green">
                                 Nền tảng đặt sân cầu lông #1 Việt Nam
                             </Badge>
                         </motion.div>
@@ -96,7 +96,7 @@ export function HeroSection() {
                         <motion.p
                             custom={2}
                             variants={fadeUp}
-                            className="mt-6 max-w-2xl text-lg leading-relaxed text-neutral-400 lg:text-xl"
+                            className="max-w-2xl text-lg leading-relaxed text-neutral-400 lg:text-lg"
                         >
                             Giải pháp toàn diện để tìm sân và đặt chỗ nhanh chóng.
                             Tích hợp công nghệ AI giúp bạn tối ưu hóa trải nghiệm và kết nối đam mê cầu lông.

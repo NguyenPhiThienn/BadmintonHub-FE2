@@ -1,9 +1,9 @@
 "use client"
 
-import Image from "next/image"
 import { Icon } from "@/components/ui/mdi-icon"
 import { mdiAccountSupervisorCircle } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
+import Image from "next/image"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -110,15 +110,15 @@ export function AboutSection() {
                     </span>
 
                     {/* Line 3 - faded */}
-                    <span className="text-foreground/40">
-                        <Word className="text-foreground/40">{"phù hợp với "}</Word>
+                    <span className="text-teal-950/70">
+                        <Word className="text-teal-950/70">{"phù hợp với "}</Word>
                         <InlinePill src="/images/about-shoes.jpg" alt="Giày thể thao" />
-                        <Word className="text-foreground/40">{" lịch trình và vị trí của bạn, "}</Word>
+                        <Word className="text-teal-950/70">{" lịch trình và vị trí của bạn, "}</Word>
                     </span>
 
                     {/* Line 4 - more faded */}
-                    <span className="text-foreground/30">
-                        <Word className="text-foreground/30">{"đảm bảo trải nghiệm hoàn hảo mọi lúc."}</Word>
+                    <span className="text-teal-950/70">
+                        <Word className="text-teal-950/70">{"đảm bảo trải nghiệm hoàn hảo mọi lúc."}</Word>
                     </span>
                 </motion.div>
             </div>
