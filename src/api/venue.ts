@@ -16,7 +16,7 @@ export const venueApi = {
   }) =>
     sendGet("/venues", params),
   
-  getMyVenues: (params?: { page?: number; limit?: number }) =>
+  getMyVenues: (params?: { page?: number; limit?: number; search?: string; sortBy?: string }) =>
     sendGet("/venues/my-venues", params),
 
   getVenueById: (id: string) =>
@@ -41,19 +41,20 @@ export const venueApi = {
     sendGet("/ai/booking-recommendation", { venueId }),
 
   // Admin specific
-  getAdminVenues: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
+  getAdminVenues: (params?: { page?: number; limit?: number; status?: string; search?: string; sortBy?: string }) =>
     sendGet("/admin/venues", {
       page: params?.page,
       limit: params?.limit,
       search: params?.search,
       status: params?.status,
+      sortBy: params?.sortBy,
     }),
 
   updateVenueStatus: (id: string, data: { status: string; reason?: string }) =>
     sendPatch(`/admin/venues/${id}/status`, data),
 
   deleteVenue: (id: string) =>
-    sendDelete(`/admin/venues/${id}`),
+    sendDelete(`/venues/${id}`),
 
   createVenue: (data: any) =>
     sendPost("/venues", data),

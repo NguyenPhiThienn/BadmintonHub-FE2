@@ -20,7 +20,7 @@ export const useVenues = (params?: {
   });
 };
 
-export const useMyVenues = (params?: { page?: number; limit?: number }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
+export const useMyVenues = (params?: { page?: number; limit?: number; search?: string; sortBy?: string }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
   return useQuery<IVenuesListResponse>({
     queryKey: ["my-venues", params],
     queryFn: () => venueApi.getMyVenues(params),
@@ -87,7 +87,7 @@ export const useAiBookingRecommendation = (venueId: string) => {
 };
 
 // Admin specific
-export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
+export const useAdminVenues = (params?: { page?: number; limit?: number; status?: string; search?: string; sortBy?: string }, options?: Omit<UseQueryOptions<IVenuesListResponse>, 'queryKey' | 'queryFn'>) => {
   return useQuery<IVenuesListResponse>({
     queryKey: ["admin-venues", params],
     queryFn: () => venueApi.getAdminVenues(params),

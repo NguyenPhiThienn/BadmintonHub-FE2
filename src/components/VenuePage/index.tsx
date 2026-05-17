@@ -96,12 +96,15 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
     const adminQuery = useAdminVenues({
         page: currentPage || 1,
         limit: pageSize || 10,
-        search: debouncedSearchQuery
+        search: debouncedSearchQuery,
+        sortBy: sortOrder
     }, { enabled: type === "admin" });
 
     const ownerQuery = useMyVenues({
         page: currentPage || 1,
-        limit: pageSize || 10
+        limit: pageSize || 10,
+        search: debouncedSearchQuery,
+        sortBy: sortOrder
     }, { enabled: type === "owner" });
 
     const venuesQuery = type === "admin" ? adminQuery : ownerQuery;
@@ -158,8 +161,24 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
     };
 
     const handleVenueSubmit = async (data: any) => {
+        const sanitizedCourts = (data.courts || []).map((c: any) => ({
+            name: c.name,
+            type: c.type || "Sàn gỗ",
+            status: c.status || "AVAILABLE"
+        }));
+
+        const payload = {
+            name: data.name,
+            address: data.address,
+            description: data.description || "",
+            openTime: data.openTime,
+            closeTime: data.closeTime,
+            pricePerHour: Number(data.pricePerHour),
+            courts: sanitizedCourts
+        };
+
         if (venueDialogMode === "create") {
-            createVenue(data, {
+            createVenue(payload, {
                 onSuccess: () => {
                     toast.success("Tạo cơ sở sân mới thành công!");
                     setIsVenueDialogOpen(false);
@@ -169,7 +188,7 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
                 }
             });
         } else if (selectedVenue) {
-            updateVenue({ id: selectedVenue._id, data }, {
+            updateVenue({ id: selectedVenue._id, data: payload }, {
                 onSuccess: () => {
                     toast.success("Cập nhật cơ sở sân thành công!");
                     setIsVenueDialogOpen(false);
