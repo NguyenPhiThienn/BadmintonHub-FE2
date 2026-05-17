@@ -40,7 +40,7 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       },
       {
         id: "owner-profile",
-        name: "Quản lý cá nhân",
+        name: "Quản lý trang cá nhân",
         path: "/owner/profile",
         icon: mdiAccountCircleOutline,
       }

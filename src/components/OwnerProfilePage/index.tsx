@@ -1,0 +1,396 @@
+"use client";
+
+import { authApi } from "@/api/auth";
+import { bookingApi } from "@/api/booking";
+import { usersApi } from "@/api/users";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Icon } from "@/components/ui/mdi-icon";
+import { useUser } from "@/context/useUserContext";
+import { useUpdateMe } from "@/hooks/useAuth";
+import { useUploadImage } from "@/hooks/useUpload";
+import {
+    mdiAccountOutline,
+    mdiCameraPlusOutline,
+    mdiCheck,
+    mdiClose,
+    mdiContentSave,
+    mdiEmailOutline,
+    mdiEye,
+    mdiEyeOff,
+    mdiLoading,
+    mdiLockOutline,
+    mdiPhoneOutline
+} from "@mdi/js";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { Badge } from "../ui/badge";
+
+interface UserStats {
+    totalHours: number;
+    totalBookings: number;
+    totalSpent: number;
+}
+
+export default function OwnerProfilePage() {
+    const { user, profile, fetchUserProfile } = useUser();
+    const [isPending, setIsPending] = useState(false);
+    const [isStatsLoading, setIsStatsLoading] = useState(true);
+    const [stats, setStats] = useState<UserStats | null>(null);
+
+    // Form states
+    const [fullName, setFullName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
+
+    // Mutation hooks
+    const uploadImageMutation = useUploadImage();
+    const updateMeMutation = useUpdateMe();
+
+    // Change Password states
+    const [isPassDialogOpen, setIsPassDialogOpen] = useState(false);
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showOldPass, setShowOldPass] = useState(false);
+    const [showNewPass, setShowNewPass] = useState(false);
+    const [showConfirmPass, setShowConfirmPass] = useState(false);
+    const [isPassPending, setIsPassPending] = useState(false);
+
+    useEffect(() => {
+        if (profile?.data) {
+            setFullName(profile.data.fullName || "");
+            setPhone(profile.data.phone || "");
+            setAvatarUrl(profile.data.avatarUrl || "");
+        }
+    }, [profile]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const statsRes = await bookingApi.getMyStatistics();
+                if (statsRes.statusCode === 200) {
+                    setStats(statsRes.data);
+                }
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            } finally {
+                setIsStatsLoading(false);
+            }
+        };
+
+        if (user) {
+            loadData();
+        }
+    }, [user]);
+
+    const handleSave = async () => {
+        setIsPending(true);
+        try {
+            const res = await usersApi.updateProfile({ fullName, phone, avatarUrl });
+            if (res.statusCode === 200) {
+                toast.success("Cập nhật thông tin thành công!");
+                fetchUserProfile();
+            } else {
+                toast.error(res.message || "Cập nhật thất bại");
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Có lỗi xảy ra, vui lòng thử lại!");
+        } finally {
+            setIsPending(false);
+        }
+    };
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setIsPending(true);
+            const res = await uploadImageMutation.mutateAsync(file);
+            if (res.data?.url) {
+                const newAvatarUrl = res.data.url;
+                setAvatarUrl(newAvatarUrl);
+
+                await updateMeMutation.mutateAsync({
+                    fullName,
+                    phone,
+                    avatarUrl: newAvatarUrl
+                });
+
+                fetchUserProfile();
+            }
+        } catch (error) {
+            console.error("Error uploading/updating avatar:", error);
+        } finally {
+            setIsPending(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (newPassword !== confirmPassword) {
+            toast.error("Mật khẩu xác nhận không khớp!");
+            return;
+        }
+
+        setIsPassPending(true);
+        try {
+            const res = await authApi.changePassword({ oldPassword, newPassword });
+            if (res.statusCode === 200) {
+                toast.success("Đổi mật khẩu thành công!");
+                setIsPassDialogOpen(false);
+                setOldPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+            } else {
+                toast.error(res.message || "Đổi mật khẩu thất bại");
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Mật khẩu cũ không chính xác");
+        } finally {
+            setIsPassPending(false);
+        }
+    };
+
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                <Icon path={mdiAccountOutline} size={1.5} className="text-neutral-400 opacity-20" />
+                <p className="text-neutral-400 italic">Vui lòng đăng nhập để xem thông tin cá nhân.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            {/* Breadcrumbs */}
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbPage className="text-gray-500">Dashboard</BreadcrumbPage>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Quản lý trang cá nhân</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch"
+            >
+                {/* Left Column: Avatar & Summary */}
+                <div className="lg:col-span-4 flex flex-col">
+                    <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 flex-1 flex flex-col items-center text-center space-y-4 shadow-xl">
+                        <div className="relative group">
+                            <Avatar className="h-40 w-40 border-4 border-accent rounded-full shadow-2xl">
+                                <AvatarImage
+                                    src={avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
+                                    alt={user.fullName}
+                                />
+                            </Avatar>
+                            <label className="absolute bottom-2 right-2 p-3 bg-accent text-white rounded-full shadow-lg hover:bg-green-600 cursor-pointer">
+                                <Icon path={mdiCameraPlusOutline} size={0.8} />
+                                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={isPending} />
+                            </label>
+                        </div>
+                        <div className="space-y-1">
+                            <h2 className="text-2xl font-bold text-white">{fullName}</h2>
+                            <p className="text-neutral-400 text-base">{user.email}</p>
+                        </div>
+                        <div className="w-full pt-4 border-t border-darkBorderV1 flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <Label>Vai trò</Label>
+                                <Badge variant="green">Chủ sân (Court Owner)</Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label>Trạng thái</Label>
+                                <Badge variant="green">Đang hoạt động</Badge>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                {/* Right Column: Edit Forms */}
+                <div className="lg:col-span-8 flex flex-col">
+                    <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 flex-1 flex flex-col justify-between space-y-4 shadow-lg">
+                        <div className="space-y-4">
+                            <h3 className="text-accent font-semibold flex items-center gap-2">
+                                <Icon path={mdiAccountOutline} size={0.8} />
+                                Thông tin tài khoản
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="fullName">Họ và tên</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="fullName"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            placeholder="Nhập họ và tên"
+                                            className="pl-10"
+                                        />
+                                        <Icon path={mdiAccountOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="phone">Số điện thoại</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="phone"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            placeholder="Nhập số điện thoại"
+                                            className="pl-10"
+                                        />
+                                        <Icon path={mdiPhoneOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                    </div>
+                                </div>
+
+                                <div className="md:col-span-2 space-y-2">
+                                    <Label htmlFor="email">Địa chỉ Email</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="email"
+                                            value={user.email}
+                                            disabled
+                                            className="pl-10"
+                                        />
+                                        <Icon path={mdiEmailOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600" />
+                                    </div>
+                                    <p className="text-sm text-neutral-400 italic">(Email đăng nhập là duy nhất và không thể thay đổi.)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <Button variant="outline" onClick={() => setIsPassDialogOpen(true)}>
+                                <Icon path={mdiLockOutline} size={0.8} />
+                                Đổi mật khẩu
+                            </Button>
+                            <Button
+                                variant="accent"
+                                onClick={handleSave}
+                                disabled={isPending}
+                            >
+                                {isPending ? (
+                                    <Icon path={mdiLoading} size={0.8} className="animate-spin" />
+                                ) : (
+                                    <Icon path={mdiCheck} size={0.8} />
+                                )}
+                                {isPending ? "Đang xử lý..." : "Cập nhật hồ sơ"}
+                            </Button>
+                        </div>
+                    </section>
+                </div>
+            </motion.div>
+
+            {/* Change Password Dialog */}
+            <Dialog open={isPassDialogOpen} onOpenChange={(open) => !open && setIsPassDialogOpen(false)}>
+                <DialogContent size="medium">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-accent">
+                            <Icon path={mdiLockOutline} size={0.8} />
+                            <span>Thay đổi mật khẩu</span>
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
+                        <div className="space-y-2">
+                            <Label>Mật khẩu hiện tại</Label>
+                            <div className="relative">
+                                <Input
+                                    type={showOldPass ? "text" : "password"}
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    placeholder="Nhập mật khẩu hiện tại"
+                                    className="pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOldPass(!showOldPass)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-accent transition-colors"
+                                >
+                                    <Icon path={showOldPass ? mdiEyeOff : mdiEye} size={0.8} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Mật khẩu mới</Label>
+                            <div className="relative">
+                                <Input
+                                    type={showNewPass ? "text" : "password"}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="Nhập mật khẩu mới"
+                                    className="pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNewPass(!showNewPass)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-accent transition-colors"
+                                >
+                                    <Icon path={showNewPass ? mdiEyeOff : mdiEye} size={0.8} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Xác nhận mật khẩu mới</Label>
+                            <div className="relative">
+                                <Input
+                                    type={showConfirmPass ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Xác nhận lại mật khẩu mới"
+                                    className="pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPass(!showConfirmPass)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-accent transition-colors"
+                                >
+                                    <Icon path={showConfirmPass ? mdiEyeOff : mdiEye} size={0.8} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsPassDialogOpen(false)} disabled={isPassPending}>
+                            <Icon path={mdiClose} size={0.8} />
+                            Đóng
+                        </Button>
+                        <Button onClick={handleChangePassword} disabled={isPassPending}>
+                            {isPassPending ? <Icon path={mdiLoading} size={0.8} className="animate-spin" /> : <Icon path={mdiContentSave} size={0.8} />}
+                            Cập nhật mật khẩu
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}

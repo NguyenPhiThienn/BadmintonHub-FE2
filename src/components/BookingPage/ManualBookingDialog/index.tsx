@@ -24,7 +24,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
 import { useCreateManualBooking } from "@/hooks/useBooking";
@@ -32,13 +31,10 @@ import { useVenueDetails } from "@/hooks/useVenue";
 import { IManualBookingRequest } from "@/interface/booking";
 import { ICourt, IVenue } from "@/interface/venue";
 import {
-    mdiAccountOutline,
-    mdiCalendarClock,
     mdiCalendarPlus,
-    mdiLoading,
-    mdiLockOutline,
-    mdiNoteOutline,
-    mdiStoreOutline
+    mdiCheck,
+    mdiClose,
+    mdiLoading
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useEffect, useState } from "react";
@@ -56,7 +52,6 @@ export const ManualBookingDialog = ({
     onClose,
     venues,
 }: ManualBookingDialogProps) => {
-    const [bookingType, setBookingType] = useState<"BOOKING" | "LOCK">("BOOKING");
     const [selectedVenueId, setSelectedVenueId] = useState<string>("");
 
     const { data: venueDetailsRes } = useVenueDetails(selectedVenueId);
@@ -88,19 +83,18 @@ export const ManualBookingDialog = ({
         if (!isOpen) {
             form.reset();
             setSelectedVenueId("");
-            setBookingType("BOOKING");
         }
     }, [isOpen, form]);
 
     const onSubmit = (data: IManualBookingRequest) => {
         const payload = {
             ...data,
-            type: bookingType,
+            type: "BOOKING" as const,
         };
 
         createManual(payload, {
             onSuccess: () => {
-                toast.success(bookingType === "BOOKING" ? "Tạo đơn đặt sân thành công" : "Đã khóa sân thành công");
+                toast.success("Tạo đơn đặt sân thành công");
                 onClose();
             },
             onError: (error: any) => {
@@ -114,38 +108,15 @@ export const ManualBookingDialog = ({
             <DialogContent size="medium">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-accent">
-                        <Icon path={bookingType === "BOOKING" ? mdiCalendarPlus : mdiLockOutline} size={0.8} />
-                        <span>{bookingType === "BOOKING" ? "Đặt sân thủ công" : "Khóa sân tạm thời"}</span>
+                        <Icon path={mdiCalendarPlus} size={0.8} />
+                        <span>Đặt sân thủ công</span>
                     </DialogTitle>
                 </DialogHeader>
-
-                <div className="p-4 bg-darkCardV1/30 border-b border-darkBorderV1">
-                    <Tabs value={bookingType} onValueChange={(v) => setBookingType(v as any)} className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 bg-darkBackgroundV1 border border-darkBorderV1">
-                            <TabsTrigger value="BOOKING" className="gap-2">
-                                <Icon path={mdiCalendarPlus} size={0.6} />
-                                Đơn đặt sân
-                            </TabsTrigger>
-                            <TabsTrigger value="LOCK" className="gap-2">
-                                <Icon path={mdiLockOutline} size={0.6} />
-                                Khóa sân
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
 
                 <Form {...form}>
                     <form id="manual-booking-form" onSubmit={form.handleSubmit(onSubmit)} className="max-h-[60vh] overflow-y-auto custom-scrollbar p-3 md:p-4 space-y-4">
                         {/* Section: Cơ sở & Sân */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 md:gap-4">
-                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
-                                    <Icon path={mdiStoreOutline} size={0.8} />
-                                    Địa điểm & Sân
-                                </h3>
-                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
-                            </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
@@ -209,14 +180,6 @@ export const ManualBookingDialog = ({
 
                         {/* Section: Thời gian */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 md:gap-4">
-                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
-                                    <Icon path={mdiCalendarClock} size={0.8} />
-                                    Thời gian
-                                </h3>
-                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
-                            </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <FormField
                                     control={form.control}
@@ -289,63 +252,46 @@ export const ManualBookingDialog = ({
                             </div>
                         </div>
 
-                        {/* Section: Khách hàng (Chỉ hiện khi là BOOKING) */}
-                        {bookingType === "BOOKING" && (
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3 md:gap-4">
-                                    <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
-                                        <Icon path={mdiAccountOutline} size={0.8} />
-                                        Thông tin khách hàng
-                                    </h3>
-                                    <div className="flex-1 border-b border-dashed border-accent mr-1" />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="customerName"
-                                        rules={{ required: bookingType === "BOOKING" ? "Tên khách là bắt buộc" : false }}
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-col">
-                                                <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
-                                                    Tên khách hàng
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nhập tên khách..." {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                        {/* Section: Khách hàng */}
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="customerName"
+                                    rules={{ required: "Tên khách là bắt buộc" }}
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Tên khách hàng
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Nhập tên khách..." {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="customerPhone"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-col">
-                                                <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
-                                                    Số điện thoại
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="09xx xxx xxx" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name="customerPhone"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Số điện thoại
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="09xx xxx xxx" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
-                        )}
+                        </div>
 
                         {/* Section: Ghi chú */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-3 md:gap-4">
-                                <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-2">
-                                    <Icon path={mdiNoteOutline} size={0.8} />
-                                    Ghi chú thêm
-                                </h3>
-                                <div className="flex-1 border-b border-dashed border-accent mr-1" />
-                            </div>
-
                             <FormField
                                 control={form.control}
                                 name="note"
@@ -354,7 +300,7 @@ export const ManualBookingDialog = ({
                                         <FormControl>
                                             <Textarea
                                                 rows={4}
-                                                placeholder={bookingType === "BOOKING" ? "Yêu cầu đặc biệt của khách..." : "Lý do khóa sân bảo trì..."}
+                                                placeholder="Yêu cầu đặc biệt của khách..."
                                                 {...field}
                                             />
                                         </FormControl>
@@ -367,6 +313,7 @@ export const ManualBookingDialog = ({
                 </Form>
                 <DialogFooter>
                     <Button type="button" variant="outline" onClick={onClose}>
+                        <Icon path={mdiClose} size={0.8} />
                         Đóng
                     </Button>
                     <Button
@@ -375,12 +322,15 @@ export const ManualBookingDialog = ({
                         form="manual-booking-form"
                     >
                         {isPending ? (
-                            <div className="flex items-center gap-2">
+                            <>
                                 <Icon path={mdiLoading} size={0.8} className="animate-spin" />
                                 <span>Đang xử lý...</span>
-                            </div>
+                            </>
                         ) : (
-                            <span>Xác nhận thực hiện</span>
+                            <>
+                                <Icon path={mdiCheck} size={0.8} />
+                                <span>Xác nhận thực hiện</span>
+                            </>
                         )}
                     </Button>
                 </DialogFooter>
