@@ -57,6 +57,7 @@ export const MyBookingsTable = memo(({
                     <TableRow>
                         <TableHead className="w-[50px] text-center">STT</TableHead>
                         <TableHead>Cơ sở sân</TableHead>
+                        <TableHead>Cố định</TableHead>
                         <TableHead>Ngày đặt</TableHead>
                         <TableHead>Khung giờ</TableHead>
                         <TableHead>Tổng tiền</TableHead>
@@ -70,6 +71,7 @@ export const MyBookingsTable = memo(({
                             <TableRow key={i}>
                                 <TableCell><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-48" /></TableCell>
+                                <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-32" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-20" /></TableCell>
@@ -79,7 +81,7 @@ export const MyBookingsTable = memo(({
                         ))
                     ) : bookings.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={7}>
+                            <TableCell colSpan={8}>
                                 <div className="text-center text-neutral-400 text-base py-12 italic flex flex-col items-center justify-center gap-4">
                                     <Icon path={mdiPlaylistRemove} size={2} />
                                     <span>Bạn chưa có lịch đặt sân nào.</span>
@@ -102,6 +104,13 @@ export const MyBookingsTable = memo(({
                                             <Link target="_blank" href={`/venues/${typeof booking.venueId === "object" ? booking.venueId._id : booking.venueId}`}><span className="hover:underline text-accent">{venueName}</span></Link>
                                             <span className="text-sm text-neutral-300 line-clamp-2">{venueAddress}</span>
                                         </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {booking.isWeekly ? (
+                                            <Badge variant="blue">Cố định theo tuần</Badge>
+                                        ) : (
+                                            <Badge variant="neutral">Lịch đơn</Badge>
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="neutral">{formatDateWithTime(booking.createdAt)}</Badge>

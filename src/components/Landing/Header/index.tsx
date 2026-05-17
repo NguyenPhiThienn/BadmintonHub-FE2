@@ -110,14 +110,17 @@ export function Header() {
                                         <span>Lịch sử đặt sân</span>
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
+
                                 {user.role === "PLAYER" && (
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/register-owner" className="cursor-pointer text-secondary">
-                                            <Icon path={mdiStorefrontOutline} size={0.8} />
-                                            <span>Đăng ký chủ sân</span>
-                                        </Link>
-                                    </DropdownMenuItem>
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/register-owner" className="cursor-pointer text-secondary">
+                                                <Icon path={mdiStorefrontOutline} size={0.8} />
+                                                <span>Đăng ký chủ sân</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </>
                                 )}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
