@@ -94,13 +94,13 @@ const ownerBenefits = [
 
 export function CoreValuesSection() {
     return (
-        <section id="features" className="relative overflow-hidden bg-background py-24 border-t border-neutral-900">
-            {/* Minimal Dotted Grid Pattern (100% Flat, No Gradient) */}
-            <div className="pointer-events-none absolute inset-0 opacity-[0.03]" aria-hidden="true">
+        <section id="features" className="relative overflow-hidden bg-white py-24 border-t border-neutral-100">
+            {/* Minimal Dotted Grid Pattern for Lightmode (100% Flat, No Gradient) */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden="true">
                 <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="dotGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-                            <circle cx="1" cy="1" r="1" className="fill-primary" />
+                            <circle cx="1.5" cy="1.5" r="1.5" className="fill-primary" />
                         </pattern>
                     </defs>
                     <rect width="100%" height="100%" fill="url(#dotGrid)" />
@@ -127,7 +127,7 @@ export function CoreValuesSection() {
                     <motion.h2 
                         custom={1} 
                         variants={fadeUp} 
-                        className="text-balance text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
+                        className="text-balance text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl"
                     >
                         Lợi ích nhân đôi cho mọi người
                     </motion.h2>
@@ -135,13 +135,13 @@ export function CoreValuesSection() {
                     <motion.p 
                         custom={2} 
                         variants={fadeUp} 
-                        className="text-base sm:text-lg leading-relaxed text-neutral-400 max-w-2xl"
+                        className="text-base sm:text-lg leading-relaxed text-neutral-500 max-w-2xl"
                     >
                         Dù bạn là người chơi hay chủ sân, BadmintonHub mang đến giải pháp toàn diện giúp nâng cao trải nghiệm cầu lông.
                     </motion.p>
                 </motion.div>
 
-                {/* Core Values - Flat 4-Column Bento-like Grid */}
+                {/* Core Values - Flat 4-Column Bento-like Grid for Lightmode */}
                 <motion.div
                     className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
                     initial="hidden"
@@ -153,17 +153,17 @@ export function CoreValuesSection() {
                             key={value.title}
                             custom={i}
                             variants={scaleIn}
-                            className="group relative overflow-hidden rounded-xl border border-neutral-800 bg-[#0a0f0d] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-[#0c1512]"
+                            className="group relative overflow-hidden rounded-xl border border-[#e2ede9] bg-[#f8faf9] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/45 hover:bg-white"
                         >
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
+                                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
                                         <Icon path={value.icon} size={1} />
                                     </div>
-                                    <h3 className="text-lg font-bold text-white transition-colors group-hover:text-primary">
+                                    <h3 className="text-lg font-bold text-neutral-900 transition-colors group-hover:text-primary">
                                         {value.title}
                                     </h3>
-                                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+                                    <p className="mt-2 text-sm leading-relaxed text-neutral-600">
                                         {value.description}
                                     </p>
                                 </div>
@@ -184,7 +184,7 @@ export function CoreValuesSection() {
                         <motion.div 
                             custom={0} 
                             variants={fadeUp} 
-                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-800"
+                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-200"
                         >
                             <Image
                                 src="/images/players-group.jpg"
@@ -195,13 +195,13 @@ export function CoreValuesSection() {
                             />
                         </motion.div>
 
-                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-800 pb-4">
+                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/5 border border-primary/20 text-primary">
                                 <Icon path={mdiAccountGroup} size={0.8} />
                             </div>
                             <div>
                                 <span className="text-xs font-bold uppercase tracking-wider text-primary">Dành cho</span>
-                                <h3 className="text-xl font-extrabold text-white">Người chơi</h3>
+                                <h3 className="text-xl font-extrabold text-neutral-900">Người chơi</h3>
                             </div>
                         </div>
 
@@ -211,16 +211,16 @@ export function CoreValuesSection() {
                                     key={benefit.title}
                                     custom={i + 1}
                                     variants={fadeUp}
-                                    className="group flex gap-4 rounded-xl border border-neutral-800 bg-[#0a0f0d]/40 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-[#0a0f0d]"
+                                    className="group flex gap-4 rounded-xl border border-[#e2ede9] bg-[#f8faf9]/50 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-white"
                                 >
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
                                         <Icon path={benefit.icon} size={0.8} />
                                     </div>
                                     <div>
-                                        <h4 className="text-base font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                                        <h4 className="text-base font-bold text-neutral-900 mb-1 group-hover:text-primary transition-colors">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-sm leading-relaxed text-neutral-400">
+                                        <p className="text-sm leading-relaxed text-neutral-600">
                                             {benefit.description}
                                         </p>
                                     </div>
@@ -239,7 +239,7 @@ export function CoreValuesSection() {
                         <motion.div 
                             custom={0} 
                             variants={fadeUp} 
-                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-800"
+                            className="relative mb-6 overflow-hidden rounded-xl border border-neutral-200"
                         >
                             <Image
                                 src="/images/owner-dashboard.jpg"
@@ -250,13 +250,13 @@ export function CoreValuesSection() {
                             />
                         </motion.div>
 
-                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-800 pb-4">
+                        <div className="mb-6 flex items-center gap-4 border-b border-neutral-200 pb-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/5 border border-primary/20 text-primary">
                                 <Icon path={mdiChartBar} size={0.8} />
                             </div>
                             <div>
                                 <span className="text-xs font-bold uppercase tracking-wider text-primary">Dành cho</span>
-                                <h3 className="text-xl font-extrabold text-white">Chủ sân</h3>
+                                <h3 className="text-xl font-extrabold text-neutral-900">Chủ sân</h3>
                             </div>
                         </div>
 
@@ -266,16 +266,16 @@ export function CoreValuesSection() {
                                     key={benefit.title}
                                     custom={i + 1}
                                     variants={fadeUp}
-                                    className="group flex gap-4 rounded-xl border border-neutral-800 bg-[#0a0f0d]/40 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-[#0a0f0d]"
+                                    className="group flex gap-4 rounded-xl border border-[#e2ede9] bg-[#f8faf9]/50 p-5 transition-all duration-300 hover:border-primary/30 hover:bg-white"
                                 >
-                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-700 bg-[#070b09] text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-black group-hover:border-primary">
+                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
                                         <Icon path={benefit.icon} size={0.8} />
                                     </div>
                                     <div>
-                                        <h4 className="text-base font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                                        <h4 className="text-base font-bold text-neutral-900 mb-1 group-hover:text-primary transition-colors">
                                             {benefit.title}
                                         </h4>
-                                        <p className="text-sm leading-relaxed text-neutral-400">
+                                        <p className="text-sm leading-relaxed text-neutral-600">
                                             {benefit.description}
                                         </p>
                                     </div>
