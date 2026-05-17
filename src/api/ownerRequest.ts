@@ -19,7 +19,7 @@ export const ownerRequestApi = {
   getMyRequest: () =>
     sendGet("/owner-requests/my-request"),
 
-  getAllRequests: (params?: { page?: number; limit?: number; status?: string }) =>
+  getAllRequests: (params?: { page?: number; limit?: number; status?: string; search?: string }) =>
     sendGet("/owner-requests", params),
 
   getRequestDetails: (id: string) =>

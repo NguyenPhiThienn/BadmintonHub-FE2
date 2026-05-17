@@ -19,7 +19,7 @@ export const useMyOwnerRequest = (enabled: boolean = true) => {
   });
 };
 
-export const useAllOwnerRequests = (params?: { page?: number; limit?: number; status?: string }) => {
+export const useAllOwnerRequests = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
   return useQuery({
     queryKey: ["all-owner-requests", params],
     queryFn: () => ownerRequestApi.getAllRequests(params),
