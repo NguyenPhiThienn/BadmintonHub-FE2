@@ -3,6 +3,7 @@
 import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 import {
     Breadcrumb,
@@ -22,9 +23,9 @@ import { useUploadImage } from "@/hooks/useUpload";
 import {
     mdiAlertCircleOutline,
     mdiCheckCircle,
-    mdiCheckCircleOutline,
     mdiCloudUploadOutline,
     mdiFileDocumentOutline,
+    mdiHome,
     mdiInvoiceTextSend,
     mdiStorefrontOutline,
     mdiTrashCanOutline
@@ -280,22 +281,102 @@ export default function RegisterOwnerPage() {
                     </div>
                 ) : myRequest && myRequest.status === "APPROVED" ? (
                     /* APPROVED STATUS CARD */
-                    <div className="bg-darkCardV1 border border-green-500/20 rounded-2xl p-8 flex flex-col items-center text-center space-y-4 shadow-xl">
-                        <div className="h-20 w-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.2)]">
-                            <Icon path={mdiCheckCircleOutline} size={1.5} />
+                    <div className="space-y-4">
+                        <div className="bg-darkCardV1 border border-green-500/20 rounded-2xl p-6 flex flex-col items-center text-center space-y-4 shadow-xl">
+                            <div className="relative w-24 h-24">
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: [0, 1.1, 1] }}
+                                    transition={{
+                                        duration: 2,
+                                        times: [0, 0.2, 0.5],
+                                        repeat: Infinity,
+                                        repeatDelay: 1
+                                    }}
+                                    className="w-full h-full bg-green-500/20 rounded-full flex items-center justify-center relative z-10"
+                                >
+                                    <Icon path={mdiCheckCircle} size={0.8} className="text-green-500 scale-[2.5]" />
+                                </motion.div>
+
+                                {/* Celebration Dots */}
+                                {[...Array(8)].map((_, i) => {
+                                    const angle = (i * 45 * Math.PI) / 180;
+                                    const targetX = Math.cos(angle) * 80;
+                                    const targetY = Math.sin(angle) * 80;
+
+                                    return (
+                                        <div key={i} className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                            <motion.div
+                                                animate={{
+                                                    scale: [0, 1, 0],
+                                                    x: [0, targetX],
+                                                    y: [0, targetY],
+                                                }}
+                                                transition={{
+                                                    duration: 0.8,
+                                                    repeat: Infinity,
+                                                    repeatDelay: 2.2,
+                                                    ease: "easeOut",
+                                                    delay: 0.4 + (i * 0.05), // Starts exactly when the checkmark reaches its peak
+                                                }}
+                                                className="w-2 h-2 rounded-full bg-green-500"
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="space-y-2 flex flex-col items-center">
+                                <h1 className="text-3xl font-semibold text-green-500">Chúc mừng bạn đã trở thành Chủ sân!</h1>
+                                <p className="text-neutral-400 text-base max-w-xl">
+                                    Đơn đăng ký của bạn đã được duyệt thành công! Tài khoản của bạn đã được cấp quyền của <span className="text-green-500 font-semibold">Chủ sân (Court Owner)</span>.
+                                </p>
+                                <p className="text-accent text-base font-semibold pt-2">
+                                    Vui lòng Đăng xuất và Đăng nhập lại để cập nhật quyền truy cập và sử dụng trang Quản lý dành cho Chủ sân!
+                                </p>
+                            </div>
+                            <Button asChild>
+                                <Link href="/">
+                                    <Icon path={mdiHome} size={0.8} />
+                                    Quay lại trang chủ
+                                </Link>
+                            </Button>
                         </div>
-                        <div className="space-y-2">
-                            <h2 className="text-3xl font-extrabold text-white">Chúc mừng bạn đã là Chủ sân!</h2>
-                            <p className="text-neutral-400 text-sm max-w-xl">
-                                Đơn đăng ký của bạn đã được duyệt thành công! Tài khoản của bạn đã được cấp quyền của **Chủ sân (Court Owner)**.
-                            </p>
-                            <p className="text-accent text-sm font-semibold pt-2">
-                                Vui lòng Đăng xuất và Đăng nhập lại để cập nhật quyền truy cập và sử dụng trang Quản lý dành cho Chủ sân!
-                            </p>
+
+                        {/* APPROVED SUBMITTED DETAILS */}
+                        <div className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4 shadow-xl">
+                            <h3 className="text-green-500 font-semibold flex items-center gap-2">
+                                <Icon path={mdiFileDocumentOutline} size={0.8} className="text-green-500" />
+                                Thông tin hồ sơ đã phê duyệt
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <Label>Số Căn cước công dân</Label>
+                                    <p className="text-white font-medium text-sm bg-darkBorderV1 p-3 rounded-lg border border-darkBorderV1">{myRequest.identityCard}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label>Địa chỉ sân hoạt động</Label>
+                                    <p className="text-white font-medium text-sm bg-darkBorderV1 p-3 rounded-lg border border-darkBorderV1">{myRequest.courtAddress}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Ảnh sân thực tế</Label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    {myRequest.courtImages?.map((url: string, index: number) => (
+                                        <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBorderV1">
+                                            <Image src={url} alt={`Court ${index + 1}`} fill className="object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Giấy phép hoạt động kinh doanh</Label>
+                                <div className="relative aspect-video max-w-sm rounded-lg overflow-hidden border border-darkBorderV1 bg-darkBorderV1">
+                                    <Image src={myRequest.businessLicense} alt="Business License" fill className="object-cover" />
+                                </div>
+                            </div>
                         </div>
-                        <Button variant="accent" size="lg" className="px-8 shadow-lg shadow-accent/20" onClick={() => window.location.href = "/"}>
-                            Quay lại trang chủ
-                        </Button>
                     </div>
                 ) : (
                     /* SUBMISSION FORM (Initial or Rejected) */
