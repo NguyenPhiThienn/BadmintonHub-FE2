@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAdminRevenueReport } from "@/hooks/useAdmin";
 import { useUsers } from "@/hooks/useUsers";
 import { useAdminVenues } from "@/hooks/useVenue";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Icon from "@mdi/react";
 import {
     mdiFinance,
@@ -23,8 +23,124 @@ import {
     mdiLoading,
     mdiRefresh,
     mdiFilterOutline,
-    mdiCalendarRange
+    mdiCalendarRange,
+    mdiChevronDown,
+    mdiMagnify,
+    mdiCheck
 } from "@mdi/js";
+
+const SearchableSelect = ({
+    value,
+    onChange,
+    placeholder,
+    options,
+    allLabel
+}: {
+    value: string;
+    onChange: (val: string) => void;
+    placeholder: string;
+    options: { value: string; label: string }[];
+    allLabel: string;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setSearchTerm("");
+        }
+    }, [isOpen]);
+
+    const filteredOptions = options.filter(option =>
+        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const selectedOption = options.find(opt => opt.value === value);
+    const displayValue = value === "all" ? allLabel : (selectedOption ? selectedOption.label : placeholder);
+
+    return (
+        <div className="relative w-full" ref={dropdownRef}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`flex h-10 w-full items-center justify-between rounded-md border bg-[#0d1e21] px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-all duration-300 ${isOpen ? "border-accent ring-1 ring-accent/30 shadow-[0_0_10px_rgba(0,255,136,0.15)]" : "border-darkBorderV1 hover:border-accent/40"}`}
+            >
+                <span className="truncate pr-2">{displayValue}</span>
+                <Icon path={mdiChevronDown} size={0.7} className={`text-neutral-400 shrink-0 transition-transform duration-300 ${isOpen ? "transform rotate-180 text-accent" : ""}`} />
+            </button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute z-[999] min-w-[8rem] w-full overflow-hidden rounded-md border border-accent/30 bg-[#091517] shadow-[0_15px_30px_rgba(0,0,0,0.85),_0_0_15px_rgba(0,255,136,0.15)] backdrop-blur-md mt-1.5"
+                    >
+                        {/* Search Input Box */}
+                        <div className="flex items-center border-b border-[#122e33] px-3 py-2 bg-[#060e0f]">
+                            <Icon path={mdiMagnify} size={0.6} className="text-accent mr-2 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="flex h-6 w-full rounded-md bg-transparent text-sm text-neutral-200 outline-none placeholder:text-neutral-500"
+                            />
+                        </div>
+                        
+                        {/* Options List */}
+                        <div className="max-h-[220px] overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-accent/20 scrollbar-track-transparent">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onChange("all");
+                                    setIsOpen(false);
+                                }}
+                                className={`flex w-full items-center justify-between px-3 py-2 text-sm text-left transition-all ${value === "all" ? "bg-accent/10 text-accent font-semibold" : "text-neutral-300 hover:bg-accent/5 hover:text-accent"}`}
+                            >
+                                <span className="truncate">{allLabel}</span>
+                                {value === "all" && <Icon path={mdiCheck} size={0.5} className="text-accent shrink-0 ml-2" />}
+                            </button>
+                            {filteredOptions.length === 0 ? (
+                                <div className="px-3 py-3 text-xs text-neutral-500 italic text-center">
+                                    Không tìm thấy kết quả
+                                </div>
+                            ) : (
+                                filteredOptions.map((opt) => (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        onClick={() => {
+                                            onChange(opt.value);
+                                            setIsOpen(false);
+                                        }}
+                                        className={`flex w-full items-center justify-between px-3 py-2 text-sm text-left transition-all ${value === opt.value ? "bg-accent/10 text-accent font-semibold" : "text-neutral-300 hover:bg-accent/5 hover:text-accent"}`}
+                                    >
+                                        <span className="truncate pr-2">{opt.label}</span>
+                                        {value === opt.value && <Icon path={mdiCheck} size={0.5} className="text-accent shrink-0 ml-2" />}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 export default function AdminRevenuePage() {
     const [page, setPage] = useState(1);
@@ -34,12 +150,40 @@ export default function AdminRevenuePage() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-    // Load filter data
-    const { data: ownersResponse } = useUsers({ page: 1, limit: 1000, role: "COURT_OWNER" });
+    // Load filter data (role should be OWNER in MongoDB)
+    const { data: ownersResponse } = useUsers({ page: 1, limit: 1000, role: "OWNER" });
     const { data: venuesResponse } = useAdminVenues({ page: 1, limit: 1000 });
 
     const owners = ownersResponse?.data?.users || [];
     const venues = venuesResponse?.data?.venues || [];
+
+    const ownerOptions = owners.map((owner: any) => ({
+        value: owner._id,
+        label: owner.fullName || owner.email
+    }));
+
+    // Dynamic Dependent Filtering: filter venues based on the selected ownerId
+    const filteredVenues = ownerId !== "all"
+        ? venues.filter((venue: any) => {
+            const venueOwnerId = typeof venue.ownerId === 'object' ? venue.ownerId?._id : venue.ownerId;
+            return venueOwnerId === ownerId;
+          })
+        : venues;
+
+    const venueOptions = filteredVenues.map((venue: any) => ({
+        value: venue._id,
+        label: venue.name
+    }));
+
+    // Auto reset selected venue if it is not owned by the selected owner
+    useEffect(() => {
+        if (ownerId !== "all" && venueId !== "all") {
+            const selectedVenueExists = filteredVenues.some((v: any) => v._id === venueId);
+            if (!selectedVenueExists) {
+                setVenueId("all");
+            }
+        }
+    }, [ownerId, filteredVenues, venueId]);
 
     // Load revenue report
     const {
@@ -148,37 +292,25 @@ export default function AdminRevenuePage() {
                         {/* Chủ sân */}
                         <div className="space-y-1.5">
                             <label className="text-xs text-neutral-400 font-medium">Chủ sân sở hữu</label>
-                            <Select value={ownerId} onValueChange={(val) => { setOwnerId(val); setPage(1); }}>
-                                <SelectTrigger className="w-full bg-darkCardV1 border-darkBorderV1">
-                                    <SelectValue placeholder="Tất cả chủ sân" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[300px]">
-                                    <SelectItem value="all">Tất cả chủ sân</SelectItem>
-                                    {owners.map((owner: any) => (
-                                        <SelectItem key={owner._id} value={owner._id}>
-                                            {owner.fullName || owner.email}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <SearchableSelect
+                                value={ownerId}
+                                onChange={(val) => { setOwnerId(val); setPage(1); }}
+                                placeholder="Tất cả chủ sân"
+                                options={ownerOptions}
+                                allLabel="Tất cả chủ sân"
+                            />
                         </div>
 
                         {/* Cơ sở sân */}
                         <div className="space-y-1.5">
                             <label className="text-xs text-neutral-400 font-medium">Cơ sở sân</label>
-                            <Select value={venueId} onValueChange={(val) => { setVenueId(val); setPage(1); }}>
-                                <SelectTrigger className="w-full bg-darkCardV1 border-darkBorderV1">
-                                    <SelectValue placeholder="Tất cả cơ sở" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-[300px]">
-                                    <SelectItem value="all">Tất cả cơ sở</SelectItem>
-                                    {venues.map((venue: any) => (
-                                        <SelectItem key={venue._id} value={venue._id}>
-                                            {venue.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <SearchableSelect
+                                value={venueId}
+                                onChange={(val) => { setVenueId(val); setPage(1); }}
+                                placeholder="Tất cả cơ sở"
+                                options={venueOptions}
+                                allLabel="Tất cả cơ sở"
+                            />
                         </div>
 
                         {/* Từ ngày */}

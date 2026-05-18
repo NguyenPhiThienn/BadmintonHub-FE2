@@ -32,11 +32,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { useUser } from "@/context/useUserContext";
 
 const SuccessContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = searchParams?.get("bookingId");
+  const { user } = useUser();
+  const isOwner = user?.role === "OWNER" || user?.role === "COURT_OWNER";
 
   const { data: bookingRes, isLoading, error } = useBookingDetails(bookingId || "");
   const [isDownloading, setIsDownloading] = useState(false);
@@ -606,10 +609,10 @@ const SuccessContent = () => {
         </Button>
         <Button
           className="flex-1"
-          onClick={() => router.push("/my-bookings")}
+          onClick={() => router.push(isOwner ? "/owner/bookings" : "/my-bookings")}
         >
           <Icon path={mdiClock} size={0.8} />
-          Đến trang quản lý đơn đặt sân
+          {isOwner ? "Quản lý đơn đặt (Chủ sân)" : "Đến trang quản lý đơn đặt sân"}
         </Button>
         {booking.status !== "CANCELLED" && (
           <>

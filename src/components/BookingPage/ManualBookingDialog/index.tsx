@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
-import { useCreateManualBooking } from "@/hooks/useBooking";
-import { useVenueDetails } from "@/hooks/useVenue";
+import { useCreateManualBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
+import { useVenueDetails, useVenuePricing } from "@/hooks/useVenue";
 import { IManualBookingRequest } from "@/interface/booking";
 import { ICourt, IVenue } from "@/interface/venue";
 import {
@@ -47,6 +47,10 @@ interface ManualBookingDialogProps {
     venues: IVenue[];
 }
 
+interface IFormManualBookingRequest extends IManualBookingRequest {
+    paymentMethod: "CASH" | "VNPAY" | "MOMO";
+}
+
 export const ManualBookingDialog = ({
     isOpen,
     onClose,
@@ -57,7 +61,7 @@ export const ManualBookingDialog = ({
     const { data: venueDetailsRes } = useVenueDetails(selectedVenueId);
     const courts = venueDetailsRes?.data?.courts || [];
 
-    const form = useForm<IManualBookingRequest>({
+    const form = useForm<IFormManualBookingRequest>({
         defaultValues: {
             type: "BOOKING",
             venueId: "",
@@ -74,10 +78,61 @@ export const ManualBookingDialog = ({
             customerName: "",
             customerPhone: "",
             note: "",
+            paymentMethod: "CASH",
         },
     });
 
-    const { mutate: createManual, isPending } = useCreateManualBooking();
+    const venueId = form.watch("venueId");
+    const courtId = form.watch("courtId");
+    const bookingDate = form.watch("bookingDate");
+    const startTime = form.watch("startTime");
+    const endTime = form.watch("endTime");
+
+    const { data: pricingRes } = useVenuePricing(venueId);
+    const pricings = pricingRes?.data || [];
+
+    const calculatePrice = () => {
+        if (!venueId || !courtId || !bookingDate || !startTime || !endTime) return 0;
+
+        const venue = venues.find((v) => v._id === venueId);
+        if (!venue) return 0;
+
+        // Calculate duration in hours
+        const [startH, startM] = startTime.split(":").map(Number);
+        const [endH, endM] = endTime.split(":").map(Number);
+        const startTotal = startH + startM / 60;
+        const endTotal = endH + endM / 60;
+        const duration = endTotal - startTotal;
+        if (duration <= 0) return 0;
+
+        // Determine day of week (Monday = 0, Tuesday = 1, ..., Sunday = 6)
+        const dateObj = new Date(bookingDate);
+        let dayOfWeek = dateObj.getDay() - 1;
+        if (dayOfWeek === -1) dayOfWeek = 6; // Sunday
+
+        // Find matching pricing rule
+        const matchingRule =
+            pricings.find((p: any) => {
+                const dayMatches = p.dayOfWeek === dayOfWeek;
+                const timeMatches = p.startTime <= startTime && p.endTime >= endTime;
+                return dayMatches && timeMatches;
+            }) ||
+            pricings.find((p: any) => {
+                const isFallback = p.dayOfWeek === null || p.dayOfWeek === undefined;
+                const timeMatches = p.startTime <= startTime && p.endTime >= endTime;
+                return isFallback && timeMatches;
+            });
+
+        const rate = matchingRule ? matchingRule.pricePerHour : venue.pricePerHour;
+        return Math.round(duration * rate);
+    };
+
+    const calculatedPrice = calculatePrice();
+
+    const { mutate: createManual, isPending: isBookingPending } = useCreateManualBooking();
+    const { mutate: createPaymentUrl, isPending: isPaymentPending } = useCreatePaymentUrl();
+
+    const isPending = isBookingPending || isPaymentPending;
 
     useEffect(() => {
         if (!isOpen) {
@@ -86,16 +141,36 @@ export const ManualBookingDialog = ({
         }
     }, [isOpen, form]);
 
-    const onSubmit = (data: IManualBookingRequest) => {
+    const onSubmit = (data: IFormManualBookingRequest) => {
         const payload = {
             ...data,
             type: "BOOKING" as const,
         };
 
         createManual(payload, {
-            onSuccess: () => {
+            onSuccess: (res: any) => {
                 toast.success("Tạo đơn đặt sân thành công");
-                onClose();
+                const bookingId = res?.data?._id;
+
+                if ((data.paymentMethod === "VNPAY" || data.paymentMethod === "MOMO") && bookingId) {
+                    toast.info("Đang kết nối đến cổng thanh toán...");
+                    createPaymentUrl({ bookingId, method: data.paymentMethod }, {
+                        onSuccess: (paymentRes: any) => {
+                            if (paymentRes?.data?.paymentUrl) {
+                                window.location.href = paymentRes.data.paymentUrl;
+                            } else {
+                                toast.error("Không tạo được liên kết thanh toán");
+                                onClose();
+                            }
+                        },
+                        onError: () => {
+                            toast.error("Không thể kết nối cổng thanh toán");
+                            onClose();
+                        }
+                    });
+                } else {
+                    onClose();
+                }
             },
             onError: (error: any) => {
                 toast.error(error?.response?.data?.message || "Thao tác thất bại");
@@ -287,6 +362,46 @@ export const ManualBookingDialog = ({
                                         </FormItem>
                                     )}
                                 />
+                            </div>
+                        </div>
+
+                        {/* Section: Thanh toán */}
+                        <div className="space-y-4 border-t border-darkBorderV1 pt-4">
+                            <h4 className="text-sm font-semibold text-accent uppercase tracking-wider">Thông tin thanh toán</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="paymentMethod"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel className="uppercase text-xs font-bold flex items-center gap-1 h-5">
+                                                Phương thức thanh toán
+                                            </FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn phương thức" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="bg-darkCardV1 border-darkBorderV1">
+                                                    <SelectItem value="CASH">💵 Tiền mặt (Tại sân)</SelectItem>
+                                                    <SelectItem value="VNPAY">💳 Chuyển khoản qua VNPay</SelectItem>
+                                                    <SelectItem value="MOMO">📱 Ví điện tử Momo</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="flex flex-col justify-end">
+                                    <div className="bg-darkBorderV1/40 border border-darkBorderV1 rounded-lg p-3 flex justify-between items-center h-[42px] mt-auto">
+                                        <span className="text-xs font-semibold text-neutral-400 uppercase">Tổng tiền:</span>
+                                        <span className="text-lg font-bold text-green-400">
+                                            {calculatedPrice.toLocaleString("vi-VN")} đ
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

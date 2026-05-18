@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { useUser } from "@/context/useUserContext";
-import { useChangePassword, useUpdateMe, useUpdateProfile } from "@/hooks/useAuth";
+import { useChangePassword, useUpdateProfile } from "@/hooks/useAuth";
 import { useMyStatistics } from "@/hooks/useBooking";
 import { useUploadImage } from "@/hooks/useUpload";
 import {
@@ -68,7 +68,6 @@ export default function ProfilePage() {
 
     // Mutation hooks
     const uploadImageMutation = useUploadImage();
-    const updateMeMutation = useUpdateMe();
     const updateProfileMutation = useUpdateProfile();
     const changePasswordMutation = useChangePassword();
 
@@ -116,16 +115,18 @@ export default function ProfilePage() {
                 const newAvatarUrl = res.data.url;
                 setAvatarUrl(newAvatarUrl);
 
-                await updateMeMutation.mutateAsync({
+                await updateProfileMutation.mutateAsync({
                     fullName,
                     phone,
                     avatarUrl: newAvatarUrl
                 });
 
+                toast.success("Cập nhật ảnh đại diện thành công!");
                 fetchUserProfile();
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error uploading/updating avatar:", error);
+            toast.error(error?.message || "Cập nhật ảnh đại diện thất bại");
         } finally {
             setIsPending(false);
         }

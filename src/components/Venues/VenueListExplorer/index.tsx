@@ -13,6 +13,7 @@ interface VenueListExplorerProps {
   onVenueClick: (id: string) => void;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 const VenueListExplorer = ({
@@ -22,7 +23,8 @@ const VenueListExplorer = ({
   selectedVenueId,
   onVenueClick,
   hasMore,
-  onLoadMore
+  onLoadMore,
+  userLocation
 }: VenueListExplorerProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +87,7 @@ const VenueListExplorer = ({
                     onClick={() => onVenueClick(venue._id)}
                     className={`transition-all duration-300 ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""}`}
                   >
-                    <VenueCard venue={venue} />
+                    <VenueCard venue={venue} userLocation={userLocation || undefined} />
                   </div>
                 ))}
               </div>

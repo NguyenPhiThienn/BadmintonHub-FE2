@@ -23,7 +23,7 @@ export interface IBookingVenue {
   address?: string;
 }
 
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
 
 export interface IBooking {
   _id: string;

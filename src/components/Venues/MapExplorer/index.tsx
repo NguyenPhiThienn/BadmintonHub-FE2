@@ -60,6 +60,28 @@ const MapExplorer = () => {
   const [sortBy, setSortBy] = useState<string | null>(searchParams?.get("sortBy") || null);
   const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
 
+  // Tự động lấy vị trí thật của người dùng khi vừa tải trang
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const uLat = position.coords.latitude;
+          const uLng = position.coords.longitude;
+          setUserLocation({ lat: uLat, lng: uLng });
+          setCenter({ lat: uLat, lng: uLng });
+        },
+        (error) => {
+          console.warn("Không lấy được vị trí thật:", error);
+          // Mặc định là thành phố Hồ Chí Minh
+          setUserLocation({ lat: 10.762622, lng: 106.660172 });
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    } else {
+      setUserLocation({ lat: 10.762622, lng: 106.660172 });
+    }
+  }, []);
+
   const { data: venuesData, isLoading } = useVenues({
     search: search,
     limit: limit,
@@ -72,6 +94,118 @@ const MapExplorer = () => {
   const pagination = venuesData?.data?.pagination;
   const hasMore = pagination ? venues.length < pagination.total : false;
   const markersRef = useRef<any[]>([]);
+  const userMarkerRef = useRef<any>(null);
+  const directionsServiceRef = useRef<any>(null);
+  const directionsRendererRef = useRef<any>(null);
+
+  // 1. Vẽ vị trí thực của người dùng dưới dạng dấu chấm xanh dương phát sáng (pulse)
+  useEffect(() => {
+    if (!map || !userLocation || !(window as any).google) return;
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setMap(null);
+      userMarkerRef.current = null;
+    }
+
+    const marker = new (window as any).google.maps.OverlayView();
+
+    marker.onAdd = function () {
+      const div = document.createElement('div');
+      div.style.position = 'absolute';
+      div.className = 'user-gps-marker-wrapper';
+      div.innerHTML = `<div class="user-gps-marker"></div>`;
+      const panes = this.getPanes();
+      panes?.overlayMouseTarget.appendChild(div);
+      (this as any).div = div;
+    };
+
+    marker.draw = function () {
+      const projection = this.getProjection();
+      if (!projection) return;
+      const pos = new (window as any).google.maps.LatLng(userLocation.lat, userLocation.lng);
+      const position = projection.fromLatLngToDivPixel(pos);
+
+      if (position && (this as any).div) {
+        (this as any).div.style.left = position.x + 'px';
+        (this as any).div.style.top = position.y + 'px';
+      }
+    };
+
+    marker.onRemove = function () {
+      if ((this as any).div) {
+        (this as any).div.parentNode.removeChild((this as any).div);
+        (this as any).div = null;
+      }
+    };
+
+    marker.setMap(map);
+    userMarkerRef.current = marker;
+
+    return () => {
+      if (marker) {
+        marker.setMap(null);
+      }
+    };
+  }, [map, userLocation]);
+
+  // 2. Khởi tạo Directions Service và Renderer để chỉ đường
+  useEffect(() => {
+    if (!map || !(window as any).google) return;
+
+    directionsServiceRef.current = new (window as any).google.maps.DirectionsService();
+    directionsRendererRef.current = new (window as any).google.maps.DirectionsRenderer({
+      map: map,
+      suppressMarkers: true, // Ẩn các pin A và B mặc định để giữ pin custom
+      polylineOptions: {
+        strokeColor: "#00ff88", // Màu xanh neon đồng bộ thương hiệu
+        strokeOpacity: 0.8,
+        strokeWeight: 6,
+      }
+    });
+
+    return () => {
+      if (directionsRendererRef.current) {
+        directionsRendererRef.current.setMap(null);
+      }
+    };
+  }, [map]);
+
+  // 3. Tự động vẽ đường đi từ vị trí người dùng đến sân khi click chọn sân
+  useEffect(() => {
+    if (!map || !userLocation || !directionsServiceRef.current || !directionsRendererRef.current) return;
+
+    if (!selectedVenueId) {
+      // Ẩn đường đi khi không có sân nào được chọn
+      directionsRendererRef.current.setDirections({ routes: [] });
+      return;
+    }
+
+    const selectedVenue = venues.find((v: IVenue) => v._id === selectedVenueId);
+    if (!selectedVenue) return;
+
+    const vLat = selectedVenue.coordinates?.coordinates[1];
+    const vLng = selectedVenue.coordinates?.coordinates[0];
+
+    if (vLat && vLng) {
+      const origin = new (window as any).google.maps.LatLng(userLocation.lat, userLocation.lng);
+      const destination = new (window as any).google.maps.LatLng(vLat, vLng);
+
+      directionsServiceRef.current.route(
+        {
+          origin: origin,
+          destination: destination,
+          travelMode: (window as any).google.maps.TravelMode.DRIVING,
+        },
+        (result: any, status: any) => {
+          if (status === (window as any).google.maps.DirectionsStatus.OK) {
+            directionsRendererRef.current.setDirections(result);
+          } else {
+            console.error("Directions request failed due to:", status);
+          }
+        }
+      );
+    }
+  }, [selectedVenueId, userLocation, venues, map]);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams?.toString() || "");
@@ -244,6 +378,7 @@ const MapExplorer = () => {
         map?.setCenter(pos);
         map?.setZoom(15);
         setCenter(pos);
+        setUserLocation(pos);
       });
     }
   };
@@ -362,7 +497,7 @@ const MapExplorer = () => {
                     className={`transition-all duration-300 cursor-pointer ${selectedVenueId === venue._id ? "ring-2 ring-accent ring-inset rounded-2xl" : ""
                       }`}
                   >
-                    <VenueCard venue={venue} />
+                    <VenueCard venue={venue} userLocation={userLocation || undefined} />
                   </div>
                 ))}
                 {isLoading && limit > 10 && (
@@ -495,6 +630,7 @@ const MapExplorer = () => {
                 map?.setZoom(16);
               }
             }}
+            userLocation={userLocation}
           />
         </div>
       </div>
@@ -551,6 +687,43 @@ const MapExplorer = () => {
         }
         .gmnoprint {
             display: none !important;
+        }
+        /* GPS Pulse Dot for User Location */
+        .user-gps-marker-wrapper {
+          z-index: 9999;
+          position: absolute;
+        }
+        .user-gps-marker {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          background: #4285F4;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 0 10px rgba(66, 133, 244, 0.8);
+          transform: translate(-50%, -50%);
+        }
+        .user-gps-marker::after {
+          content: '';
+          position: absolute;
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          border: 3px solid #4285F4;
+          border-radius: 50%;
+          animation: gpsPulse 2s infinite ease-out;
+          opacity: 0;
+        }
+        @keyframes gpsPulse {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(3);
+            opacity: 0;
+          }
         }
       `}</style>
     </div>

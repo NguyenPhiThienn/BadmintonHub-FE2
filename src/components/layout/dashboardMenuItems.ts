@@ -7,7 +7,8 @@ import {
   mdiSoccerField,
   mdiStorefrontOutline,
   mdiViewDashboardOutline,
-  mdiFinance
+  mdiFinance,
+  mdiMapMarkerOutline
 } from "@mdi/js";
 
 export const getDashboardMenuItems = (permissions: string[] = [], role?: string): MenuItem[] => {
@@ -44,6 +45,12 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
         name: "Quản lý trang cá nhân",
         path: "/owner/profile",
         icon: mdiAccountCircleOutline,
+      },
+      {
+        id: "switch-to-player",
+        name: "Đặt sân (Người chơi)",
+        path: "/venues",
+        icon: mdiMapMarkerOutline,
       }
     ];
   }

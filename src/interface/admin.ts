@@ -15,6 +15,7 @@ export interface ISummaryStats {
     growth: string;
   }[];
   onlineNow?: number;
+  locationDistribution?: any;
 }
 
 export interface IChartItem {

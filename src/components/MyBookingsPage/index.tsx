@@ -141,7 +141,7 @@ export default function MyBookingsPage() {
         <div className="min-h-screen flex flex-col bg-darkBackgroundV1">
             <Header />
 
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 pt-24 pb-8 space-y-4">
+            <main className="flex-1 max-w-[95%] xl:max-w-[1550px] mx-auto w-full px-4 pt-24 pb-8 space-y-4">
                 {/* Breadcrumbs */}
                 <Breadcrumb>
                     <BreadcrumbList>
@@ -155,8 +155,8 @@ export default function MyBookingsPage() {
                     </BreadcrumbList>
                 </Breadcrumb>
                 {/* Right Column: Booking Table */}
-                <div className="lg:col-span-8 space-y-4">
-                    <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4 shadow-lg min-h-[600px] flex flex-col">
+                <div className="w-full space-y-4">
+                    <section className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-6 space-y-5 shadow-2xl min-h-[600px] flex flex-col">
                         <h3 className="text-accent font-semibold flex items-center gap-2">
                             <Icon path={mdiCalendarCheckOutline} size={0.8} />
                             Lịch sử đặt sân

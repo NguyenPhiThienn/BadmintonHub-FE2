@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/mdi-icon"
 import { mdiArrowRight, mdiFlash, mdiHeart, mdiShieldCheck } from "@mdi/js"
 import { motion, Variants } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
@@ -65,7 +66,12 @@ export function CTASection() {
                                 placeholder="Nhập email của bạn..."
                                 className="h-12 border-white/20 bg-white/10 text-secondary placeholder:text-secondary/50 focus-visible:border-white focus-visible:ring-white/30 !text-lg"
                             />
-                            <Button>
+                            <Button
+                                onClick={() => {
+                                    const event = new CustomEvent("open-auth", { detail: "register" });
+                                    window.dispatchEvent(event);
+                                }}
+                            >
                                 Đăng ký ngay
                                 <Icon path={mdiArrowRight} size={0.8} />
                             </Button>

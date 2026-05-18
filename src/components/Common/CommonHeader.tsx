@@ -9,10 +9,11 @@ import {
 import { useUser } from "@/context/useUserContext";
 import { useMe } from "@/hooks/useAuth";
 import { useMenuSidebar } from "@/stores/useMenuSidebar";
-import { mdiAccountTie, mdiLogout } from "@mdi/js";
+import { mdiAccountTie, mdiLogout, mdiHomeOutline, mdiCalendarMonthOutline } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { HamburgerMenu } from "iconsax-reactjs";
 import Image from "next/image";
+import Link from "next/link";
 import { DropdownNav } from "./DropdownNav";
 
 export default function CommonHeader() {
@@ -65,6 +66,25 @@ export default function CommonHeader() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                
+                {(profile?.role === "OWNER" || profile?.role === "COURT_OWNER" || profile?.role === "ADMIN") && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/" className="cursor-pointer flex items-center gap-2">
+                        <Icon path={mdiHomeOutline} size={0.8} className="flex-shrink-0" />
+                        <span>Trang chủ đặt sân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/my-bookings" className="cursor-pointer flex items-center gap-2">
+                        <Icon path={mdiCalendarMonthOutline} size={0.8} className="flex-shrink-0" />
+                        <span>Lịch sử đặt sân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
                 <DropdownMenuItem
                   onClick={logoutUser}
                   className="hover:!bg-red-500/10 hover:!text-red-400 text-red-400 focus:bg-red-500/10 focus:text-red-400"

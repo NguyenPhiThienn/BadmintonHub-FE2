@@ -170,6 +170,8 @@ export default function VenuePage({ type = "admin" }: VenuePageProps) {
         const payload = {
             name: data.name,
             address: data.address,
+            lat: data.coordinates?.coordinates?.[1] ? Number(data.coordinates.coordinates[1]) : undefined,
+            lng: data.coordinates?.coordinates?.[0] ? Number(data.coordinates.coordinates[0]) : undefined,
             description: data.description || "",
             openTime: data.openTime,
             closeTime: data.closeTime,

@@ -106,7 +106,7 @@ export function HeroSection() {
                                 </Link>
                             </Button>
                             <Button variant="outline" size="xl" asChild className="border-white/30 bg-white/5 text-secondary hover:bg-white/15 hover:text-secondary backdrop-blur-sm">
-                                <Link href="#features">
+                                <Link href="#how-it-works">
                                     <Icon path={mdiPlay} size={0.8} />
                                     Xem cách hoạt động
                                 </Link>

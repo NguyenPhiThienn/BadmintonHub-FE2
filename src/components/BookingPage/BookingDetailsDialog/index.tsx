@@ -57,6 +57,7 @@ export const BookingDetailsDialog = ({
             case "CONFIRMED": return "green";
             case "COMPLETED": return "blue";
             case "CANCELLED": return "red";
+            case "NO_SHOW": return "red";
             default: return "neutral";
         }
     };
@@ -67,6 +68,7 @@ export const BookingDetailsDialog = ({
             case "CONFIRMED": return "Đã xác nhận";
             case "COMPLETED": return "Hoàn thành";
             case "CANCELLED": return "Đã hủy";
+            case "NO_SHOW": return "Khách không đến";
             default: return status;
         }
     };

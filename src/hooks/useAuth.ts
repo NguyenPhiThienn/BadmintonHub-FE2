@@ -56,6 +56,8 @@ export const useMe = () => {
     queryKey: ["me"],
     queryFn: () => authApi.getMe(),
     enabled: !!token,
+    refetchInterval: 5 * 60 * 1000, // Ping every 5 minutes to update lastLogin → realtime count
+    refetchIntervalInBackground: false, // Only when tab is active
   });
 };
 

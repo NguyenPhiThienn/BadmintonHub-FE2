@@ -220,7 +220,13 @@ export const UserDetailsDialog = ({
                                                         </TableCell>
                                                         <TableCell>
                                                             <Badge variant="neutral">
-                                                                <span className="uppercase">{userData?.role?.toString().toLowerCase()}</span>
+                                                                <span className="uppercase">
+                                                                    {userData?.role?.toString() === 'ADMIN' || userData?.role?.toString() === 'admin'
+                                                                        ? 'Quản trị viên'
+                                                                        : userData?.role?.toString() === 'COURT_OWNER' || userData?.role?.toString() === 'OWNER' || userData?.role?.toString() === 'court_owner' || userData?.role?.toString() === 'owner'
+                                                                            ? 'Chủ sân'
+                                                                            : 'Người chơi'}
+                                                                </span>
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell className="text-neutral-300 font-semibold w-[160px]">

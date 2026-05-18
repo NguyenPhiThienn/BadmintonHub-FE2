@@ -42,7 +42,7 @@ const steps = [
 
 export function HowItWorksSection() {
     return (
-        <section className="relative overflow-hidden bg-background py-20">
+        <section id="how-it-works" className="relative overflow-hidden bg-background py-20">
             {/* SVG Background */}
             <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
                 <defs>

@@ -9,6 +9,7 @@ import { IChartData, ISummaryStats } from "@/interface/admin";
 import { mdiAccountGroup, mdiCalendarCheck, mdiFinance, mdiMapMarkerRadius } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const StatCard = ({ title, value, subValue, icon, color, isCurrency, unit, delay = 0 }: any) => {
@@ -85,10 +86,53 @@ const StatCardsGrid = ({ summary }: { summary: ISummaryStats | undefined }) => {
 };
 
 const RevenueFlowChart = ({ chartData }: { chartData: IChartData | undefined }) => {
-  const formattedData = chartData?.map((item: any) => ({
-    name: item._id,
-    value: item.value,
-  })) || [];
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Tạo mảng gồm 30 ngày gần nhất ở định dạng YYYY-MM-DD
+  const getLast30Days = () => {
+    const list = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      list.push(`${year}-${month}-${day}`);
+    }
+    return list;
+  };
+
+  const last30DaysList = getLast30Days();
+
+  // Khớp dữ liệu thực tế từ backend hoặc mặc định điền 0đ
+  const allFormattedData = last30DaysList.map(dateStr => {
+    const match = chartData?.find((item: any) => item._id === dateStr);
+    return {
+      name: dateStr,
+      value: match ? match.value : 0,
+    };
+  });
+
+  // Tìm chỉ mục của ngày đầu tiên có phát sinh doanh thu thực tế
+  const firstActiveIndex = allFormattedData.findIndex(item => item.value > 0);
+
+  // Nếu có dữ liệu doanh thu, cắt mảng bắt đầu từ trước ngày đầu tiên có giao dịch 1 ngày
+  // Việc này giúp đường cong bắt đầu mềm mại từ mốc 0đ và kéo căng trải đều, căn giữa toàn bộ biểu đồ
+  const formattedData = firstActiveIndex !== -1 
+    ? allFormattedData.slice(Math.max(0, firstActiveIndex - 1)) 
+    : allFormattedData;
+
+  if (!mounted) {
+    return (
+      <Card className="bg-darkCardV1/40 border-darkBorderV1 h-[400px] flex items-center justify-center">
+        <LoadingSpinner />
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-darkCardV1/40 border-darkBorderV1 h-[400px]">
@@ -136,13 +180,7 @@ const RevenueFlowChart = ({ chartData }: { chartData: IChartData | undefined }) 
 };
 
 const TopPerformingVenues = ({ topVenues }: { topVenues?: any[] }) => {
-  const displayVenues = topVenues && topVenues.length > 0 ? topVenues : [
-    { name: "Sân Cầu Lông Thống Nhất", bookings: 450, revenue: "27.5M", growth: "+12%" },
-    { name: "Badminton Hub Quận 7", bookings: 380, revenue: "22.0M", growth: "+8%" },
-    { name: "Sân Thành Công Gò Vấp", bookings: 310, revenue: "18.6M", growth: "+15%" },
-    { name: "Sân ABC Bình Thạnh", bookings: 290, revenue: "17.2M", growth: "-3%" },
-    { name: "Viking Badminton Center", bookings: 250, revenue: "15.0M", growth: "+5%" },
-  ];
+  const displayVenues = topVenues || [];
 
   return (
     <Card className="bg-darkCardV1/40 border-darkBorderV1">
@@ -161,19 +199,27 @@ const TopPerformingVenues = ({ topVenues }: { topVenues?: any[] }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {displayVenues.map((venue, i) => (
-              <TableRow key={i}>
-                <TableCell className="text-center font-semibold">{i + 1}</TableCell>
-                <TableCell className="text-left font-medium text-neutral-300">{venue.name}</TableCell>
-                <TableCell>{venue.bookings}</TableCell>
-                <TableCell className="text-accent font-semibold">{venue.revenue}</TableCell>
-                <TableCell>
-                  <Badge variant={venue.growth.startsWith("+") ? "green" : "neutral"} className="px-2 py-0.5">
-                    {venue.growth}
-                  </Badge>
+            {displayVenues.length > 0 ? (
+              displayVenues.map((venue, i) => (
+                <TableRow key={i}>
+                  <TableCell className="text-center font-semibold">{i + 1}</TableCell>
+                  <TableCell className="text-left font-medium text-neutral-300">{venue.name}</TableCell>
+                  <TableCell>{venue.bookings}</TableCell>
+                  <TableCell className="text-accent font-semibold">{venue.revenue}</TableCell>
+                  <TableCell>
+                    <Badge variant={venue.growth?.startsWith("+") ? "green" : "neutral"} className="px-2 py-0.5">
+                      {venue.growth || "0%"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-neutral-500 py-8">
+                  Chưa có dữ liệu cơ sở và lượt đặt sân nào.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -181,8 +227,8 @@ const TopPerformingVenues = ({ topVenues }: { topVenues?: any[] }) => {
   );
 };
 
-const ActiveUsersMap = ({ onlineNow }: { onlineNow?: number }) => {
-  const displayOnlineNow = onlineNow || 152;
+const ActiveUsersMap = ({ onlineNow, distribution }: { onlineNow?: number; distribution?: any[] }) => {
+  const displayOnlineNow = onlineNow || 0;
   return (
     <Card className="bg-darkCardV1/40 border-darkBorderV1 h-full">
       <CardHeader>
@@ -201,14 +247,25 @@ const ActiveUsersMap = ({ onlineNow }: { onlineNow?: number }) => {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4 w-full px-4">
-          <div className="bg-darkBackgroundV1/60 p-3 rounded-xl border border-darkBorderV1">
-            <p className="text-sm text-neutral-400 uppercase font-semibold">TP. Hồ Chí Minh</p>
-            <p className="text-lg font-semibold text-neutral-300">82%</p>
-          </div>
-          <div className="bg-darkBackgroundV1/60 p-3 rounded-xl border border-darkBorderV1">
-            <p className="text-sm text-neutral-400 uppercase font-semibold">Khu vực khác</p>
-            <p className="text-lg font-semibold text-neutral-300">18%</p>
-          </div>
+          {distribution && distribution.length > 0 ? (
+            distribution.slice(0, 2).map((item, idx) => (
+              <div key={idx} className="bg-darkBackgroundV1/60 p-3 rounded-xl border border-darkBorderV1">
+                <p className="text-sm text-neutral-400 uppercase font-semibold truncate">{item.city}</p>
+                <p className="text-lg font-semibold text-neutral-300">{item.percentage}%</p>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="bg-darkBackgroundV1/60 p-3 rounded-xl border border-darkBorderV1">
+                <p className="text-sm text-neutral-400 uppercase font-semibold">Chưa có cơ sở</p>
+                <p className="text-lg font-semibold text-neutral-300">0%</p>
+              </div>
+              <div className="bg-darkBackgroundV1/60 p-3 rounded-xl border border-darkBorderV1">
+                <p className="text-sm text-neutral-400 uppercase font-semibold">Khu vực khác</p>
+                <p className="text-lg font-semibold text-neutral-300">0%</p>
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -249,7 +306,7 @@ export default function AdminDashboardPage() {
           <RevenueFlowChart chartData={chartData} />
         </div>
         <div>
-          <ActiveUsersMap onlineNow={summaryData?.onlineNow} />
+          <ActiveUsersMap onlineNow={summaryData?.onlineNow} distribution={summaryData?.locationDistribution} />
         </div>
       </div>
 

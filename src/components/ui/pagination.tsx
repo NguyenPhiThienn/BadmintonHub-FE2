@@ -55,11 +55,9 @@ export function Pagination({
       // Trang cuối: 1, ..., prev, end
       if (prevPage > 2) {
         pages.push("...");
+        pages.push(prevPage);
       } else if (prevPage === 2) {
         pages.push(2);
-      }
-      if (prevPage > 1) {
-        pages.push(prevPage);
       }
       // Thêm trang cuối
       pages.push(endPage);
@@ -67,12 +65,9 @@ export function Pagination({
       // Trang ở giữa: 1, ..., prev, current, next, ..., end
       if (prevPage > 2) {
         pages.push("...");
+        pages.push(prevPage);
       } else if (prevPage === 2) {
         pages.push(2);
-      }
-      // Chỉ thêm prev nếu nó khác 1 (vì 1 đã có rồi)
-      if (prevPage > 1) {
-        pages.push(prevPage);
       }
       // Thêm trang hiện tại
       pages.push(page);
@@ -111,7 +106,7 @@ export function Pagination({
           </button>
         </li>
         {getPages().map((p, index) => (
-          <li key={typeof p === "number" ? p : `ellipsis-${index}`}>
+          <li key={`pagination-item-${p}-${index}`}>
             {p === "..." ? (
               <span className="px-3 text-sm h-10 min-w-10 flex items-center justify-center leading-tight text-neutral-300 bg-darkBorderV1 border border-darkBackgroundV1">
                 ...

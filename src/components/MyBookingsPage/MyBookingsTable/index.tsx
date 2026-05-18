@@ -56,24 +56,24 @@ export const MyBookingsTable = memo(({
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[50px] text-center">STT</TableHead>
-                        <TableHead>Cơ sở sân</TableHead>
-                        <TableHead>Cố định</TableHead>
-                        <TableHead>Ngày đặt</TableHead>
-                        <TableHead>Khung giờ</TableHead>
-                        <TableHead>Tổng tiền</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead className="text-right">Thao tác</TableHead>
+                        <TableHead className="min-w-[200px]">Cơ sở sân</TableHead>
+                        <TableHead className="w-[120px]">Cố định</TableHead>
+                        <TableHead className="w-[140px]">Ngày đặt</TableHead>
+                        <TableHead className="w-[145px]">Khung giờ</TableHead>
+                        <TableHead className="w-[120px]">Tổng tiền</TableHead>
+                        <TableHead className="w-[120px]">Trạng thái</TableHead>
+                        <TableHead className="text-right w-[240px]">Thao tác</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {isLoading ? (
                         [...Array(pageSize)].map((_, i) => (
                             <TableRow key={i}>
-                                <TableCell><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
+                                <TableCell className="text-center"><Skeleton className="h-6 w-8 mx-auto" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-48" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-                                <TableCell><Skeleton className="h-6 w-32" /></TableCell>
+                                <TableCell><Skeleton className="h-6 w-28" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24" /></TableCell>
                                 <TableCell className="text-right"><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
@@ -94,45 +94,47 @@ export const MyBookingsTable = memo(({
                     ) : (
                         bookings.map((booking: IBooking, index: number) => {
                             const rowNumber = (currentPage - 1) * pageSize + index + 1;
-                            const venueName = typeof booking.venueId === "object" ? booking.venueId.name : "Sân cầu lông";
-                            const venueAddress = typeof booking.venueId === "object" ? booking.venueId.address : "";
+                            const isVenueObj = booking.venueId !== null && typeof booking.venueId === "object";
+                            const venueName = isVenueObj ? (booking.venueId as any).name : "Sân cầu lông (Đã giải thể)";
+                            const venueAddress = isVenueObj ? (booking.venueId as any).address : "Địa chỉ không khả dụng";
+                            const venueIdStr = isVenueObj ? (booking.venueId as any)._id : (booking.venueId || "");
                             return (
                                 <TableRow key={booking._id} className="hover:bg-darkBorderV1/30 transition-colors">
-                                    <TableCell className="text-center font-medium">{rowNumber}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-center font-medium w-[50px]">{rowNumber}</TableCell>
+                                    <TableCell className="min-w-[200px]">
                                         <div className="flex flex-col">
-                                            <Link target="_blank" href={`/venues/${typeof booking.venueId === "object" ? booking.venueId._id : booking.venueId}`}><span className="hover:underline text-accent">{venueName}</span></Link>
-                                            <span className="text-sm text-neutral-300 line-clamp-2">{venueAddress}</span>
+                                            <Link target="_blank" href={`/venues/${venueIdStr}`}><span className="hover:underline text-accent font-semibold">{venueName}</span></Link>
+                                            <span className="text-sm text-neutral-300 line-clamp-2 mt-0.5">{venueAddress}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-[120px]">
                                         {booking.isWeekly ? (
                                             <Badge variant="blue">Cố định theo tuần</Badge>
                                         ) : (
                                             <Badge variant="neutral">Lịch đơn</Badge>
                                         )}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-[140px]">
                                         <Badge variant="neutral">{formatDateWithTime(booking.createdAt)}</Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <div className="grid grid-cols-2 gap-2">
+                                    <TableCell className="w-[145px]">
+                                        <div className="flex flex-col gap-1 items-stretch justify-center w-[125px] mx-auto">
                                             {booking.details.map((d, i) => (
-                                                <Badge key={i} variant="neutral">
+                                                <Badge key={i} variant="neutral" className="justify-center w-full text-center whitespace-nowrap">
                                                     {d.startTime}-{d.endTime}
                                                 </Badge>
                                             ))}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-[120px]">
                                         <Badge variant="green">
                                             {booking.finalPrice?.toLocaleString("vi-VN")}đ
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="w-[120px]">
                                         {getStatusBadge(booking.status)}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right w-[240px]">
                                         <div className="flex justify-end gap-2">
                                             <Button
                                                 asChild

@@ -17,7 +17,7 @@ import { mdiAccountOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, m
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const navLinks = [
     { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
@@ -29,7 +29,16 @@ const navLinks = [
 export function Header() {
     const [mobileOpen, setMobileOpen] = useState(false)
     const [authMode, setAuthMode] = useState<AuthMode>(null)
-    const { user, logoutUser: handleLogout } = useUser()
+    const { user, profile, logoutUser: handleLogout } = useUser()
+
+    useEffect(() => {
+        const handleOpenAuth = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            setAuthMode(customEvent.detail || "login");
+        };
+        window.addEventListener("open-auth", handleOpenAuth);
+        return () => window.removeEventListener("open-auth", handleOpenAuth);
+    }, []);
 
     return (
         <motion.header
@@ -83,7 +92,7 @@ export function Header() {
                             <DropdownMenuTrigger asChild>
                                 <Avatar className="h-10 w-10 border border-primary rounded-full cursor-pointer ">
                                     <AvatarImage
-                                        src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
+                                        src={profile?.data?.avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${user.fullName}`}
                                         alt={user.fullName}
                                         className="bg-darkBorderV1"
                                     />
@@ -111,7 +120,7 @@ export function Header() {
                                     </Link>
                                 </DropdownMenuItem>
 
-                                {user.role === "PLAYER" && (
+                                {user.role === "PLAYER" ? (
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
@@ -121,7 +130,27 @@ export function Header() {
                                             </Link>
                                         </DropdownMenuItem>
                                     </>
-                                )}
+                                ) : (user.role === "OWNER" || user.role === "COURT_OWNER" || user.role === "owner" || user.role === "court_owner") ? (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/owner" className="cursor-pointer text-accent font-semibold">
+                                                <Icon path={mdiStorefrontOutline} size={0.8} />
+                                                <span>Kênh chủ sân</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </>
+                                ) : (user.role === "ADMIN" || user.role === "admin") ? (
+                                    <>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/admin" className="cursor-pointer text-accent font-semibold">
+                                                <Icon path={mdiStorefrontOutline} size={0.8} />
+                                                <span>Kênh quản trị</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    </>
+                                ) : null}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-red-500 cursor-pointer focus:text-red-500" onClick={handleLogout}>
                                     <Icon path={mdiLogout} size={0.8} />

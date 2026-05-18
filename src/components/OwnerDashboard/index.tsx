@@ -57,23 +57,54 @@ export default function OwnerDashboard() {
   const revenueDetails = revenueRes?.data?.details || [];
   const occupancyData = occupancyRes?.data?.occupancyData || [];
 
-  const formattedRevenueData = [...revenueDetails]
-    .sort((a, b) => {
-      const dateA = new Date(a._id.year, a._id.month - 1, a._id.day).getTime();
-      const dateB = new Date(b._id.year, b._id.month - 1, b._id.day).getTime();
-      return dateA - dateB;
-    })
-    .map((item: any) => ({
-      name: `${item._id.day}/${item._id.month}`,
-      value: item.totalRevenue,
-    }));
+  // Helper to generate last 7 days as an array of dates
+  const getLast7Days = () => {
+    const list = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      list.push(d);
+    }
+    return list;
+  };
 
-  const formattedOccupancyData = [...occupancyData]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .map((item: IOccupancyData) => ({
-      name: item.date.split("-").reverse().slice(0, 2).join("/"),
-      rate: item.occupancyRate,
-    }));
+  const last7DaysList = getLast7Days();
+
+  // Format revenue data for the last 7 days (fill 0 for missing days)
+  const formattedRevenueData = last7DaysList.map(date => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    
+    const match = revenueDetails.find(
+      (item: any) =>
+        item._id.day === day &&
+        item._id.month === month &&
+        item._id.year === year
+    );
+
+    return {
+      name: `${day}/${month}`,
+      value: match ? match.totalRevenue : 0,
+    };
+  });
+
+  // Format occupancy data for the last 7 days (fill 0 for missing days)
+  const formattedOccupancyData = last7DaysList.map(date => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const dateStr = `${year}-${month}-${day}`;
+
+    const match = occupancyData.find(
+      (item: IOccupancyData) => item.date === dateStr
+    );
+
+    return {
+      name: `${parseInt(day)}/${parseInt(month)}`,
+      rate: match ? Math.round(match.occupancyRate * 10) / 10 : 0.0,
+    };
+  });
 
   if (isRevenueLoading || isOccupancyLoading) {
     return (

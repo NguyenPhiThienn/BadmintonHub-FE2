@@ -23,7 +23,7 @@ import { useUpdateBookingStatus } from "@/hooks/useBooking";
 import { useOwnerBookings } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import { BookingStatus, IBooking } from "@/interface/booking";
-import { mdiMagnify, mdiPlus, mdiRefresh } from "@mdi/js";
+import { mdiMagnify, mdiPlus, mdiRefresh, mdiQrcodeScan } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -31,6 +31,7 @@ import { toast } from "react-toastify";
 import { BookingDetailsDialog } from "./BookingDetailsDialog";
 import { BookingTable } from "./BookingTable";
 import { ManualBookingDialog } from "./ManualBookingDialog";
+import { CheckinDialog } from "./CheckinDialog";
 
 export default function BookingPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -40,6 +41,7 @@ export default function BookingPage() {
     const [pageSize] = useState(10);
 
     const [isManualBookingOpen, setIsManualBookingOpen] = useState(false);
+    const [isCheckinOpen, setIsCheckinOpen] = useState(false);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
 
@@ -129,6 +131,7 @@ export default function BookingPage() {
                                     <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
                                     <SelectItem value="COMPLETED">Đã hoàn thành</SelectItem>
                                     <SelectItem value="CANCELLED">Đã hủy</SelectItem>
+                                    <SelectItem value="NO_SHOW">Khách không đến</SelectItem>
                                 </SelectContent>
                             </Select>
 
@@ -142,12 +145,23 @@ export default function BookingPage() {
                                 {!isMobile && "Làm mới"}
                             </Button>
                         </div>
-                        <Button
-                            onClick={() => setIsManualBookingOpen(true)}
-                        >
-                            <Icon path={mdiPlus} size={0.8} />
-                            {!isMobile && "Đặt sân thủ công"}
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setIsCheckinOpen(true)}
+                                variant="outline"
+                                className="border-accent text-accent hover:bg-accent/10 flex items-center gap-1.5"
+                            >
+                                <Icon path={mdiQrcodeScan} size={0.8} />
+                                {!isMobile && "Check-in nhanh"}
+                            </Button>
+                            <Button
+                                onClick={() => setIsManualBookingOpen(true)}
+                                className="flex items-center gap-1.5"
+                            >
+                                <Icon path={mdiPlus} size={0.8} />
+                                {!isMobile && "Đặt sân thủ công"}
+                            </Button>
+                        </div>
                     </div>
 
                     <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
@@ -178,6 +192,11 @@ export default function BookingPage() {
                     isOpen={isManualBookingOpen}
                     onClose={() => setIsManualBookingOpen(false)}
                     venues={venues}
+                />
+
+                <CheckinDialog
+                    isOpen={isCheckinOpen}
+                    onClose={() => setIsCheckinOpen(false)}
                 />
 
                 <BookingDetailsDialog

@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -55,6 +56,10 @@ export const VenueDialog = ({
         defaultValues: {
             name: "",
             address: "",
+            coordinates: {
+                type: "Point",
+                coordinates: [106.660172, 10.762622] as [number, number]
+            },
             description: "",
             openTime: "06:00",
             closeTime: "22:00",
@@ -80,6 +85,10 @@ export const VenueDialog = ({
                 form.reset({
                     name: initialData.name || "",
                     address: initialData.address || "",
+                    coordinates: initialData.coordinates || {
+                        type: "Point",
+                        coordinates: [106.660172, 10.762622]
+                    },
                     description: initialData.description || "",
                     openTime: initialData.openTime || "06:00",
                     closeTime: initialData.closeTime || "22:00",
@@ -91,6 +100,10 @@ export const VenueDialog = ({
                 form.reset({
                     name: "",
                     address: "",
+                    coordinates: {
+                        type: "Point",
+                        coordinates: [106.660172, 10.762622]
+                    },
                     description: "",
                     openTime: "06:00",
                     closeTime: "22:00",
@@ -102,8 +115,153 @@ export const VenueDialog = ({
         }
     }, [initialData, mode, form, isOpen]);
 
+    // Tích hợp Google Place Autocomplete & Bản đồ Preview
+    useEffect(() => {
+        let autocomplete: any = null;
+
+        const initAutocomplete = () => {
+            const input = document.getElementById("venue-address-input") as HTMLInputElement;
+            if (!input || !(window as any).google || !(window as any).google.maps || !(window as any).google.maps.places) return;
+
+            autocomplete = new (window as any).google.maps.places.Autocomplete(input, {
+                types: ["geocode", "establishment"],
+                componentRestrictions: { country: "vn" },
+            });
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (!place || !place.geometry) return;
+
+                const address = place.formatted_address || place.name || "";
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                form.setValue("address", address);
+                form.setValue("coordinates", {
+                    type: "Point",
+                    coordinates: [lng, lat]
+                });
+
+                const mapDiv = document.getElementById("venue-map-preview");
+                if (mapDiv) {
+                    mapDiv.classList.remove("hidden");
+                    const mapInstance = new (window as any).google.maps.Map(mapDiv, {
+                        center: { lat, lng },
+                        zoom: 16,
+                        disableDefaultUI: true,
+                    });
+                    new (window as any).google.maps.Marker({
+                        position: { lat, lng },
+                        map: mapInstance,
+                    });
+                }
+            });
+        };
+
+        const handleScriptLoad = () => {
+            initAutocomplete();
+        };
+
+        window.addEventListener('google-maps-loaded', handleScriptLoad);
+
+        // Khởi tạo ngay nếu Google Maps đã được tải trước đó
+        if ((window as any).google && (window as any).google.maps && (window as any).google.maps.places) {
+            initAutocomplete();
+        }
+
+        const timer = setTimeout(() => {
+            if (isOpen) {
+                initAutocomplete();
+
+                // Nếu là chế độ edit và có sẵn toạ độ thì vẽ bản đồ preview ban đầu
+                if (initialData && initialData.coordinates && initialData.coordinates.coordinates) {
+                    const [lng, lat] = initialData.coordinates.coordinates;
+                    const mapDiv = document.getElementById("venue-map-preview");
+                    if (mapDiv && (window as any).google && (window as any).google.maps) {
+                        mapDiv.classList.remove("hidden");
+                        const mapInstance = new (window as any).google.maps.Map(mapDiv, {
+                            center: { lat, lng },
+                            zoom: 16,
+                            disableDefaultUI: true,
+                        });
+                        new (window as any).google.maps.Marker({
+                            position: { lat, lng },
+                            map: mapInstance,
+                        });
+                    }
+                }
+            }
+        }, 500);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('google-maps-loaded', handleScriptLoad);
+            if (autocomplete && (window as any).google && (window as any).google.maps) {
+                (window as any).google.maps.event.clearInstanceListeners(autocomplete);
+            }
+        };
+    }, [isOpen, form, initialData]);
+
+    const apiKey = process.env.NEXT_PUBLIC_MAPS_API_KEY;
+
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <>
+            <style>{`
+                .pac-container {
+                    background-color: #0d1e21 !important;
+                    border: 1px solid #1a3038 !important;
+                    border-radius: 8px !important;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+                    font-family: inherit !important;
+                    z-index: 99999 !important;
+                    margin-top: 4px !important;
+                }
+                .pac-item {
+                    border-top: 1px solid #14282c !important;
+                    padding: 8px 12px !important;
+                    color: #e5e7eb !important;
+                    cursor: pointer !important;
+                    font-size: 14px !important;
+                }
+                .pac-item:first-child {
+                    border-top: none !important;
+                }
+                .pac-item:hover, .pac-item-selected {
+                    background-color: #162f36 !important;
+                }
+                .pac-item-query {
+                    color: #ffffff !important;
+                    font-size: 14px !important;
+                    padding-right: 4px !important;
+                }
+                .pac-matched {
+                    color: #00ff88 !important;
+                    font-weight: bold !important;
+                }
+                .pac-icon {
+                    filter: invert(1) hue-rotate(90deg) !important;
+                }
+                /* Ẩn nút tăng giảm của thẻ input type="number" */
+                input[type="number"]::-webkit-outer-spin-button,
+                input[type="number"]::-webkit-inner-spin-button {
+                    -webkit-appearance: none !important;
+                    margin: 0 !important;
+                }
+                input[type="number"] {
+                    -moz-appearance: textfield !important;
+                }
+            `}</style>
+            {isOpen && apiKey && (
+                <Script
+                    src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`}
+                    strategy="afterInteractive"
+                    onLoad={() => {
+                        const triggerEvent = new Event('google-maps-loaded');
+                        window.dispatchEvent(triggerEvent);
+                    }}
+                />
+            )}
+            <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent size="medium">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-accent">
@@ -146,9 +304,12 @@ export const VenueDialog = ({
                                         <FormItem>
                                             <FormLabel>Địa chỉ</FormLabel>
                                             <FormControl>
-                                                <div className="relative">
-                                                    <Input className="pl-9" placeholder="Nhập địa chỉ chi tiết..." {...field} />
-                                                    <Icon path={mdiMapMarkerOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                                <div className="space-y-2">
+                                                    <div className="relative">
+                                                        <Input id="venue-address-input" className="pl-9" placeholder="Nhập địa chỉ chi tiết..." {...field} />
+                                                        <Icon path={mdiMapMarkerOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                                    </div>
+                                                    <div id="venue-map-preview" className="w-full h-[180px] rounded-lg overflow-hidden border border-neutral-800 bg-neutral-950 hidden" />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -227,7 +388,17 @@ export const VenueDialog = ({
                                             <FormLabel>Giá thuê mặc định (đ/giờ)</FormLabel>
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Input type="number" className="pl-9" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                                                    <Input 
+                                                        type="number" 
+                                                        className="pl-9" 
+                                                        placeholder="0"
+                                                        {...field} 
+                                                        value={field.value === 0 ? "" : field.value}
+                                                        onChange={e => {
+                                                            const val = e.target.value;
+                                                            field.onChange(val === "" ? 0 : Number(val));
+                                                        }} 
+                                                    />
                                                     <Icon path={mdiCurrencyUsd} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
                                                 </div>
                                             </FormControl>
@@ -313,5 +484,6 @@ export const VenueDialog = ({
                 </Form>
             </DialogContent>
         </Dialog>
+        </>
     );
 };

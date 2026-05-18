@@ -114,9 +114,21 @@ export const UserTable = memo(({
                                     </TableCell>
                                     <TableCell>
                                         <Badge
-                                            variant={role === 'admin' || role === 'ADMIN' ? 'red' : role === 'COURT_OWNER' ? 'blue' : 'green'}
+                                            variant={
+                                                role === 'admin' || role === 'ADMIN'
+                                                    ? 'red'
+                                                    : role === 'COURT_OWNER' || role === 'OWNER' || role === 'court_owner' || role === 'owner'
+                                                        ? 'blue'
+                                                        : 'green'
+                                            }
                                         >
-                                            {role === 'admin' || role === 'ADMIN' ? 'Quản trị viên' : role === 'COURT_OWNER' ? 'Chủ sân' : 'Người chơi'}
+                                            {
+                                                role === 'admin' || role === 'ADMIN'
+                                                    ? 'Quản trị viên'
+                                                    : role === 'COURT_OWNER' || role === 'OWNER' || role === 'court_owner' || role === 'owner'
+                                                        ? 'Chủ sân'
+                                                        : 'Người chơi'
+                                            }
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">

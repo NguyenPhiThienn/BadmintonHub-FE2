@@ -4,6 +4,7 @@ import { Footer } from "@/components/Landing/Footer";
 import { Header } from "@/components/Landing/Header";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Script from "next/script";
 
 import {
     Breadcrumb,
@@ -27,15 +28,18 @@ import {
     mdiFileDocumentOutline,
     mdiHome,
     mdiInvoiceTextSend,
+    mdiMapMarkerOutline,
     mdiStorefrontOutline,
     mdiTrashCanOutline
 } from "@mdi/js";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function RegisterOwnerPage() {
-    const { user } = useUser();
+    const { user, fetchUserProfile } = useUser();
+    const router = useRouter();
 
     // Request status hook
     const { data: myRequestResponse, isLoading: isRequestLoading, refetch: refetchRequest } = useMyOwnerRequest(!!user);
@@ -52,6 +56,41 @@ export default function RegisterOwnerPage() {
     const [businessLicense, setBusinessLicense] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Tự động đồng bộ quyền lợi và nhảy qua giao diện chủ sân khi đơn được phê duyệt (APPROVED)
+    useEffect(() => {
+        if (myRequest && myRequest.status === "APPROVED") {
+            // Chỉ chạy chuyển hướng nếu vai trò hiện tại của user vẫn là PLAYER để tránh vòng lặp
+            if (user && user.role === "PLAYER") {
+                const syncAndRedirect = async () => {
+                    toast.success("🎉 Chúc mừng! Đơn đăng ký Chủ sân của bạn đã được phê duyệt!", {
+                        position: "top-center",
+                        autoClose: 3500,
+                    });
+                    
+                    try {
+                        // Gọi API lấy thông tin profile mới nhất, cập nhật role từ PLAYER thành OWNER
+                        if (fetchUserProfile) {
+                            await fetchUserProfile();
+                        }
+                    } catch (err) {
+                        console.error("Lỗi đồng bộ profile:", err);
+                    }
+                    
+                    toast.info("🚀 Đang chuyển hướng bạn sang giao diện quản lý Chủ sân...", {
+                        position: "top-center",
+                        autoClose: 2000,
+                    });
+                    
+                    // Chuyển hướng sau 2 giây
+                    setTimeout(() => {
+                        router.push("/owner");
+                    }, 2000);
+                };
+                syncAndRedirect();
+            }
+        }
+    }, [myRequest, user, fetchUserProfile, router]);
+
     // If rejected, allow editing previous values
     useEffect(() => {
         if (myRequest && myRequest.status === "REJECTED") {
@@ -61,6 +100,95 @@ export default function RegisterOwnerPage() {
             setBusinessLicense(myRequest.businessLicense || "");
         }
     }, [myRequest]);
+
+    const apiKey = process.env.NEXT_PUBLIC_MAPS_API_KEY;
+
+    // Tích hợp Google Place Autocomplete & Bản đồ Preview
+    useEffect(() => {
+        let autocomplete: any = null;
+
+        const initAutocomplete = () => {
+            const input = document.getElementById("register-court-address-input") as HTMLInputElement;
+            if (!input || !(window as any).google || !(window as any).google.maps || !(window as any).google.maps.places) return;
+
+            autocomplete = new (window as any).google.maps.places.Autocomplete(input, {
+                types: ["geocode", "establishment"],
+                componentRestrictions: { country: "vn" },
+            });
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (!place || !place.geometry) return;
+
+                const address = place.formatted_address || place.name || "";
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                setCourtAddress(address);
+
+                const mapDiv = document.getElementById("register-venue-map-preview");
+                if (mapDiv) {
+                    mapDiv.classList.remove("hidden");
+                    const mapInstance = new (window as any).google.maps.Map(mapDiv, {
+                        center: { lat, lng },
+                        zoom: 16,
+                        disableDefaultUI: true,
+                    });
+                    new (window as any).google.maps.Marker({
+                        position: { lat, lng },
+                        map: mapInstance,
+                    });
+                }
+            });
+        };
+
+        const handleScriptLoad = () => {
+            initAutocomplete();
+        };
+
+        window.addEventListener('google-maps-loaded', handleScriptLoad);
+
+        // Khởi tạo ngay nếu Google Maps đã được tải trước đó
+        if ((window as any).google && (window as any).google.maps && (window as any).google.maps.places) {
+            initAutocomplete();
+        }
+
+        const timer = setTimeout(() => {
+            initAutocomplete();
+            
+            // Nếu đã có sẵn địa chỉ (ví dụ khi bị reject và load lại dữ liệu cũ)
+            if (courtAddress && (window as any).google && (window as any).google.maps && (window as any).google.maps.places) {
+                const geocoder = new (window as any).google.maps.Geocoder();
+                geocoder.geocode({ address: courtAddress }, (results: any, status: any) => {
+                    if (status === 'OK' && results[0]) {
+                        const lat = results[0].geometry.location.lat();
+                        const lng = results[0].geometry.location.lng();
+                        const mapDiv = document.getElementById("register-venue-map-preview");
+                        if (mapDiv) {
+                            mapDiv.classList.remove("hidden");
+                            const mapInstance = new (window as any).google.maps.Map(mapDiv, {
+                                center: { lat, lng },
+                                zoom: 16,
+                                disableDefaultUI: true,
+                            });
+                            new (window as any).google.maps.Marker({
+                                position: { lat, lng },
+                                map: mapInstance,
+                            });
+                        }
+                    }
+                });
+            }
+        }, 800);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('google-maps-loaded', handleScriptLoad);
+            if (autocomplete && (window as any).google && (window as any).google.maps) {
+                (window as any).google.maps.event.clearInstanceListeners(autocomplete);
+            }
+        };
+    }, [courtAddress]);
 
     if (!user) {
         return (
@@ -333,8 +461,8 @@ export default function RegisterOwnerPage() {
                                 <p className="text-neutral-400 text-base max-w-xl">
                                     Đơn đăng ký của bạn đã được duyệt thành công! Tài khoản của bạn đã được cấp quyền của <span className="text-green-500 font-semibold">Chủ sân (Court Owner)</span>.
                                 </p>
-                                <p className="text-accent text-base font-semibold pt-2">
-                                    Vui lòng Đăng xuất và Đăng nhập lại để cập nhật quyền truy cập và sử dụng trang Quản lý dành cho Chủ sân!
+                                <p className="text-accent text-base font-semibold pt-2 animate-pulse">
+                                    Hệ thống đang tự động đồng bộ hóa quyền hạn tài khoản và chuyển hướng bạn đến Kênh quản lý Chủ sân trong giây lát...
                                 </p>
                             </div>
                             <Button asChild>
@@ -423,16 +551,22 @@ export default function RegisterOwnerPage() {
 
                                     {/* ADDRESS INPUT */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="courtAddress">
+                                        <Label htmlFor="register-court-address-input">
                                             Địa chỉ cơ sở sân <span className="text-red-500">*</span>
                                         </Label>
-                                        <Input
-                                            id="courtAddress"
-                                            placeholder="Nhập địa chỉ đầy đủ của cơ sở sân"
-                                            value={courtAddress}
-                                            onChange={(e) => setCourtAddress(e.target.value)}
-
-                                        />
+                                        <div className="space-y-2">
+                                            <div className="relative">
+                                                <Input
+                                                    id="register-court-address-input"
+                                                    className="pl-9"
+                                                    placeholder="Nhập địa chỉ đầy đủ của cơ sở sân..."
+                                                    value={courtAddress}
+                                                    onChange={(e) => setCourtAddress(e.target.value)}
+                                                />
+                                                <Icon path={mdiMapMarkerOutline} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                                            </div>
+                                            <div id="register-venue-map-preview" className="w-full h-[180px] rounded-lg overflow-hidden border border-neutral-800 bg-neutral-950 hidden" />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -533,6 +667,52 @@ export default function RegisterOwnerPage() {
                     </div>
                 )}
             </main>
+            <style>{`
+                .pac-container {
+                    background-color: #0d1e21 !important;
+                    border: 1px solid #1a3038 !important;
+                    border-radius: 8px !important;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+                    font-family: inherit !important;
+                    z-index: 99999 !important;
+                    margin-top: 4px !important;
+                }
+                .pac-item {
+                    border-top: 1px solid #14282c !important;
+                    padding: 8px 12px !important;
+                    color: #e5e7eb !important;
+                    cursor: pointer !important;
+                    font-size: 14px !important;
+                }
+                .pac-item:first-child {
+                    border-top: none !important;
+                }
+                .pac-item:hover, .pac-item-selected {
+                    background-color: #162f36 !important;
+                }
+                .pac-item-query {
+                    color: #ffffff !important;
+                    font-size: 14px !important;
+                    padding-right: 4px !important;
+                }
+                .pac-matched {
+                    color: #00ff88 !important;
+                    font-weight: bold !important;
+                }
+                .pac-icon {
+                    filter: invert(1) hue-rotate(90deg) !important;
+                }
+            `}</style>
+            {apiKey && (
+                <Script
+                    src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`}
+                    strategy="afterInteractive"
+                    onLoad={() => {
+                        const triggerEvent = new Event('google-maps-loaded');
+                        window.dispatchEvent(triggerEvent);
+                    }}
+                />
+            )}
             <Footer />
         </div>
     );

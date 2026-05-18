@@ -83,6 +83,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setProfile(profileData);
         if (isClient) {
           localStorage.setItem("userProfile", JSON.stringify(profileData));
+          
+          // Đồng bộ hóa trạng thái user chính để cập nhật quyền và thông tin ngay lập tức
+          setUser((prevUser) => {
+            const updatedUser = {
+              ...(prevUser || {}),
+              _id: profileData.data._id,
+              fullName: profileData.data.fullName,
+              email: profileData.data.email,
+              phone: profileData.data.phone,
+              role: profileData.data.role,
+            };
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            return updatedUser as any;
+          });
         }
       }
     } catch (error: any) {
