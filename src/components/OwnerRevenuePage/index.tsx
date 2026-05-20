@@ -23,7 +23,6 @@ import { useResponsive } from "@/hooks/use-mobile";
 import { useOwnerRevenueReport } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import {
-    mdiCalendarRange,
     mdiCash,
     mdiChevronRight,
     mdiCreditCardOutline,
@@ -184,7 +183,7 @@ export default function OwnerRevenuePage() {
 
                             {/* Phương thức */}
                             <Select value={method} onValueChange={(val) => { setMethod(val); setPage(1); }}>
-                                <SelectTrigger className="w-full md:w-[180px]">
+                                <SelectTrigger className="w-full md:w-[250px]">
                                     <SelectValue placeholder="Phương thức" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -206,28 +205,6 @@ export default function OwnerRevenuePage() {
                                     ))}
                                 </SelectContent>
                             </Select>
-
-                            {/* Từ ngày */}
-                            <div className="relative">
-                                <Input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
-                                    className="w-full md:w-auto pl-9 pr-3 text-neutral-300"
-                                />
-                                <Icon path={mdiCalendarRange} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                            </div>
-
-                            {/* Đến ngày */}
-                            <div className="relative">
-                                <Input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
-                                    className="w-full md:w-auto pl-9 pr-3 text-neutral-300"
-                                />
-                                <Icon path={mdiCalendarRange} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                            </div>
                         </div>
 
                         <Button
