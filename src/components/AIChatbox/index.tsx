@@ -2,7 +2,9 @@
 
 import { sendPost } from '@/api/axios';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+
+import { Icon } from '@/components/ui/mdi-icon';
+import { mdiRobotOutline } from '@mdi/js';
 
 // Tải động ChatBotWidget để tránh lỗi Server-Side Rendering (SSR) trong Next.js App Router
 const ChatBotWidget = dynamic(
@@ -15,26 +17,10 @@ interface IMessage {
   content: string;
 }
 
-// Hàm format Markdown đơn giản (chuyển đổi **text** thành <strong>text</strong> và bảo toàn xuống dòng)
-const formatMarkdown = (text: string) => {
-  if (!text) return '';
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br />');
-};
+import { useChatStore } from '@/store/useChatStore';
 
 export default function AIChatbox() {
-  const [messages, setMessages] = useState<IMessage[]>([
-    {
-      role: 'assistant',
-      content: formatMarkdown('Xin chào! Tôi là trợ lý ảo BadmintonHub. Tôi có thể giúp gì cho bạn hôm nay? 🏸'),
-    },
-  ]);
+  const { messages, addMessage } = useChatStore();
 
   const handleCallApi = async (message: string) => {
     try {
@@ -56,12 +42,12 @@ export default function AIChatbox() {
     }
   };
 
-  const handleNewMessage = (newMsg: IMessage) => {
-    setMessages((prev) => [...prev, { ...newMsg, content: formatMarkdown(newMsg.content) }]);
+  const handleNewMessage = (newMsg: { role: string, content: string }) => {
+    addMessage(newMsg);
   };
 
   const handleBotResponse = (reply: string) => {
-    setMessages((prev) => [...prev, { role: 'assistant', content: formatMarkdown(reply) }]);
+    addMessage({ role: 'assistant', content: reply });
   };
 
   return (
@@ -83,11 +69,26 @@ export default function AIChatbox() {
         .chatbox .chat p strong {
           font-weight: 700 !important;
         }
+        /* Fix icon alignment inside avatar */
+        .chatbox .chat span {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        .chatbox .chat span svg {
+          margin: 0 !important;
+        }
+        /* Resize toggle button */
+        .chatbot-toggler {
+          width: 44px !important;
+          height: 44px !important;
+        }
       `}} />
       <ChatBotWidget
         callApi={handleCallApi}
         chatbotName="BadmintonHub Assistant"
         primaryColor="#41C651"
+        botIcon={<div className="flex items-center justify-center w-full h-full text-white"><Icon path={mdiRobotOutline} size={1} /></div>}
         inputMsgPlaceholder="Chúng tôi sẽ trả lời ngay lập tức..."
         isTypingMessage="AI đang soạn câu trả lời..."
         IncommingErrMsg="Lỗi kết nối AI. Vui lòng thử lại!"

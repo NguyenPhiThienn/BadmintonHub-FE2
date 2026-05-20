@@ -4,80 +4,75 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
-import { mdiReply, mdiSend, mdiShimmer, mdiStar, mdiThumbUpOutline } from "@mdi/js";
+import { useMe } from "@/hooks/useAuth";
+import { useCreateReview, useReviews, useToggleLikeReview } from "@/hooks/useReview";
+import { mdiReply, mdiSend, mdiShimmer, mdiStar, mdiThumbUp, mdiThumbUpOutline } from "@mdi/js";
+import { format, parseISO } from "date-fns";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
-const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then(mod => mod.RichTextEditor), { 
+const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then(mod => mod.RichTextEditor), {
   ssr: false,
   loading: () => <div className="h-[130px] w-full bg-darkBackgroundV1 animate-pulse rounded-xl border border-darkBorderV1" />
 });
-const MOCK_NAMES = [
-  "Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Minh Đức", "Hoàng Anh Tuấn",
-  "Đặng Quang Huy", "Bùi Thị Mai", "Vũ Minh Hải", "Ngô Thanh Tâm", "Lý Gia Thành",
-  "Trịnh Công Sơn", "Mai Thu Huyền", "Đỗ Hùng Dũng", "Nguyễn Quang Hải", "Đoàn Văn Hậu"
-];
 
-const MOCK_COMMENTS = [
-  "Sân rất đẹp, ánh sáng tốt, thảm tiêu chuẩn chơi cực sướng. Độ nảy của cầu rất ổn định.",
-  "Thảm hơi trơn một chút ở các góc, nhưng tổng thể dịch vụ rất ok, chủ sân nhiệt tình hỗ trợ.",
-  "Vị trí hơi khó tìm nhưng sân chất lượng bù lại, giá cả hợp lý so với khu vực Gò Vấp.",
-  "Đèn hơi chói mắt khi nhìn lên cao cứu cầu, mong sân điều chỉnh lại góc chiếu hoặc thêm lưới che.",
-  "Sân rộng rãi, trần cao thoáng mát, có quạt công nghiệp nên không bị bí bách khi đánh đông người.",
-  "Dịch vụ gửi xe miễn phí và an toàn. Căn tin có bán nhiều loại nước giải khát giá sinh viên.",
-  "Khung giờ vàng (18h-20h) thường xuyên hết sân, mọi người nên đặt trước ít nhất 4-5 ngày.",
-  "Sân mới được bảo trì, lưới căng đều, vạch kẻ rõ ràng, không gian chuyên nghiệp.",
-  "Phòng thay đồ và nhà vệ sinh rất sạch sẽ, có cả phòng tắm cho anh em ở xa tới.",
-  "Giá thuê sân vào cuối tuần hơi cao, nhưng chất lượng mặt thảm Yonex thì hoàn toàn xứng đáng.",
-  "Chủ sân vui tính, hay tổ chức các giải phong trào cho anh em giao lưu học hỏi.",
-  "Sân có cho thuê vợt và giày chất lượng khá tốt cho những ai quên mang đồ.",
-  "Khoảng cách giữa các sân hơi sát nhau, thỉnh thoảng hay bị va chạm khi cứu cầu ở biên.",
-  "Hệ thống thông gió hoạt động tốt, dù sân kín nhưng không có mùi mồ hôi khó chịu.",
-  "Sân có lớp dạy cầu lông cho trẻ em và người mới bắt đầu vào buổi sáng, thầy dạy rất tận tâm.",
-  "Wifi mạnh, có chỗ ngồi chờ rộng rãi cho người nhà hoặc đồng đội nghỉ ngơi.",
-  "Hơi nóng vào buổi trưa do mái tôn chưa cách nhiệt tốt, nhưng buổi tối thì cực kỳ mát mẻ.",
-  "Mặt sân bám giày, di chuyển linh hoạt không lo chấn thương cổ chân.",
-  "Cầu bán tại quầy là cầu Hải Yến chính hãng, giá phải chăng.",
-  "Sân này phù hợp cho cả đánh phong trào lẫn tập luyện chuyên nghiệp."
-];
+interface ReviewSectionProps {
+  venueId: string;
+}
 
-const MOCK_REPLIES = [
-  "Cảm ơn bạn đã ủng hộ sân! Rất vui khi thấy bạn hài lòng với chất lượng thảm và ánh sáng.",
-  "Dạ, chúng tôi sẽ cho nhân viên lau sàn thường xuyên hơn để khắc phục tình trạng trơn trượt ạ.",
-  "Rất vui khi bạn hài lòng với dịch vụ. Chúng tôi sẽ sớm cập nhật bảng chỉ dẫn ngoài đường lớn.",
-  "Cảm ơn góp ý của bạn về hệ thống đèn, chúng tôi đang nghiên cứu lắp thêm tấm chắn chống chói.",
-  "Vệ sinh và độ thoáng của sân luôn là ưu tiên hàng đầu. Chúc bạn có những trận cầu nảy lửa!",
-  "Dạ, khung giờ tối thường rất đông khách, quý khách vui lòng đặt qua App để giữ chỗ chắc chắn ạ.",
-  "Sân luôn cố gắng nâng cấp định kỳ để đảm bảo mặt thảm và lưới luôn trong trạng thái tốt nhất.",
-  "Dịch vụ khách hàng là niềm tự hào của chúng tôi. Hẹn gặp lại bạn vào buổi tập tới!",
-  "Chúng tôi ghi nhận ý kiến về mái tôn và sẽ sớm triển khai phương án cách nhiệt vào tháng tới.",
-  "Cảm ơn bạn đã đánh giá cao các giải đấu phong trào. Mong bạn tiếp tục tham gia cùng hội sân!",
-  "Rất tiếc về sự bất tiện ở khoảng cách sân, chúng tôi sẽ điều chỉnh lại sơ đồ bố trí khi có thể.",
-  "Cảm ơn bạn! Đội ngũ nhân viên sân luôn sẵn sàng hỗ trợ mọi yêu cầu của anh em lông thủ."
-];
-
-export const ReviewSection = () => {
+export const ReviewSection = ({ venueId }: ReviewSectionProps) => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
-  const reviews = useMemo(() => {
-    return Array.from({ length: 6 }).map((_, i) => {
-      const name = MOCK_NAMES[Math.floor(Math.random() * MOCK_NAMES.length)];
-      const comment = MOCK_COMMENTS[Math.floor(Math.random() * MOCK_COMMENTS.length)];
-      const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
-      const hasReply = Math.random() > 0.3;
-      const reply = hasReply ? MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)] : null;
 
-      return {
-        id: i,
-        name,
-        comment,
-        rating,
-        date: "2 ngày trước",
-        reply,
-        likes: Math.floor(Math.random() * 20)
-      };
+  const { data: meRes } = useMe();
+  const me = meRes?.data;
+
+  const { data: reviewsRes, isLoading } = useReviews(venueId);
+  const { mutate: createReview, isPending: isCreating } = useCreateReview(venueId);
+  const { mutate: toggleLike } = useToggleLikeReview(venueId);
+
+  const reviews = reviewsRes?.data || [];
+
+  const handleSendReview = () => {
+    if (!me) {
+      toast.error("Vui lòng đăng nhập để gửi đánh giá!");
+      return;
+    }
+    if (!comment.trim()) return;
+
+    createReview({
+      venueId,
+      rating,
+      comment
+    }, {
+      onSuccess: () => {
+        setComment("");
+        setRating(5);
+        toast.success("Gửi đánh giá thành công!");
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || "Lỗi gửi đánh giá. Vui lòng thử lại.");
+      }
     });
-  }, []);
+  };
+
+  const handleLike = (reviewId: string) => {
+    if (!me) {
+      toast.error("Vui lòng đăng nhập để thích đánh giá!");
+      return;
+    }
+    toggleLike(reviewId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-8 flex flex-col items-center justify-center gap-2 text-neutral-400">
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm">Đang tải đánh giá...</p>
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-4 pb-4">
@@ -88,90 +83,124 @@ export const ReviewSection = () => {
 
       {/* Write Review Section */}
       <div className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-secondary font-semibold mb-2 flex items-center gap-2">
-              <Icon path={mdiShimmer} size={0.8} />
-              Viết đánh giá của bạn
-            </h3>
-            <div className="flex items-center gap-4">
-              <span className="text-neutral-300 text-sm font-semibold">Chất lượng sân:</span>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setRating(s)}
-                    className="transition-transform hover:scale-110"
-                  >
-                    <Icon
-                      path={mdiStar}
-                      size={1}
-                      className={s <= rating ? "text-yellow-500" : "text-neutral-600"}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <Button variant="accent" disabled={!comment.trim()}>
-            <Icon path={mdiSend} size={0.8} />
-            Gửi đánh giá
-          </Button>
-        </div>
-        <RichTextEditor
-          value={comment}
-          onChange={setComment}
-          placeholder="Chia sẻ trải nghiệm của bạn"
-        />
-      </div>
-      <div className="flex flex-col gap-4">
-        {reviews.map((review) => (
-          <div key={review.id} className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
+        {me ? (
+          <>
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-10 w-10 border border-primary">
-                  <AvatarImage src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${review.name}`} />
-                </Avatar>
-                <div>
-                  <h4 className="text-white font-semibold text-sm">{review.name}</h4>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
+              <div>
+                <h3 className="text-secondary font-semibold mb-2 flex items-center gap-2">
+                  <Icon path={mdiShimmer} size={0.8} />
+                  Viết đánh giá của bạn
+                </h3>
+                <div className="flex items-center gap-4">
+                  <span className="text-neutral-300 text-sm font-semibold">Chất lượng sân:</span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setRating(s)}
+                        className="transition-transform hover:scale-110"
+                      >
                         <Icon
-                          key={i}
                           path={mdiStar}
-                          size={0.6}
-                          className={i < review.rating ? "text-yellow-500" : "text-neutral-600"}
+                          size={1}
+                          className={s <= rating ? "text-yellow-500" : "text-neutral-600"}
                         />
-                      ))}
-                    </div>
-                    <span className="text-neutral-400 text-sm">({review.date})</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
-              <Badge variant="ghost">
-                <Icon path={mdiThumbUpOutline} size={0.6} className="mr-1" />
-                {review.likes}
-              </Badge>
+              <Button
+                variant="accent"
+                disabled={!comment.trim() || isCreating}
+                onClick={handleSendReview}
+              >
+                <Icon path={mdiSend} size={0.8} />
+                {isCreating ? "Đang gửi..." : "Gửi đánh giá"}
+              </Button>
             </div>
-
-            <p className="text-neutral-300 text-base leading-relaxed">
-              {review.comment}
-            </p>
-
-            {review.reply && (
-              <div className="bg-primary/5 border-l-2 border-primary p-4 rounded-r-xl space-y-4">
-                <div className="flex items-center gap-2 text-pneutral-500 font-bold text-sm">
-                  <Icon path={mdiReply} size={0.8} />
-                  Phản hồi từ chủ sân
-                </div>
-                <p className="text-neutral-400 text-base italic">
-                  {review.reply}
-                </p>
-              </div>
-            )}
+            <RichTextEditor
+              value={comment}
+              onChange={setComment}
+              placeholder="Chia sẻ trải nghiệm của bạn"
+            />
+          </>
+        ) : (
+          <div className="py-6 text-center space-y-2">
+            <p className="text-neutral-400">Bạn cần đăng nhập để gửi đánh giá cho cơ sở này.</p>
           </div>
-        ))}
+        )}
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {reviews.length > 0 ? (
+          reviews.map((review: any) => {
+            const name = review.playerId?.fullName || "Người chơi";
+            const avatar = review.playerId?.avatarUrl || `https://api.dicebear.com/9.x/thumbs/svg?seed=${name}`;
+            const isLiked = me ? review.likes?.includes(me._id) : false;
+            const likesCount = review.likes?.length || 0;
+            const dateFormatted = review.createdAt ? format(parseISO(review.createdAt), 'dd/MM/yyyy') : "Gần đây";
+
+            return (
+              <div key={review._id} className="bg-darkCardV1 border border-darkBorderV1 rounded-2xl p-4 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-10 w-10 border border-primary">
+                      <AvatarImage src={avatar} />
+                    </Avatar>
+                    <div>
+                      <h4 className="text-white font-semibold text-sm">{name}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Icon
+                              key={i}
+                              path={mdiStar}
+                              size={0.6}
+                              className={i < review.rating ? "text-yellow-500" : "text-neutral-600"}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-neutral-400 text-sm">({dateFormatted})</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleLike(review._id)}
+                    className="hover:scale-105 transition-transform"
+                  >
+                    <Badge variant={isLiked ? "green" : "ghost"} className="cursor-pointer gap-1 select-none">
+                      <Icon path={isLiked ? mdiThumbUp : mdiThumbUpOutline} size={0.6} />
+                      {likesCount}
+                    </Badge>
+                  </button>
+                </div>
+
+                <div
+                  className="text-neutral-300 text-base leading-relaxed prose prose-invert max-w-full"
+                  dangerouslySetInnerHTML={{ __html: review.comment }}
+                />
+
+                {review.reply && (
+                  <div className="bg-primary/5 border-l-2 border-primary p-4 rounded-r-xl space-y-4">
+                    <div className="flex items-center gap-2 text-pneutral-500 font-bold text-sm">
+                      <Icon path={mdiReply} size={0.8} />
+                      Phản hồi từ chủ sân
+                    </div>
+                    <p className="text-neutral-400 text-base italic">
+                      {review.reply}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <div className="py-12 flex flex-col items-center justify-center gap-4 text-neutral-400 border border-dashed border-darkBorderV1 rounded-2xl bg-darkCardV1/50">
+            <Icon path={mdiShimmer} size={2} className="text-gray-500" />
+            <p className="text-sm font-medium">Chưa có đánh giá nào cho sân này. Hãy là người đầu tiên!</p>
+          </div>
+        )}
       </div>
     </section>
   );

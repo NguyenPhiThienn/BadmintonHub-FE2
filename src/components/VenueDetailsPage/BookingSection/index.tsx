@@ -139,6 +139,16 @@ export const BookingSection = ({
     onDateChange(recDate);
   };
 
+  const filteredAvailabilityData = availabilityData.map(courtAvail => {
+    const filteredSlots = (courtAvail.slots || []).filter((slot: ISlot) => {
+      const [hours, minutes] = slot.startTime.split(':').map(Number);
+      const slotTime = new Date(selectedDate);
+      slotTime.setHours(hours, minutes, 0, 0);
+      return slotTime > new Date();
+    });
+    return { ...courtAvail, slots: filteredSlots };
+  }).filter(courtAvail => courtAvail.slots.length > 0);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -297,9 +307,9 @@ export const BookingSection = ({
                 <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
                 <p className="text-sm font-medium">Đang tải lịch sân...</p>
               </div>
-            ) : availabilityData.length > 0 ? (
+            ) : filteredAvailabilityData.length > 0 ? (
               <div className="space-y-8">
-                {availabilityData.map((courtAvail: IAvailability) => (
+                {filteredAvailabilityData.map((courtAvail: IAvailability) => (
                   <CourtTimeGrid
                     key={courtAvail.courtId}
                     court={{
@@ -355,12 +365,15 @@ export const BookingSection = ({
                   <span className="font-semibold text-base">Thanh toán bằng tiền mặt</span>
                 </button>
                 <button
+                  disabled={isWeekly}
                   onClick={() => setPaymentMethod("VNPAY")}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
-                    paymentMethod === "VNPAY"
-                      ? "bg-accent/10 border-accent text-accent"
-                      : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
+                    isWeekly
+                      ? "opacity-50 cursor-not-allowed bg-darkCardV1 border-darkBorderV1 text-neutral-500"
+                      : paymentMethod === "VNPAY"
+                        ? "bg-accent/10 border-accent text-accent"
+                        : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
                   )}
                 >
                   <div className="w-10 h-10 flex-shrink-0 bg-white rounded-full overflow-hidden p-1">
@@ -423,7 +436,13 @@ export const BookingSection = ({
           {selectedSlots.length > 0 && (
             <section className="pt-2">
               <button
-                onClick={() => setIsWeekly(!isWeekly)}
+                onClick={() => {
+                  const newIsWeekly = !isWeekly;
+                  setIsWeekly(newIsWeekly);
+                  if (newIsWeekly && paymentMethod === "VNPAY") {
+                    setPaymentMethod("CASH");
+                  }
+                }}
                 className={cn(
                   "flex items-center gap-3 p-4 rounded-xl border-2 transition-all w-full text-left",
                   isWeekly

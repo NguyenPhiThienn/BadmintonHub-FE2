@@ -267,7 +267,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           userId={userId}
         />
 
-        <ReviewSection />
+        <ReviewSection venueId={id} />
       </main>
       <VenueFooter
         selectedSlotsCount={selectedSlots.length}
