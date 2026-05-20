@@ -72,6 +72,7 @@ export default function OwnerRevenuePage() {
         isLoading,
         isFetching,
         refetch,
+        // @ts-ignore
     } = useOwnerRevenueReport({
         page,
         limit: 10,

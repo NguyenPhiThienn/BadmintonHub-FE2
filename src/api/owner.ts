@@ -17,6 +17,7 @@ export const ownerApi = {
     method?: string;
     startDate?: string;
     endDate?: string;
+    ownerId?: string;
   }) =>
     sendGet("/dashboard/revenue-report", params),
 };
