@@ -1,13 +1,11 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAdminRevenueReport } from "@/hooks/useAdmin";
 import { useUsers } from "@/hooks/useUsers";
@@ -20,7 +18,6 @@ import {
     mdiCreditCardOutline,
     mdiFilterOutline,
     mdiFinance,
-    mdiLoading,
     mdiMagnify,
     mdiRefresh,
     mdiWallet
@@ -28,6 +25,7 @@ import {
 import Icon from "@mdi/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { AdminRevenueTable } from "./AdminRevenueTable";
 
 const SearchableSelect = ({
     value,
@@ -416,92 +414,12 @@ export default function AdminRevenuePage() {
                 </div>
 
                 {/* Table Section */}
-                <Card className="bg-transparent border border-darkBorderV1 overflow-hidden p-0">
-                    <div className="w-full overflow-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="border-b border-darkBorderV1 bg-darkBackgroundV1/40">
-                                    <TableHead className="w-12 text-center text-neutral-400">STT</TableHead>
-                                    <TableHead className="text-neutral-400">Mã giao dịch</TableHead>
-                                    <TableHead className="text-neutral-400">Khách hàng</TableHead>
-                                    <TableHead className="text-neutral-400">Cơ sở sân</TableHead>
-                                    <TableHead className="text-neutral-400">Chủ sở hữu</TableHead>
-                                    <TableHead className="text-center text-neutral-400">Số tiền</TableHead>
-                                    <TableHead className="text-center text-neutral-400">Phương thức</TableHead>
-                                    <TableHead className="text-right text-neutral-400">Thời gian</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading || isFetching ? (
-                                    [...Array(5)].map((_, i) => (
-                                        <TableRow key={i} className="border-b border-darkBorderV1/40">
-                                            <TableCell colSpan={8} className="text-center py-6">
-                                                <div className="flex items-center justify-center gap-2 text-neutral-400">
-                                                    <Icon path={mdiLoading} size={0.8} className="animate-spin text-accent" />
-                                                    <span>Đang tải dữ liệu giao dịch...</span>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : transactions.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={8} className="text-center py-12 text-neutral-400 italic">
-                                            Không tìm thấy giao dịch doanh thu nào phù hợp với bộ lọc.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    transactions.map((t: any, index: number) => {
-                                        const stt = (page - 1) * 10 + index + 1;
-                                        return (
-                                            <TableRow key={t._id} className="hover:bg-darkBorderV1/10 border-b border-darkBorderV1/40 transition-colors">
-                                                <TableCell className="text-center text-neutral-300 font-medium">{stt}</TableCell>
-                                                <TableCell className="font-mono text-xs text-neutral-400 max-w-[120px] truncate" title={t._id}>
-                                                    {t.transaction_id || t._id}
-                                                </TableCell>
-                                                <TableCell className="text-neutral-200">
-                                                    <div>
-                                                        <div className="font-semibold text-sm">{t.booking?.customerName || "N/A"}</div>
-                                                        <div className="text-xs text-neutral-400">{t.booking?.customerPhone || ""}</div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-neutral-200 font-semibold text-sm">
-                                                    {t.venue?.name || "N/A"}
-                                                </TableCell>
-                                                <TableCell className="text-neutral-300">
-                                                    <div>
-                                                        <div className="font-medium text-sm">{t.owner?.fullName || "N/A"}</div>
-                                                        <div className="text-xs text-neutral-400">{t.owner?.email || ""}</div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-center text-accent font-bold">
-                                                    {(t.amount || 0).toLocaleString()} đ
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <Badge
-                                                        variant={
-                                                            t.method === "CASH" ? "green" : t.method === "VNPAY" ? "blue" : "purple"
-                                                        }
-                                                    >
-                                                        {t.method === "CASH" ? "Tiền mặt" : t.method === "VNPAY" ? "VNPay" : "Ví MoMo"}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell className="text-right text-xs text-neutral-400 font-medium">
-                                                    {new Date(t.createdAt).toLocaleString("vi-VN", {
-                                                        year: "numeric",
-                                                        month: "2-digit",
-                                                        day: "2-digit",
-                                                        hour: "2-digit",
-                                                        minute: "2-digit"
-                                                    })}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </Card>
+                <AdminRevenueTable
+                    transactions={transactions}
+                    isLoading={isLoading || isFetching}
+                    page={page}
+                    pageSize={10}
+                />
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (

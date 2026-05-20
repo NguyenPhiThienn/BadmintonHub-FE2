@@ -231,7 +231,7 @@ export const CheckinDialog = ({
                                         <div className="flex items-center gap-2">
                                             <Icon path={mdiPhoneOutline} size={0.6} className="text-neutral-400" />
                                             <span className="text-neutral-400">Số điện thoại:</span>
-                                            <span className="font-mono text-neutral-200">{customerPhone}</span>
+                                            <span className=" text-neutral-200">{customerPhone}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <Icon path={mdiEmailOutline} size={0.6} className="text-neutral-400" />

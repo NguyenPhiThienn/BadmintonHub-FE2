@@ -139,7 +139,7 @@ export const OwnerCustomersTable = memo(({
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-mono text-neutral-300">
+                                    <TableCell className=" text-neutral-300">
                                         <Badge variant="neutral">{cust.phone}</Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
