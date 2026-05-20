@@ -32,3 +32,17 @@ export const usePredictRevenue = (params?: { venueId?: string }) => {
     enabled: false, // Don't fetch automatically
   });
 };
+
+export const useOwnerRevenueReport = (params?: {
+  page?: number;
+  limit?: number;
+  venueId?: string;
+  method?: string;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  return useQuery({
+    queryKey: ["owner", "revenue-report", params],
+    queryFn: () => ownerApi.getOwnerRevenueReport(params),
+  });
+};

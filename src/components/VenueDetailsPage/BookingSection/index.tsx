@@ -185,11 +185,11 @@ export const BookingSection = ({
                 </h4>
                 <div className="text-neutral-300 text-base font-medium flex flex-wrap items-center gap-1.5">
                   Khung giờ từ
-                  <Badge variant="amber" className="px-3 py-1 text-sm">
+                  <Badge variant="amber">
                     {aiRec.startTime} - {aiRec.endTime}
                   </Badge>
                   vào ngày
-                  <Badge variant="amber" className="px-3 py-1 text-sm">
+                  <Badge variant="amber">
                     {format(parseISO(aiRec.date), 'dd/MM/yyyy')}
                   </Badge>
                   là lựa chọn hoàn hảo nhất!

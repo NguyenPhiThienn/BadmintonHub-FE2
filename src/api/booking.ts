@@ -1,11 +1,11 @@
-import { sendGet, sendPost, sendPut } from "./axios";
 import {
-  IBookingRequest,
   IAdminBookingQuery,
-  IUpdateBookingStatusRequest,
+  IBookingRequest,
+  IManualBookingRequest,
   IOwnerBookingQuery,
-  IManualBookingRequest
+  IUpdateBookingStatusRequest
 } from "@/interface/booking";
+import { sendGet, sendPost, sendPut } from "./axios";
 
 export const bookingApi = {
   createBooking: (data: IBookingRequest) =>
@@ -39,6 +39,6 @@ export const promotionApi = {
 };
 
 export const paymentApi = {
-  createPaymentUrl: (data: { bookingId: string; method: "VNPAY" | "MOMO" | "CASH" }) =>
+  createPaymentUrl: (data: { bookingId: string; method: "VNPAY" | "CASH" }) =>
     sendPost("/payments/create-url", data),
 };

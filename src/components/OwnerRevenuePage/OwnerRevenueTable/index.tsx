@@ -16,7 +16,7 @@ import {
 import Icon from "@mdi/react";
 import { memo } from "react";
 
-export interface IRevenueTransaction {
+export interface IOwnerRevenueTransaction {
     _id: string;
     transaction_id?: string;
     amount: number;
@@ -25,18 +25,15 @@ export interface IRevenueTransaction {
     booking?: {
         customerName?: string;
         customerPhone?: string;
+        _id?: string;
     };
     venue?: {
         name?: string;
     };
-    owner?: {
-        fullName?: string;
-        email?: string;
-    };
 }
 
-interface AdminRevenueTableProps {
-    transactions: IRevenueTransaction[];
+interface OwnerRevenueTableProps {
+    transactions: IOwnerRevenueTransaction[];
     isLoading?: boolean;
     page?: number;
     pageSize?: number;
@@ -47,12 +44,12 @@ const METHOD_CONFIG: Record<string, { label: string; variant: "green" | "blue" |
     VNPAY: { label: "VNPay", variant: "blue", icon: mdiCreditCardOutline },
 };
 
-export const AdminRevenueTable = memo(({
+export const OwnerRevenueTable = memo(({
     transactions,
     isLoading = false,
     page = 1,
     pageSize = 10,
-}: AdminRevenueTableProps) => {
+}: OwnerRevenueTableProps) => {
     return (
         <div className="w-full overflow-auto border border-darkBackgroundV1 rounded-md">
             <Table>
@@ -62,7 +59,6 @@ export const AdminRevenueTable = memo(({
                         <TableHead>Mã giao dịch</TableHead>
                         <TableHead>Khách hàng</TableHead>
                         <TableHead>Cơ sở sân</TableHead>
-                        <TableHead>Chủ sở hữu</TableHead>
                         <TableHead className="text-center">Số tiền</TableHead>
                         <TableHead className="text-center">Phương thức</TableHead>
                         <TableHead className="text-right">Thời gian</TableHead>
@@ -76,7 +72,6 @@ export const AdminRevenueTable = memo(({
                                 <TableCell><Skeleton className="h-6 w-28" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-36" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                                <TableCell><Skeleton className="h-6 w-32" /></TableCell>
                                 <TableCell><Skeleton className="h-6 w-24 mx-auto" /></TableCell>
                                 <TableCell><Skeleton className="h-8 w-20 mx-auto" /></TableCell>
                                 <TableCell className="text-right"><Skeleton className="h-6 w-28 ml-auto" /></TableCell>
@@ -84,7 +79,7 @@ export const AdminRevenueTable = memo(({
                         ))
                     ) : transactions.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8}>
+                            <TableCell colSpan={7}>
                                 <div className="text-center text-neutral-400 text-base py-8 italic flex items-center justify-center gap-2">
                                     <Icon path={mdiPlaylistRemove} size={1} className="flex-shrink-0" />
                                     Không tìm thấy giao dịch doanh thu nào phù hợp với bộ lọc.
@@ -101,9 +96,7 @@ export const AdminRevenueTable = memo(({
                                     className="cursor-default hover:bg-darkBorderV1/50 transition-colors"
                                 >
                                     {/* STT */}
-                                    <TableCell className="text-center">
-                                        {rowNumber}
-                                    </TableCell>
+                                    <TableCell className="text-center">{rowNumber}</TableCell>
 
                                     {/* Mã giao dịch */}
                                     <TableCell>
@@ -115,31 +108,22 @@ export const AdminRevenueTable = memo(({
                                     {/* Khách hàng */}
                                     <TableCell>
                                         <div className="flex flex-col gap-1">
-                                            {
-                                                t.booking?.customerName && <Badge variant="neutral" className="w-fit">{t.booking?.customerName || "Chưa thiết lập"}</Badge>
-                                            }
-                                            {
-                                                t.booking?.customerPhone && (
-                                                    <Badge variant="neutral" className="w-fit">{t.booking?.customerPhone}</Badge>
-                                                )
-                                            }
-
+                                            {t.booking?.customerName && (
+                                                <Badge variant="neutral" className="w-fit">
+                                                    {t.booking.customerName}
+                                                </Badge>
+                                            )}
+                                            {t.booking?.customerPhone && (
+                                                <Badge variant="neutral" className="w-fit">
+                                                    {t.booking.customerPhone}
+                                                </Badge>
+                                            )}
                                         </div>
                                     </TableCell>
 
                                     {/* Cơ sở sân */}
-                                    <TableCell className="min-w-[300px]">
-                                        <span className="text-accent">{t.venue?.name || "Chưa thiết lập"}</span>
-                                    </TableCell>
-
-                                    {/* Chủ sở hữu */}
                                     <TableCell>
-                                        <div className="flex flex-col gap-1">
-                                            <Badge variant="neutral" className="w-fit">{t.owner?.fullName || "Chưa thiết lập"}</Badge>
-                                            {t.owner?.email && (
-                                                <Badge variant="neutral">{t.owner.email}</Badge>
-                                            )}
-                                        </div>
+                                        <span className="text-accent">{t.venue?.name || "Chưa thiết lập"}</span>
                                     </TableCell>
 
                                     {/* Số tiền */}
@@ -159,7 +143,7 @@ export const AdminRevenueTable = memo(({
 
                                     {/* Thời gian */}
                                     <TableCell className="text-right">
-                                        <Badge variant="neutral">
+                                        <Badge variant="neutral" className="font-mono text-xs">
                                             {new Date(t.createdAt).toLocaleString("vi-VN", {
                                                 year: "numeric",
                                                 month: "2-digit",
@@ -179,4 +163,4 @@ export const AdminRevenueTable = memo(({
     );
 });
 
-AdminRevenueTable.displayName = "AdminRevenueTable";
+OwnerRevenueTable.displayName = "OwnerRevenueTable";

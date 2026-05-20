@@ -48,7 +48,7 @@ interface ManualBookingDialogProps {
 }
 
 interface IFormManualBookingRequest extends IManualBookingRequest {
-    paymentMethod: "CASH" | "VNPAY" | "MOMO";
+    paymentMethod: "CASH" | "VNPAY";
 }
 
 export const ManualBookingDialog = ({
@@ -152,7 +152,7 @@ export const ManualBookingDialog = ({
                 toast.success("Tạo đơn đặt sân thành công");
                 const bookingId = res?.data?._id;
 
-                if ((data.paymentMethod === "VNPAY" || data.paymentMethod === "MOMO") && bookingId) {
+                if ((data.paymentMethod === "VNPAY") && bookingId) {
                     toast.info("Đang kết nối đến cổng thanh toán...");
                     createPaymentUrl({ bookingId, method: data.paymentMethod }, {
                         onSuccess: (paymentRes: any) => {
@@ -386,7 +386,6 @@ export const ManualBookingDialog = ({
                                                 <SelectContent className="bg-darkCardV1 border-darkBorderV1">
                                                     <SelectItem value="CASH">💵 Tiền mặt (Tại sân)</SelectItem>
                                                     <SelectItem value="VNPAY">💳 Chuyển khoản qua VNPay</SelectItem>
-                                                    <SelectItem value="MOMO">📱 Ví điện tử Momo</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />

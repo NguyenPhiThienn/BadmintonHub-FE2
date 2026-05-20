@@ -421,7 +421,7 @@ const SuccessContent = () => {
                     Đơn đặt sân đang được giữ chỗ
                   </Badge>
                 ) : booking.status === 'COMPLETED' ? (
-                  <Badge variant="neutral" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                  <Badge variant="neutral">
                     <Icon path={mdiCheckCircle} size={0.6} />
                     Đơn đặt sân đã hoàn tất
                   </Badge>
@@ -438,12 +438,12 @@ const SuccessContent = () => {
                 )}
 
                 {booking.payment?.method === 'VNPAY' ? (
-                  <Badge variant="neutral" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+                  <Badge variant="neutral">
                     <Icon path={mdiCreditCardOutline} size={0.6} />
                     Thanh toán bằng VNPay
                   </Badge>
                 ) : (
-                  <Badge variant="neutral" className="bg-orange-500/10 text-orange-400 border-orange-500/20">
+                  <Badge variant="neutral">
                     <Icon path={mdiCash} size={0.6} />
                     Thanh toán bằng tiền mặt
                   </Badge>
@@ -483,7 +483,7 @@ const SuccessContent = () => {
                     {booking.customerPhone || booking.playerId?.phone || "Chưa thiết lập số điện thoại"}
                   </Badge>
                   {booking.isWeekly && (
-                    <Badge variant="neutral" className="bg-accent/10 text-accent border-accent/20">
+                    <Badge variant="green">
                       <Icon path={mdiCheckCircle} size={0.6} />
                       Đặt sân cố định hàng tuần
                     </Badge>

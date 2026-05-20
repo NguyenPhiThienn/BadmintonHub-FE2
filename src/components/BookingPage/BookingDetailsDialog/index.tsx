@@ -134,7 +134,7 @@ export const BookingDetailsDialog = ({
                                         </div>
                                     </TableCell>
                                     <TableCell colSpan={3}>
-                                        <Badge variant="neutral" className="max-w-xs truncate">{customerEmail}</Badge>
+                                        <Badge variant="neutral">{customerEmail}</Badge>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>

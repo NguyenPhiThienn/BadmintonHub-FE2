@@ -9,4 +9,14 @@ export const ownerApi = {
 
   getPredictRevenue: (params?: { venueId?: string }) =>
     sendGet("/dashboard/predict-revenue", params),
+
+  getOwnerRevenueReport: (params?: {
+    page?: number;
+    limit?: number;
+    venueId?: string;
+    method?: string;
+    startDate?: string;
+    endDate?: string;
+  }) =>
+    sendGet("/dashboard/revenue-report", params),
 };

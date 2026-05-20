@@ -40,6 +40,12 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
         icon: mdiAccountMultipleOutline,
       },
       {
+        id: "owner-revenue",
+        name: "Quản lý doanh thu",
+        path: "/owner/revenue",
+        icon: mdiFinance,
+      },
+      {
         id: "owner-profile",
         name: "Quản lý trang cá nhân",
         path: "/owner/profile",
@@ -47,6 +53,7 @@ export const getDashboardMenuItems = (permissions: string[] = [], role?: string)
       },
     ];
   }
+
 
   const allItems: MenuItem[] = [
     {

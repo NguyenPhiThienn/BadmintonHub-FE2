@@ -78,7 +78,7 @@ export interface IVoucherCheckResponse {
 
 export interface IPaymentRequest {
   bookingId: string;
-  method: "VNPAY" | "MOMO" | "CASH";
+  method: "VNPAY" | "CASH";
 }
 
 export interface IPaymentResponse {

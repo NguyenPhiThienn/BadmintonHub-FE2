@@ -19,8 +19,7 @@ import {
     mdiFilterOutline,
     mdiFinance,
     mdiMagnify,
-    mdiRefresh,
-    mdiWallet
+    mdiRefresh
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -207,12 +206,9 @@ export default function AdminRevenuePage() {
         count: 0,
         cashRevenue: 0,
         vnpayRevenue: 0,
-        momoRevenue: 0
     };
-    // Normalize cash revenue: backend might use cashRevenue, cashTotal, or CASH key
     const cashRevenue = stats.cashRevenue ?? stats.cashTotal ?? stats.CASH ?? 0;
     const vnpayRevenue = stats.vnpayRevenue ?? stats.vnpayTotal ?? stats.VNPAY ?? 0;
-    const momoRevenue = stats.momoRevenue ?? stats.momoTotal ?? stats.MOMO ?? 0;
     const pagination = reportData.pagination || {
         total: 0,
         totalPages: 1
@@ -287,7 +283,6 @@ export default function AdminRevenuePage() {
                                     <SelectItem value="all">Tất cả phương thức</SelectItem>
                                     <SelectItem value="CASH">Tiền mặt</SelectItem>
                                     <SelectItem value="VNPAY">VNPay</SelectItem>
-                                    <SelectItem value="MOMO">Ví MoMo</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -391,22 +386,6 @@ export default function AdminRevenuePage() {
                                 </div>
                                 <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
                                     <Icon path={mdiCreditCardOutline} size={1} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-
-                    {/* Card 4: MoMo */}
-                    <motion.div whileHover={{ y: -4 }} className="h-full">
-                        <Card className="bg-gradient-to-br from-pink-500/5 to-transparent bg-darkCardV1/40 border-darkBorderV1 hover:border-pink-500/40 transition-all h-full">
-                            <CardContent className="p-4 flex items-center justify-between">
-                                <div className="space-y-1">
-                                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu Ví MoMo</p>
-                                    <h3 className="text-xl font-bold text-pink-400">{(momoRevenue).toLocaleString()} đ</h3>
-                                    <p className="text-xs text-neutral-400 italic">Cổng thanh toán MoMo</p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400">
-                                    <Icon path={mdiWallet} size={1} />
                                 </div>
                             </CardContent>
                         </Card>

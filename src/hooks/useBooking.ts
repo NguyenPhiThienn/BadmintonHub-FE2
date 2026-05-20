@@ -67,7 +67,7 @@ export const useCheckVoucher = () => {
 
 export const useCreatePaymentUrl = () => {
   return useMutation({
-    mutationFn: (data: { bookingId: string; method: "VNPAY" | "MOMO" | "CASH" }) =>
+    mutationFn: (data: { bookingId: string; method: "VNPAY" | "CASH" }) =>
       paymentApi.createPaymentUrl(data),
   });
 };

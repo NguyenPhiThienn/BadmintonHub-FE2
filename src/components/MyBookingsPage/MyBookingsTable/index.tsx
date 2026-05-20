@@ -120,7 +120,7 @@ export const MyBookingsTable = memo(({
                                     <TableCell className="w-[145px]">
                                         <div className="flex flex-col gap-1 items-stretch justify-center w-[125px] mx-auto">
                                             {booking.details.map((d, i) => (
-                                                <Badge key={i} variant="neutral" className="justify-center w-full text-center whitespace-nowrap">
+                                                <Badge key={i} variant="neutral">
                                                     {d.startTime}-{d.endTime}
                                                 </Badge>
                                             ))}
