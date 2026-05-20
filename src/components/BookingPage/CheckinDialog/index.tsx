@@ -19,28 +19,24 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useBookingDetails, useUpdateBookingStatus } from "@/hooks/useBooking";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus } from "@/interface/booking";
 import { formatDateWithTime } from "@/lib/format";
 import {
     mdiAccountOutline,
+    mdiAlertCircleOutline,
+    mdiCalendarCheck,
     mdiCalendarClock,
     mdiCashMultiple,
-    mdiCheck,
     mdiClose,
     mdiEmailOutline,
-    mdiInformationOutline,
     mdiMagnify,
-    mdiMapMarkerOutline,
     mdiPhoneOutline,
     mdiQrcodeScan,
-    mdiStoreOutline,
-    mdiAlertCircleOutline,
     mdiSoccerField,
-    mdiCalendarCheck,
-    mdiClockStart
+    mdiStoreOutline
 } from "@mdi/js";
 import Icon from "@mdi/react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 interface CheckinDialogProps {
@@ -141,35 +137,35 @@ export const CheckinDialog = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent size="large" className="bg-darkCardV1 border-darkBorderV1 text-neutral-200">
+            <DialogContent size="medium">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2 text-accent text-xl">
-                        <Icon path={mdiQrcodeScan} size={1} />
+                    <DialogTitle className="flex items-center gap-2 text-accent">
+                        <Icon path={mdiQrcodeScan} size={0.8} />
                         <span>Check-in Khách Chơi Nhanh</span>
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar p-1">
+                <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
                     {/* Search Panel */}
-                    <div className="bg-accent/5 p-4 rounded-xl border border-accent/20 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-                        <div className="relative flex-1">
+                    <div className="bg-accent/5 p-4 rounded-xl border border-accent/20 flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+                        <div className="relative flex-1 min-w-[300px]">
                             <Input
                                 ref={inputRef}
                                 placeholder="Nhập mã đơn hàng (ID) hoặc quét mã QR check-in..."
                                 value={searchVal}
                                 onChange={(e) => setSearchVal(e.target.value)}
                                 onKeyDown={handleKeyPress}
-                                className="pl-10 py-3 bg-darkBackgroundV1/50 border-darkBorderV1 focus:border-accent text-neutral-100 placeholder-neutral-500 rounded-lg text-sm w-full"
+                                className="pl-8 py-2 w-full"
                             />
-                            <Icon path={mdiQrcodeScan} size={0.8} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" />
+                            <Icon path={mdiQrcodeScan} size={0.8} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-300" />
                         </div>
                         <Button
                             onClick={handleSearch}
                             disabled={isLoading}
-                            className="bg-accent hover:bg-accent/90 text-black font-semibold flex items-center justify-center gap-2 px-6 rounded-lg py-3"
+                            variant="accent"
                         >
                             <Icon path={mdiMagnify} size={0.8} />
-                            <span>Kiểm tra đơn</span>
+                            Kiểm tra đơn
                         </Button>
                     </div>
 
@@ -207,10 +203,9 @@ export const CheckinDialog = ({
                                         <Button
                                             onClick={() => handleUpdateStatus("COMPLETED")}
                                             disabled={isUpdating}
-                                            className="bg-green-500 hover:bg-green-600 text-black font-bold flex items-center gap-1.5 px-4 py-2 rounded-lg"
                                         >
-                                            <Icon path={mdiCalendarCheck} size={0.7} />
-                                            <span>Nhận sân</span>
+                                            <Icon path={mdiCalendarCheck} size={0.8} />
+                                            Nhận sân
                                         </Button>
                                     ) : (
                                         <div className="text-xs text-neutral-400 italic">
@@ -222,8 +217,11 @@ export const CheckinDialog = ({
 
                             {/* Details Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Card className="p-4 border-darkBorderV1 bg-darkBackgroundV1/20 space-y-3">
-                                    <h3 className="text-sm font-bold text-accent uppercase tracking-wider border-b border-darkBorderV1 pb-2">Thông tin khách hàng</h3>
+                                <Card className="p-4 border-darkBorderV1 bg-darkBackgroundV1/20 space-y-4">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin khách hàng</h3>
+                                        <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                                    </div>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex items-center gap-2">
                                             <Icon path={mdiAccountOutline} size={0.6} className="text-neutral-400" />
@@ -243,8 +241,11 @@ export const CheckinDialog = ({
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 border-darkBorderV1 bg-darkBackgroundV1/20 space-y-3">
-                                    <h3 className="text-sm font-bold text-accent uppercase tracking-wider border-b border-darkBorderV1 pb-2">Thông tin sân đấu</h3>
+                                <Card className="p-4 border-darkBorderV1 bg-darkBackgroundV1/20 space-y-4">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <h3 className="text-accent font-semibold whitespace-nowrap">Thông tin sân đấu</h3>
+                                        <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                                    </div>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex items-center gap-2">
                                             <Icon path={mdiStoreOutline} size={0.6} className="text-neutral-400" />
@@ -274,7 +275,7 @@ export const CheckinDialog = ({
                             {/* Courts details table */}
                             <Card className="p-0 overflow-hidden border border-darkBorderV1 bg-transparent">
                                 <Table>
-                                    <TableHeader className="bg-darkBackgroundV1/50">
+                                    <TableHeader>
                                         <TableRow>
                                             <TableHead className="w-12 text-center">STT</TableHead>
                                             <TableHead>Tên sân</TableHead>
@@ -323,7 +324,7 @@ export const CheckinDialog = ({
                                         )}
                                         <div className="border-t border-dashed border-accent/30 pt-2 flex justify-between items-center">
                                             <div className="flex items-center gap-1 text-accent font-semibold">
-                                                <Icon path={mdiCashMultiple} size={0.7} />
+                                                <Icon path={mdiCashMultiple} size={0.8} />
                                                 <span className="text-xs uppercase tracking-wider font-bold">Tổng cộng</span>
                                             </div>
                                             <span className="text-base font-bold text-accent">
@@ -337,10 +338,10 @@ export const CheckinDialog = ({
                     )}
                 </div>
 
-                <DialogFooter className="border-t border-darkBorderV1 pt-4">
-                    <Button variant="outline" onClick={onClose} className="gap-2 border-darkBorderV1 text-neutral-300 hover:bg-darkBackgroundV1/50">
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
                         <Icon path={mdiClose} size={0.8} />
-                        <span>Đóng</span>
+                        Đóng
                     </Button>
                 </DialogFooter>
             </DialogContent>

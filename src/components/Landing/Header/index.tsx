@@ -17,7 +17,7 @@ import { mdiAccountOutline, mdiCalendarMonthOutline, mdiClose, mdiHomeOutline, m
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const navLinks = [
     { label: "Trang chủ", href: "/", icon: mdiHomeOutline },
@@ -136,7 +136,7 @@ export function Header() {
                                         <DropdownMenuItem asChild>
                                             <Link href="/owner" className="cursor-pointer text-accent font-semibold">
                                                 <Icon path={mdiStorefrontOutline} size={0.8} />
-                                                <span>Kênh chủ sân</span>
+                                                <span>Trang chủ sân</span>
                                             </Link>
                                         </DropdownMenuItem>
                                     </>
@@ -146,7 +146,7 @@ export function Header() {
                                         <DropdownMenuItem asChild>
                                             <Link href="/admin" className="cursor-pointer text-accent font-semibold">
                                                 <Icon path={mdiStorefrontOutline} size={0.8} />
-                                                <span>Kênh quản trị</span>
+                                                <span>Trang quản trị</span>
                                             </Link>
                                         </DropdownMenuItem>
                                     </>

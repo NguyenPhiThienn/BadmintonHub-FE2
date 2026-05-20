@@ -1,33 +1,33 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAdminRevenueReport } from "@/hooks/useAdmin";
 import { useUsers } from "@/hooks/useUsers";
 import { useAdminVenues } from "@/hooks/useVenue";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Pagination } from "@/components/ui/pagination";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
-import Icon from "@mdi/react";
 import {
-    mdiFinance,
-    mdiCash,
-    mdiCreditCardOutline,
-    mdiWallet,
-    mdiLoading,
-    mdiRefresh,
-    mdiFilterOutline,
     mdiCalendarRange,
+    mdiCash,
+    mdiCheck,
     mdiChevronDown,
+    mdiCreditCardOutline,
+    mdiFilterOutline,
+    mdiFinance,
+    mdiLoading,
     mdiMagnify,
-    mdiCheck
+    mdiRefresh,
+    mdiWallet
 } from "@mdi/js";
+import Icon from "@mdi/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 const SearchableSelect = ({
     value,
@@ -77,7 +77,7 @@ const SearchableSelect = ({
                 className={`flex h-10 w-full items-center justify-between rounded-md border bg-[#0d1e21] px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-all duration-300 ${isOpen ? "border-accent ring-1 ring-accent/30 shadow-[0_0_10px_rgba(0,255,136,0.15)]" : "border-darkBorderV1 hover:border-accent/40"}`}
             >
                 <span className="truncate pr-2">{displayValue}</span>
-                <Icon path={mdiChevronDown} size={0.7} className={`text-neutral-400 shrink-0 transition-transform duration-300 ${isOpen ? "transform rotate-180 text-accent" : ""}`} />
+                <Icon path={mdiChevronDown} size={0.8} className={`text-neutral-400 shrink-0 transition-transform duration-300 ${isOpen ? "transform rotate-180 text-accent" : ""}`} />
             </button>
 
             <AnimatePresence>
@@ -100,7 +100,7 @@ const SearchableSelect = ({
                                 className="flex h-6 w-full rounded-md bg-transparent text-sm text-neutral-200 outline-none placeholder:text-neutral-500"
                             />
                         </div>
-                        
+
                         {/* Options List */}
                         <div className="max-h-[220px] overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-accent/20 scrollbar-track-transparent">
                             <button
@@ -167,7 +167,7 @@ export default function AdminRevenuePage() {
         ? venues.filter((venue: any) => {
             const venueOwnerId = typeof venue.ownerId === 'object' ? venue.ownerId?._id : venue.ownerId;
             return venueOwnerId === ownerId;
-          })
+        })
         : venues;
 
     const venueOptions = filteredVenues.map((venue: any) => ({
@@ -268,7 +268,7 @@ export default function AdminRevenuePage() {
                 {/* Filters Panel */}
                 <div className="bg-darkBackgroundV1/50 border border-darkBorderV1 rounded-xl p-4 md:p-5 space-y-4">
                     <div className="flex items-center gap-2 text-accent font-medium">
-                        <Icon path={mdiFilterOutline} size={0.7} />
+                        <Icon path={mdiFilterOutline} size={0.8} />
                         <span>Bộ lọc tìm kiếm nâng cao</span>
                     </div>
 
@@ -323,7 +323,7 @@ export default function AdminRevenuePage() {
                                     onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
                                     className="bg-darkCardV1 border-darkBorderV1 w-full pl-9 pr-3 text-neutral-300"
                                 />
-                                <Icon path={mdiCalendarRange} size={0.7} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                                <Icon path={mdiCalendarRange} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
                             </div>
                         </div>
 
@@ -337,7 +337,7 @@ export default function AdminRevenuePage() {
                                     onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
                                     className="bg-darkCardV1 border-darkBorderV1 w-full pl-9 pr-3 text-neutral-300"
                                 />
-                                <Icon path={mdiCalendarRange} size={0.7} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+                                <Icon path={mdiCalendarRange} size={0.8} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
                             </div>
                         </div>
                     </div>
