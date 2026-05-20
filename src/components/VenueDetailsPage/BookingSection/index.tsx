@@ -47,14 +47,16 @@ const CourtTimeGrid = ({
   currentPrice,
   selectedSlots,
   onToggle,
-  userId
+  userId,
+  selectedDate
 }: {
   court: ICourt,
   courtAvailability?: IAvailability,
   currentPrice: number,
   selectedSlots: { courtId: string, time: string }[],
   onToggle: (time: string, price: number) => void,
-  userId: string
+  userId: string,
+  selectedDate: Date
 }) => {
   const slots = courtAvailability?.slots || [];
 
@@ -68,20 +70,29 @@ const CourtTimeGrid = ({
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 gap-4">
         {slots.map((slot: ISlot) => {
           const isBooked = slot.status !== "AVAILABLE" && !(slot.status === "LOCKED" && slot.userId === userId);
+          const isToday = isSameDay(selectedDate, new Date());
+          let isPast = false;
+          if (isToday) {
+            const [hours, minutes] = slot.startTime.split(':').map(Number);
+            const slotTime = new Date(selectedDate);
+            slotTime.setHours(hours, minutes, 0, 0);
+            isPast = slotTime <= new Date();
+          }
+          const isDisabled = isBooked || isPast;
           const isSelected = selectedSlots.some(s => s.courtId === court._id && s.time === slot.startTime);
 
           return (
             <button
               key={slot.startTime}
-              disabled={isBooked}
+              disabled={isDisabled}
               onClick={() => onToggle(slot.startTime, currentPrice)}
               className={cn(
                 "h-11 rounded-lg text-sm font-medium border-2 transition-all relative overflow-hidden",
-                isBooked
+                isDisabled
                   ? "bg-neutral-900 border-darkBorderV1 text-neutral-700 cursor-not-allowed"
                   : isSelected
                     ? "bg-accent/10 border-accent text-accent"
-                    : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-darkBorderV1"
+                    : "bg-darkCardV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-700"
               )}
             >
               <div className="flex items-center justify-center gap-2">
@@ -92,7 +103,7 @@ const CourtTimeGrid = ({
                   {slot.startTime} - {slot.endTime}
                 </span>
               </div>
-              {isBooked && (
+              {isDisabled && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <div className="w-full h-[1px] bg-neutral-700 rotate-12" />
                 </div>
@@ -139,15 +150,7 @@ export const BookingSection = ({
     onDateChange(recDate);
   };
 
-  const filteredAvailabilityData = availabilityData.map(courtAvail => {
-    const filteredSlots = (courtAvail.slots || []).filter((slot: ISlot) => {
-      const [hours, minutes] = slot.startTime.split(':').map(Number);
-      const slotTime = new Date(selectedDate);
-      slotTime.setHours(hours, minutes, 0, 0);
-      return slotTime > new Date();
-    });
-    return { ...courtAvail, slots: filteredSlots };
-  }).filter(courtAvail => courtAvail.slots.length > 0);
+  const filteredAvailabilityData = availabilityData.filter(courtAvail => (courtAvail.slots || []).length > 0);
 
   return (
     <div className="space-y-4">
@@ -323,6 +326,7 @@ export const BookingSection = ({
                     selectedSlots={selectedSlots}
                     onToggle={(time, price) => onToggleSlot(courtAvail.courtId, time, price)}
                     userId={userId}
+                    selectedDate={selectedDate}
                   />
                 ))}
               </div>
