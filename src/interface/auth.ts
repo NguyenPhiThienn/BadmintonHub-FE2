@@ -1,7 +1,7 @@
 import { IEmployee } from './employee';
 import { IPartner } from './partner';
 
-export type UserRole = 'admin' | 'employee' | 'customer' | 'driver' | 'partner' | 'PLAYER' | 'COURT_OWNER';
+export type UserRole = 'admin' | 'employee' | 'customer' | 'driver' | 'partner' | 'PLAYER' | 'OWNER';
 export type DriverStatus = 'PENDING' | 'APPROVED' | 'LOCKED' | 'REJECTED';
 
 

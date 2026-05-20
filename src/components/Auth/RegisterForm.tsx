@@ -286,7 +286,7 @@ export const RegisterForm = ({ onSwitchLogin, isDialog }: RegisterFormProps) => 
                 <Label htmlFor="player" className="cursor-pointer font-normal text-neutral-300">Người chơi</Label>
               </div>
               <div className="flex items-center space-x-2 cursor-pointer">
-                <RadioGroupItem value="COURT_OWNER" id="owner" />
+                <RadioGroupItem value="OWNER" id="owner" />
                 <Label htmlFor="owner" className="cursor-pointer font-normal text-neutral-300">Chủ sân</Label>
               </div>
             </RadioGroup>

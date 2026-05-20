@@ -13,7 +13,7 @@ import {
 export const getDashboardMenuItems = (permissions: string[] = [], role?: string): MenuItem[] => {
   const userRole = role?.toUpperCase();
 
-  if (userRole === "COURT_OWNER" || userRole === "OWNER") {
+  if (userRole === "OWNER" || userRole === "OWNER") {
     return [
       {
         id: "owner-dashboard",

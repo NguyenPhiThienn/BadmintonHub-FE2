@@ -117,7 +117,7 @@ export const UserTable = memo(({
                                             variant={
                                                 role === 'admin' || role === 'ADMIN'
                                                     ? 'red'
-                                                    : role === 'COURT_OWNER' || role === 'OWNER' || role === 'court_owner' || role === 'owner'
+                                                    : role === 'OWNER' || role === 'OWNER' || role === 'OWNER' || role === 'owner'
                                                         ? 'blue'
                                                         : 'green'
                                             }
@@ -125,7 +125,7 @@ export const UserTable = memo(({
                                             {
                                                 role === 'admin' || role === 'ADMIN'
                                                     ? 'Quản trị viên'
-                                                    : role === 'COURT_OWNER' || role === 'OWNER' || role === 'court_owner' || role === 'owner'
+                                                    : role === 'OWNER' || role === 'OWNER' || role === 'OWNER' || role === 'owner'
                                                         ? 'Chủ sân'
                                                         : 'Người chơi'
                                             }

@@ -151,8 +151,9 @@ export default function AdminRevenuePage() {
     const [endDate, setEndDate] = useState("");
 
     // Load filter data (role should be OWNER in MongoDB)
-    const { data: ownersResponse } = useUsers({ page: 1, limit: 1000, role: "OWNER" });
-    const { data: venuesResponse } = useAdminVenues({ page: 1, limit: 1000 });
+    const { data: ownersResponse } = useUsers({ page: 1, limit: 1000, role: "OWNER" }, { staleTime: 0, refetchOnMount: true });
+    const { data: venuesResponse } = useAdminVenues({ page: 1, limit: 1000 }, { staleTime: 0, refetchOnMount: true });
+
 
     const owners = ownersResponse?.data?.users || [];
     const venues = venuesResponse?.data?.venues || [];
@@ -210,6 +211,10 @@ export default function AdminRevenuePage() {
         vnpayRevenue: 0,
         momoRevenue: 0
     };
+    // Normalize cash revenue: backend might use cashRevenue, cashTotal, or CASH key
+    const cashRevenue = stats.cashRevenue ?? stats.cashTotal ?? stats.CASH ?? 0;
+    const vnpayRevenue = stats.vnpayRevenue ?? stats.vnpayTotal ?? stats.VNPAY ?? 0;
+    const momoRevenue = stats.momoRevenue ?? stats.momoTotal ?? stats.MOMO ?? 0;
     const pagination = reportData.pagination || {
         total: 0,
         totalPages: 1
@@ -367,7 +372,7 @@ export default function AdminRevenuePage() {
                             <CardContent className="p-4 flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu Tiền mặt</p>
-                                    <h3 className="text-xl font-bold text-green-400">{(stats.cashRevenue || 0).toLocaleString()} đ</h3>
+                                    <h3 className="text-xl font-bold text-green-400">{(cashRevenue).toLocaleString()} đ</h3>
                                     <p className="text-xs text-neutral-400 italic">Thanh toán trực tiếp tại quầy</p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400">
@@ -383,7 +388,7 @@ export default function AdminRevenuePage() {
                             <CardContent className="p-4 flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu VNPay</p>
-                                    <h3 className="text-xl font-bold text-blue-400">{(stats.vnpayRevenue || 0).toLocaleString()} đ</h3>
+                                    <h3 className="text-xl font-bold text-blue-400">{(vnpayRevenue).toLocaleString()} đ</h3>
                                     <p className="text-xs text-neutral-400 italic">Thẻ ATM / QR VNPay</p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
@@ -399,7 +404,7 @@ export default function AdminRevenuePage() {
                             <CardContent className="p-4 flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Doanh thu Ví MoMo</p>
-                                    <h3 className="text-xl font-bold text-pink-400">{(stats.momoRevenue || 0).toLocaleString()} đ</h3>
+                                    <h3 className="text-xl font-bold text-pink-400">{(momoRevenue).toLocaleString()} đ</h3>
                                     <p className="text-xs text-neutral-400 italic">Cổng thanh toán MoMo</p>
                                 </div>
                                 <div className="p-3 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400">

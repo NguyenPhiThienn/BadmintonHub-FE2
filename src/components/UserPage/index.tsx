@@ -21,14 +21,14 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useDeleteUser, useUsers } from "@/hooks/useUsers";
-import { IUser, UserRole } from "@/interface/auth";
-import { UserTable } from "./UserTable";
-import { UserDetailsDialog } from "./UserDetailsDialog";
-import { CreateUserDialog } from "./CreateUserDialog";
-import { mdiAccountPlus, mdiAccountPlusOutline, mdiLockReset, mdiMagnify, mdiRefresh } from "@mdi/js";
+import { IUser } from "@/interface/auth";
+import { mdiAccountPlus, mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { CreateUserDialog } from "./CreateUserDialog";
+import { UserDetailsDialog } from "./UserDetailsDialog";
+import { UserTable } from "./UserTable";
 
 export default function UserPage() {
     const [searchQuery, setSearchQuery] = useState("");

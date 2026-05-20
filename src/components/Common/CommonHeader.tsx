@@ -9,7 +9,7 @@ import {
 import { useUser } from "@/context/useUserContext";
 import { useMe } from "@/hooks/useAuth";
 import { useMenuSidebar } from "@/stores/useMenuSidebar";
-import { mdiAccountTie, mdiLogout, mdiHomeOutline, mdiCalendarMonthOutline } from "@mdi/js";
+import { mdiAccountTie, mdiCalendarMonthOutline, mdiHomeOutline, mdiLogout } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { HamburgerMenu } from "iconsax-reactjs";
 import Image from "next/image";
@@ -41,10 +41,10 @@ export default function CommonHeader() {
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex flex-col items-end">
               <span className="text-sm text-neutral-300 font-semibold truncate max-w-[200px]">
-                👋 Xin chào, {profile?.role === "OWNER" || profile?.role === "COURT_OWNER" ? "Chủ sân" : (profile?.employee?.position || "Quản trị viên")}
+                👋 Xin chào, {profile?.role === "OWNER" || profile?.role === "OWNER" ? "Chủ sân" : (profile?.employee?.position || "Quản trị viên")}
               </span>
               <span className="text-xs font-semibold text-accent text-right max-w-[220px] truncate">
-                {profile?.role === "OWNER" ? profile?.fullName : profile?.role === "COURT_OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
+                {profile?.role === "OWNER" ? profile?.fullName : profile?.role === "OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
               </span>
             </div>
 
@@ -66,8 +66,8 @@ export default function CommonHeader() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                
-                {(profile?.role === "OWNER" || profile?.role === "COURT_OWNER" || profile?.role === "ADMIN") && (
+
+                {(profile?.role === "OWNER" || profile?.role === "OWNER" || profile?.role === "ADMIN") && (
                   <>
                     <DropdownMenuItem asChild>
                       <Link href="/" className="cursor-pointer flex items-center gap-2">

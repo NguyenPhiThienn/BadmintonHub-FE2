@@ -23,18 +23,19 @@ import { useUpdateBookingStatus } from "@/hooks/useBooking";
 import { useOwnerBookings } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import { BookingStatus, IBooking } from "@/interface/booking";
-import { mdiMagnify, mdiPlus, mdiRefresh, mdiQrcodeScan } from "@mdi/js";
+import { mdiMagnify, mdiPlus, mdiQrcodeScan, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { BookingDetailsDialog } from "./BookingDetailsDialog";
 import { BookingTable } from "./BookingTable";
-import { ManualBookingDialog } from "./ManualBookingDialog";
 import { CheckinDialog } from "./CheckinDialog";
+import { ManualBookingDialog } from "./ManualBookingDialog";
 
 export default function BookingPage() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [venueFilter, setVenueFilter] = useState<string>("all");
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [currentPage, setCurrentPage] = useState(1);
@@ -46,6 +47,15 @@ export default function BookingPage() {
     const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
 
     const { isMobile, isTablet } = useResponsive();
+
+    // Debounce search query
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+            setCurrentPage(1);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     // Fetch venues for filter
     const { data: venuesRes } = useMyVenues({ limit: 100 });
@@ -61,7 +71,8 @@ export default function BookingPage() {
         page: currentPage,
         limit: pageSize,
         venueId: venueFilter !== "all" ? venueFilter : undefined,
-        status: statusFilter !== "all" ? (statusFilter as BookingStatus) : undefined
+        status: statusFilter !== "all" ? (statusFilter as BookingStatus) : undefined,
+        search: debouncedSearch || undefined,
     });
 
     const { mutate: updateStatus } = useUpdateBookingStatus();

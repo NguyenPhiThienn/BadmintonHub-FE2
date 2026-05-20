@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
+import { useUser } from "@/context/useUserContext";
 import { useBookingDetails } from "@/hooks/useBooking";
 import {
   mdiAccountSupervisorCircle,
@@ -32,14 +33,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useUser } from "@/context/useUserContext";
 
 const SuccessContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = searchParams?.get("bookingId");
   const { user } = useUser();
-  const isOwner = user?.role === "OWNER" || user?.role === "COURT_OWNER";
+  const isOwner = user?.role === "OWNER" || user?.role === "OWNER";
 
   const { data: bookingRes, isLoading, error } = useBookingDetails(bookingId || "");
   const [isDownloading, setIsDownloading] = useState(false);

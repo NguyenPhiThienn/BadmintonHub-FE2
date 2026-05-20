@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
     Select,
     SelectContent,
@@ -18,35 +17,34 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Table,
     TableBody,
     TableCell,
     TableRow,
 } from "@/components/ui/table";
-import { useUserById, useUpdateUser } from "@/hooks/useUsers";
+import { useUpdateUser, useUserById } from "@/hooks/useUsers";
 import { IUser } from "@/interface/auth";
+import { formatDateOnly, formatDateWithTime } from "@/lib/format";
 import {
     mdiAccount,
-    mdiPhone,
-    mdiEmail,
-    mdiCheckCircleOutline,
-    mdiClose,
-    mdiFaceManProfile,
-    mdiCalendarClock,
     mdiAccountEditOutline,
-    mdiContentSaveOutline,
-    mdiClipboardAccount,
-    mdiBarcode,
     mdiCalendar,
-    mdiChevronRight,
+    mdiCalendarClock,
+    mdiCheckCircleOutline,
+    mdiClipboardAccount,
+    mdiClose,
+    mdiContentSaveOutline,
+    mdiEmail,
     mdiEye,
     mdiEyeOff,
-    mdiLoading
+    mdiFaceManProfile,
+    mdiLoading,
+    mdiPhone
 } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useEffect, useState } from "react";
-import { formatDateWithTime, formatDateOnly } from "@/lib/format";
 
 interface UserDetailsDialogProps {
     isOpen: boolean;
@@ -78,12 +76,15 @@ export const UserDetailsDialog = ({
 
     useEffect(() => {
         if (userData) {
+            // Normalize role: backend may store OWNER, but UI uses OWNER
+            const rawRole = userData.role?.toString() || "";
+            const normalizedRole = rawRole === "OWNER" || rawRole === "OWNER" ? "OWNER" : rawRole.toUpperCase();
             setFormData({
                 fullName: userData.fullName || userData.full_name || "",
                 email: userData.email || "",
                 phone: userData.phone || "",
                 password: "",
-                role: userData.role?.toString() || "",
+                role: normalizedRole,
                 status: (userData as any).status || "ACTIVE"
             });
         }
@@ -223,7 +224,7 @@ export const UserDetailsDialog = ({
                                                                 <span className="uppercase">
                                                                     {userData?.role?.toString() === 'ADMIN' || userData?.role?.toString() === 'admin'
                                                                         ? 'Quản trị viên'
-                                                                        : userData?.role?.toString() === 'COURT_OWNER' || userData?.role?.toString() === 'OWNER' || userData?.role?.toString() === 'court_owner' || userData?.role?.toString() === 'owner'
+                                                                        : userData?.role?.toString() === 'OWNER' || userData?.role?.toString() === 'OWNER' || userData?.role?.toString() === 'OWNER' || userData?.role?.toString() === 'owner'
                                                                             ? 'Chủ sân'
                                                                             : 'Người chơi'}
                                                                 </span>

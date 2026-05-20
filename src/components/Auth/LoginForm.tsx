@@ -55,7 +55,7 @@ export const LoginForm = ({ onSwitchRegister, onSwitchForgot, isDialog, onSucces
         const userRole = user?.role?.toUpperCase();
         if (userRole === "ADMIN") {
           router.push("/admin");
-        } else if (userRole === "COURT_OWNER" || userRole === "OWNER") {
+        } else if (userRole === "OWNER" || userRole === "OWNER") {
           router.push("/owner");
         } else {
           router.push("/");

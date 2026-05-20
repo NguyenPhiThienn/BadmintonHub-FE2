@@ -1,11 +1,15 @@
 import { usersApi } from "@/api/users";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-export const useUsers = (params: { page: number; limit: number; role?: string; search?: string; status?: string }) => {
+export const useUsers = (
+  params: { page: number; limit: number; role?: string; search?: string; status?: string },
+  options?: Omit<UseQueryOptions<any, any, any, any>, "queryKey" | "queryFn">
+) => {
   return useQuery({
     queryKey: ["users", params],
     queryFn: () => usersApi.getUsers(params),
+    ...options,
   });
 };
 

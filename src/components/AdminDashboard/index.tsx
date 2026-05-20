@@ -11,6 +11,7 @@ import { Icon } from "@mdi/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { RevenuePredictionDialog } from "@/components/OwnerDashboard/RevenuePredictionDialog";
 
 const StatCard = ({ title, value, subValue, icon, color, isCurrency, unit, delay = 0 }: any) => {
   return (
@@ -292,9 +293,12 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <header>
-        <h1 className="text-3xl font-semibold text-neutral-300">Bảng điều khiển tổng quan</h1>
-        <p className="text-neutral-400 mt-1">Dữ liệu được cập nhật mới nhất theo thời gian thực.</p>
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-semibold text-neutral-300">Bảng điều khiển tổng quan</h1>
+          <p className="text-neutral-400 mt-1">Dữ liệu được cập nhật mới nhất theo thời gian thực.</p>
+        </div>
+        <RevenuePredictionDialog />
       </header>
 
       <div>

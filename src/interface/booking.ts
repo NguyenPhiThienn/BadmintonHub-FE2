@@ -129,4 +129,5 @@ export interface IOwnerBookingQuery {
   limit?: number;
   status?: BookingStatus;
   venueId?: string;
+  search?: string;
 }

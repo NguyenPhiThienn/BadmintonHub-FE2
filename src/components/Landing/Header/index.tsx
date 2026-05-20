@@ -130,7 +130,7 @@ export function Header() {
                                             </Link>
                                         </DropdownMenuItem>
                                     </>
-                                ) : (user.role === "OWNER" || user.role === "COURT_OWNER" || user.role === "owner" || user.role === "court_owner") ? (
+                                ) : (user.role === "OWNER" || user.role === "OWNER" || user.role === "owner" || user.role === "OWNER") ? (
                                     <>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
