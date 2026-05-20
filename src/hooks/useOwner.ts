@@ -40,6 +40,8 @@ export const useOwnerRevenueReport = (params?: {
   method?: string;
   startDate?: string;
   endDate?: string;
+  ownerId?: string;
+
 }) => {
   return useQuery({
     queryKey: ["owner", "revenue-report", params],

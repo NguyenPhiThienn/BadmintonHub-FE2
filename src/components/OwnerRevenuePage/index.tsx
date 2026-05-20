@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
+import { useMe } from "@/hooks/useAuth";
 import { useOwnerRevenueReport } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
 import {
@@ -60,11 +61,12 @@ export default function OwnerRevenuePage() {
         isFirstRender.current = false;
     }, []);
 
-    // Load owner's venues for filter
+    const { data: meRes } = useMe();
+    const ownerId = meRes?.data?.id;
+
     const { data: venuesRes } = useMyVenues({ limit: 200 });
     const venues = venuesRes?.data?.venues || [];
 
-    // Load revenue report
     const {
         data: reportResponse,
         isLoading,
@@ -77,6 +79,7 @@ export default function OwnerRevenuePage() {
         venueId: venueId !== "all" ? venueId : undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
+        ownerId,
     });
 
     const reportData = reportResponse?.data || {};
