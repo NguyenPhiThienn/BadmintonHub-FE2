@@ -356,7 +356,7 @@ export default function OwnerCustomersPage() {
                                                     <div className="flex flex-wrap gap-2">
                                                         {booking.details.map((d: any, idx: number) => (
                                                             <Badge key={idx} variant="neutral">
-                                                                {typeof d.courtId === "object" ? d.courtId.name : "Không rõ"}: {d.bookingDate} ({d.startTime} - {d.endTime})
+                                                                {typeof d.courtId === "object" && d.courtId !== null ? d.courtId.name : "Không rõ"}: {d.bookingDate} ({d.startTime} - {d.endTime})
                                                             </Badge>
                                                         ))}
                                                     </div>
