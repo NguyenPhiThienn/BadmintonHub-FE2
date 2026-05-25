@@ -23,8 +23,10 @@ export class DashboardService {
   ) { }
 
   async getRevenue(ownerId: string, venueId?: string, query?: any): Promise<ApiResponseType> {
-    const filter: any = {};
+    const ownerObjectId = new Types.ObjectId(ownerId);
 
+    // Get venue IDs for this owner
+    let venueFilter: any = { ownerId: ownerObjectId };
     if (venueId) {
       if (!Types.ObjectId.isValid(venueId)) {
         throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
@@ -33,65 +35,51 @@ export class DashboardService {
       if (!venue || venue.ownerId.toString() !== ownerId.toString()) {
         throw new HttpException('Bạn không có quyền xem cơ sở này', HttpStatus.FORBIDDEN);
       }
-      filter.venueId = new Types.ObjectId(venueId);
-    } else {
-      const ownerObjectId = new Types.ObjectId(ownerId);
-      const venues = await this.venueModel.find({ ownerId: ownerObjectId }).exec();
-      const venueIds = venues.map(v => v._id);
-      filter.venueId = { $in: venueIds };
+      venueFilter._id = new Types.ObjectId(venueId);
     }
 
-    // Always calculate from 1st of current month to last day of current month (ignores query dates)
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = now.getUTCMonth();
-    const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
-    const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
-    const dayCount = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
 
-    filter.createdAt = { $gte: startDate, $lte: endDate };
-
-    const revenueData = await this.bookingModel.aggregate([
-      { $match: filter },
-      ...this.getRevenueMatchStage(),
-      {
-        $group: {
-          _id: {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' },
-            day: { $dayOfMonth: '$createdAt' },
-          },
-          totalRevenue: { $sum: '$finalPrice' },
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
-    ]);
-
-    const dataMap = new Map<string, { totalRevenue: number; count: number }>();
-    for (const item of revenueData) {
-      const key = `${item._id.year}-${String(item._id.month).padStart(2, '0')}-${String(item._id.day).padStart(2, '0')}`;
-      dataMap.set(key, { totalRevenue: item.totalRevenue, count: item.count });
+    if (venueIds.length === 0) {
+      return createApiResponse({ summary: { totalRevenue: 0, totalBookings: 0 }, details: [] }, 'Thống kê doanh thu thành công', HttpStatus.OK);
     }
 
-    const details = [];
-    for (let i = 1; i <= dayCount; i++) {
-      const d = new Date(Date.UTC(year, month, i));
-      const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-      const existing = dataMap.get(key);
-      details.push({
-        _id: { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate(), dateStr: key },
-        totalRevenue: existing?.totalRevenue ?? 0,
-        count: existing?.count ?? 0,
-      });
-    }
-
-    const summary = {
-      totalRevenue: details.reduce((acc, curr) => acc + curr.totalRevenue, 0),
-      totalBookings: details.reduce((acc, curr) => acc + curr.count, 0),
+    // Build match filter - lấy tất cả đơn CONFIRMED/COMPLETED
+    const matchFilter: any = {
+      venueId: { $in: venueIds },
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }
     };
 
-    return createApiResponse({ summary, details }, 'Thống kê doanh thu thành công', HttpStatus.OK);
+    // Chỉ lọc theo ngày nếu có truyền startDate và endDate
+    if (query?.startDate && query?.endDate) {
+      const startDateFilter = new Date(query.startDate);
+      const endDateFilter = new Date(query.endDate);
+      startDateFilter.setHours(0, 0, 0, 0);
+      endDateFilter.setHours(23, 59, 59, 999);
+      matchFilter.createdAt = { $gte: startDateFilter, $lte: endDateFilter };
+    }
+
+    // Lấy tổng doanh thu từ bookings CONFIRMED hoặc COMPLETED
+    const revenueData = await this.bookingModel.aggregate([
+      {
+        $match: matchFilter
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$finalPrice' },
+          totalBookings: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const summary = {
+      totalRevenue: revenueData[0]?.totalRevenue || 0,
+      totalBookings: revenueData[0]?.totalBookings || 0
+    };
+
+    return createApiResponse({ summary, details: [] }, 'Thống kê doanh thu thành công', HttpStatus.OK);
   }
 
   async getBookingStats(ownerId: string, venueId?: string, query?: any): Promise<ApiResponseType> {
@@ -532,47 +520,48 @@ export class DashboardService {
     const limit = Number(query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const filter: any = {};
+    // Build match filter - lấy bookings CONFIRMED hoặc COMPLETED
+    const matchFilter: any = {
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }
+    };
 
-    // 1. Payment status should be SUCCESS or PAID
-    filter.status = { $in: ['SUCCESS', 'PAID'] };
-
-    // Default to current month if no date range provided
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = now.getUTCMonth();
-    const defaultStart = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
-    const defaultEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
-
-    if (query.startDate || query.endDate) {
-      filter.createdAt = {};
-      if (query.startDate) filter.createdAt.$gte = new Date(query.startDate);
-      if (query.endDate) filter.createdAt.$lte = new Date(query.endDate);
-    } else {
-      filter.createdAt = { $gte: defaultStart, $lte: defaultEnd };
+    // Chỉ lọc theo ngày nếu có truyền startDate và endDate
+    if (query.startDate && query.endDate) {
+      const startDate = new Date(query.startDate);
+      const endDate = new Date(query.endDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      matchFilter.createdAt = { $gte: startDate, $lte: endDate };
     }
 
-    if (query.method && query.method !== 'all') {
-      filter.method = query.method.toUpperCase();
-    }
-
+    // Lấy bookings trực tiếp với status CONFIRMED hoặc COMPLETED
     const pipeline: any[] = [
-      { $match: filter },
-      // Lookup booking
+      { $match: matchFilter },
+      // Lookup venue
       {
         $lookup: {
-          from: 'bookings',
-          localField: 'bookingId',
+          from: 'venues',
+          localField: 'venueId',
           foreignField: '_id',
-          as: 'booking',
+          as: 'venue',
         },
       },
-      { $unwind: '$booking' },
+      { $unwind: { path: '$venue', preserveNullAndEmptyArrays: true } },
+      // Lookup owner
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'venue.ownerId',
+          foreignField: '_id',
+          as: 'owner',
+        },
+      },
+      { $unwind: { path: '$owner', preserveNullAndEmptyArrays: true } },
       // Lookup player (user who booked)
       {
         $lookup: {
           from: 'users',
-          localField: 'booking.playerId',
+          localField: 'playerId',
           foreignField: '_id',
           as: 'player',
         },
@@ -583,26 +572,15 @@ export class DashboardService {
           preserveNullAndEmptyArrays: true,
         },
       },
-      // Lookup venue
+      // Lookup payment để lấy phương thức thanh toán
       {
         $lookup: {
-          from: 'venues',
-          localField: 'booking.venueId',
-          foreignField: '_id',
-          as: 'venue',
+          from: 'payments',
+          localField: '_id',
+          foreignField: 'bookingId',
+          as: 'paymentInfo',
         },
       },
-      { $unwind: '$venue' },
-      // Lookup owner
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'venue.ownerId',
-          foreignField: '_id',
-          as: 'owner',
-        },
-      },
-      { $unwind: '$owner' },
     ];
 
     // Filter by venueId
@@ -619,27 +597,39 @@ export class DashboardService {
       });
     }
 
-    // Now clone the pipeline for total count and total amount stats before pagination
+    // Stats pipeline - tính tổng từ booking.finalPrice theo phương thức thanh toán
     const statsPipeline = [
       ...pipeline,
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$amount' },
+          totalRevenue: { $sum: '$finalPrice' },
           count: { $sum: 1 },
           cashRevenue: {
             $sum: {
-              $cond: [{ $eq: ['$method', 'CASH'] }, '$amount', 0]
+              $cond: [
+                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'CASH'] },
+                '$finalPrice',
+                0
+              ]
             }
           },
           vnpayRevenue: {
             $sum: {
-              $cond: [{ $eq: ['$method', 'VNPAY'] }, '$amount', 0]
+              $cond: [
+                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'VNPAY'] },
+                '$finalPrice',
+                0
+              ]
             }
           },
           momoRevenue: {
             $sum: {
-              $cond: [{ $eq: ['$method', 'MOMO'] }, '$amount', 0]
+              $cond: [
+                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'MOMO'] },
+                '$finalPrice',
+                0
+              ]
             }
           }
         }
@@ -655,16 +645,14 @@ export class DashboardService {
       {
         $project: {
           _id: 1,
-          amount: 1,
-          method: 1,
-          status: 1,
+          amount: '$finalPrice',
+          method: { $arrayElemAt: ['$paymentInfo.method', 0] },
+          transaction_id: { $arrayElemAt: ['$paymentInfo.transactionId', 0] },
           createdAt: 1,
-          transaction_id: '$transactionId',
-          booking: {
-            _id: '$booking._id',
-            customerName: { $ifNull: ['$booking.customerName', '$player.fullName'] },
-            customerPhone: { $ifNull: ['$booking.customerPhone', '$player.phone'] }
-          },
+          status: 1,
+          finalPrice: 1,
+          customerName: { $ifNull: ['$customerName', '$player.fullName'] },
+          customerPhone: { $ifNull: ['$customerPhone', '$player.phone'] },
           venue: {
             _id: '$venue._id',
             name: '$venue.name'
@@ -678,9 +666,9 @@ export class DashboardService {
       }
     ];
 
-    const [transactions, statsResult] = await Promise.all([
-      this.paymentModel.aggregate(dataPipeline).exec(),
-      this.paymentModel.aggregate(statsPipeline).exec()
+    const [bookings, statsResult] = await Promise.all([
+      this.bookingModel.aggregate(dataPipeline).exec(),
+      this.bookingModel.aggregate(statsPipeline).exec()
     ]);
 
     const stats = statsResult[0] || {
@@ -690,6 +678,23 @@ export class DashboardService {
       vnpayRevenue: 0,
       momoRevenue: 0
     };
+
+    // Map lại data để tương thích với frontend
+    const transactions = bookings.map((b: any) => ({
+      _id: b._id,
+      amount: b.amount,
+      method: b.method || 'CASH',
+      transaction_id: b.transaction_id,
+      createdAt: b.createdAt,
+      status: b.status,
+      booking: {
+        _id: b._id,
+        customerName: b.customerName,
+        customerPhone: b.customerPhone
+      },
+      venue: b.venue,
+      owner: b.owner
+    }));
 
     return createApiResponse({
       transactions,
@@ -704,98 +709,83 @@ export class DashboardService {
   }
 
   async getOwnerRevenueChart(ownerId: string, query: any): Promise<ApiResponseType> {
-    const filter: any = {
-      status: { $in: ['SUCCESS', 'PAID'] }
-    };
+    const ownerObjectId = new Types.ObjectId(ownerId);
 
-    const startDate = query.startDate ? new Date(query.startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const endDate = query.endDate ? new Date(query.endDate) : new Date();
-    
-    // Normalize dates to start/end of day
-    startDate.setUTCHours(0, 0, 0, 0);
-    endDate.setUTCHours(23, 59, 59, 999);
+    // Get venue IDs for this owner
+    let venueFilter: any = { ownerId: ownerObjectId };
+    if (query.venueId && query.venueId !== 'all') {
+      venueFilter._id = new Types.ObjectId(query.venueId);
+    }
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
 
-    filter.createdAt = { $gte: startDate, $lte: endDate };
-
-    if (query.method && query.method !== 'all') {
-      filter.method = query.method.toUpperCase();
+    if (venueIds.length === 0) {
+      return createApiResponse([], 'Lấy dữ liệu biểu đồ doanh thu thành công', HttpStatus.OK);
     }
 
-    const pipeline: any[] = [
-      { $match: filter },
-      // Lookup booking
+    // Build date filter - mặc định 30 ngày nếu không có
+    let startDate: Date;
+    let endDate: Date;
+
+    if (query.startDate && query.endDate) {
+      startDate = new Date(query.startDate);
+      endDate = new Date(query.endDate);
+    } else {
+      endDate = new Date();
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+    }
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    // Lấy bookings CONFIRMED hoặc COMPLETED
+    const bookings = await this.bookingModel.find({
+      venueId: { $in: venueIds },
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }
+    }).select('_id').exec();
+
+    const bookingIds = bookings.map(b => b._id);
+
+    if (bookingIds.length === 0) {
+      return createApiResponse([], 'Lấy dữ liệu biểu đồ doanh thu thành công', HttpStatus.OK);
+    }
+
+    // Lấy booking details để group theo ngày đặt sân (bookingDate)
+    const chartData = await this.bookingDetailModel.aggregate([
+      {
+        $match: {
+          bookingId: { $in: bookingIds },
+          bookingDate: { $gte: startDate, $lte: endDate }
+        }
+      },
       {
         $lookup: {
           from: 'bookings',
           localField: 'bookingId',
           foreignField: '_id',
-          as: 'booking',
-        },
+          as: 'booking'
+        }
       },
       { $unwind: '$booking' },
-      // Lookup venue
-      {
-        $lookup: {
-          from: 'venues',
-          localField: 'booking.venueId',
-          foreignField: '_id',
-          as: 'venue',
-        },
-      },
-      { $unwind: '$venue' },
-    ];
-
-    const ownerObjectId = new Types.ObjectId(ownerId);
-    if (query.venueId && query.venueId !== 'all') {
-      pipeline.push({
-        $match: {
-          'venue._id': new Types.ObjectId(query.venueId),
-          'venue.ownerId': ownerObjectId
-        }
-      });
-    } else {
-      pipeline.push({
-        $match: {
-          'venue.ownerId': ownerObjectId
-        }
-      });
-    }
-
-    pipeline.push(
       {
         $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          totalRevenue: { $sum: '$amount' },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$bookingDate' } },
+          revenue: { $sum: '$price' },
           count: { $sum: 1 }
         }
       },
-      { $sort: { '_id': 1 } }
-    );
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          date: '$_id',
+          revenue: '$revenue',
+          count: '$count',
+          _id: 0
+        }
+      }
+    ]);
 
-    const chartData = await this.paymentModel.aggregate(pipeline).exec();
-
-    // Map existing data by YYYY-MM-DD
-    const dataMap = new Map<string, { totalRevenue: number; count: number }>();
-    for (const item of chartData) {
-      dataMap.set(item._id, { totalRevenue: item.totalRevenue, count: item.count });
-    }
-
-    // Fill in dates
-    const filledData = [];
-    const currDate = new Date(startDate);
-    
-    while (currDate <= endDate) {
-      const dateStr = `${currDate.getUTCFullYear()}-${String(currDate.getUTCMonth() + 1).padStart(2, '0')}-${String(currDate.getUTCDate()).padStart(2, '0')}`;
-      const existing = dataMap.get(dateStr);
-      filledData.push({
-        date: dateStr,
-        revenue: existing?.totalRevenue ?? 0,
-        count: existing?.count ?? 0
-      });
-      currDate.setUTCDate(currDate.getUTCDate() + 1);
-    }
-
-    return createApiResponse(filledData, 'Lấy dữ liệu biểu đồ doanh thu thành công', HttpStatus.OK);
+    return createApiResponse(chartData, 'Lấy dữ liệu biểu đồ doanh thu thành công', HttpStatus.OK);
   }
 
   private getRevenueMatchStage(): any[] {
