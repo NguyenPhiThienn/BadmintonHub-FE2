@@ -14,6 +14,7 @@ import { Promotion, PromotionDocument } from '../promotions/schemas/promotion.sc
 import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
+import { SlotLock, SlotLockDocument } from '../availability/schemas/slot-lock.schema';
 import { ApplyCouponDto, CreateBookingDto, UpdateBookingStatusDto } from './dto/booking.dto';
 import { BookingDetail, BookingDetailDocument } from './schemas/booking-detail.schema';
 import { Booking, BookingDocument, BookingStatus } from './schemas/booking.schema';
@@ -31,6 +32,7 @@ export class BookingsService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     @InjectModel(Coupon.name) private couponModel: Model<CouponDocument>,
+    @InjectModel(SlotLock.name) private slotLockModel: Model<SlotLockDocument>,
     private mailService: MailService,
     private notificationsService: NotificationsService,
   ) { }
@@ -41,6 +43,14 @@ export class BookingsService {
       throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
     }
 
+    const venue = await this.venueModel.findById(venueId);
+    if (!venue) {
+      throw new HttpException('Cơ sở không tồn tại', HttpStatus.NOT_FOUND);
+    }
+
+    const admins = await this.userModel.find({ role: 'ADMIN' }).select('_id').exec();
+    const adminIds = admins.map(a => a._id);
+
     const now = new Date();
 
     const coupons = await this.couponModel.find({
@@ -49,7 +59,10 @@ export class BookingsService {
       endDate: { $gte: now },
       $or: [
         { venueId: new Types.ObjectId(venueId) },
-        { venueId: null }
+        { 
+          venueId: null,
+          ownerId: { $in: [venue.ownerId, ...adminIds] }
+        }
       ],
       $expr: { $lt: ['$usedCount', '$usageLimit'] } // Only return coupons that haven't reached usage limit
     }).sort({ discountValue: -1 }).exec();
@@ -268,8 +281,19 @@ export class BookingsService {
       if (!Types.ObjectId.isValid(couponId)) {
         throw new HttpException('ID mã khuyến mãi không hợp lệ', HttpStatus.BAD_REQUEST);
       }
-      coupon = await this.couponModel.findById(couponId).exec();
+      coupon = await this.couponModel.findById(couponId).populate('ownerId').exec();
       if (coupon && coupon.status === CouponStatus.ACTIVE) {
+        if (coupon.venueId && coupon.venueId.toString() !== venueId) {
+          throw new HttpException('Mã khuyến mãi không áp dụng cho cơ sở này', HttpStatus.BAD_REQUEST);
+        }
+        if (!coupon.venueId) {
+          const couponOwner: any = coupon.ownerId;
+          const isAdmin = couponOwner && couponOwner.role === 'ADMIN';
+          if (couponOwner && couponOwner._id.toString() !== venue.ownerId.toString() && !isAdmin) {
+            throw new HttpException('Mã khuyến mãi không áp dụng cho cơ sở này', HttpStatus.BAD_REQUEST);
+          }
+        }
+
         const now = new Date();
         if (now >= coupon.startDate && now <= coupon.endDate && coupon.usedCount < coupon.usageLimit) {
           if (!coupon.minOrderValue || totalPrice >= coupon.minOrderValue) {
@@ -311,7 +335,7 @@ export class BookingsService {
       await coupon.save();
     }
 
-    // 5. Create Booking Details
+    // 5. Create Booking Details & Clear Slot Locks
     if (processedDetails.length > 0) {
       const detailsToCreate = processedDetails.map(d => ({
         ...d,
@@ -320,6 +344,14 @@ export class BookingsService {
         bookingId: newBooking._id
       }));
       await this.bookingDetailModel.insertMany(detailsToCreate);
+
+      // Clear the temporary SlotLocks since the booking is successfully created
+      for (const d of processedDetails) {
+        await this.slotLockModel.deleteMany({
+          courtId: new Types.ObjectId(d.courtId as any),
+          startTime: d.startTime,
+        }).exec();
+      }
     }
 
     // 6. Send Booking Confirmation Email asynchronously
@@ -543,6 +575,17 @@ export class BookingsService {
       .populate('venueId')
       .exec();
 
+    // Dọn dẹp (Release) SlotLock nếu có (Fix lỗi hiển thị Xanh dương - Khóa trên lịch)
+    if (dto.status === BookingStatus.CANCELLED) {
+      const details = await this.bookingDetailModel.find({ bookingId: updatedBooking._id }).exec();
+      for (const d of details) {
+        await this.slotLockModel.deleteMany({
+          courtId: new Types.ObjectId(d.courtId as any),
+          startTime: d.startTime,
+        }).exec();
+      }
+    }
+
     // Send push notification to Customer based on Status
     if (updatedBooking.playerId && updatedBooking.status !== booking.status) {
       let title = '';
@@ -576,6 +619,21 @@ export class BookingsService {
          title = '💸 Hoàn tiền thành công';
          body = `Tiền đặt sân tại ${venueName} đã được hoàn về tài khoản của bạn.`;
          type = NotificationType.SYSTEM_ALERT;
+      } else if (dto.status === BookingStatus.IN_PROGRESS) {
+         title = '🏸 Tới giờ chơi rồi!';
+         body = `Đơn đặt sân của bạn tại ${venueName} đã bắt đầu (Check-in). Chúc bạn có một buổi chơi vui vẻ!`;
+         type = NotificationType.SYSTEM_ALERT;
+      } else if (dto.status === BookingStatus.COMPLETED) {
+         const paymentStatus = dto.paymentStatus || 'SUCCESS';
+         if (paymentStatus === 'DEBT') {
+           title = '⚠️ Ghi nhận khách nợ';
+           body = `Đơn đặt sân tại ${venueName} đã hoàn thành nhưng bạn chưa thanh toán tiền mặt. Vui lòng thanh toán để không bị ảnh hưởng tài khoản.`;
+           type = NotificationType.SYSTEM_ALERT;
+         } else {
+           title = '✅ Đơn đặt sân hoàn tất';
+           body = `Cảm ơn bạn đã chơi tại ${venueName}. Hãy để lại đánh giá cho sân nhé!`;
+           type = NotificationType.SYSTEM_ALERT;
+         }
       }
 
       if (title && body && type) {
@@ -1446,6 +1504,91 @@ export class BookingsService {
           await this.bookingModel.findByIdAndUpdate(booking._id, { status: BookingStatus.LATE_ARRIVAL }).exec();
           console.log(`[Cron Auto-LateArrival] Booking BH${booking._id.toString().slice(-6).toUpperCase()} has passed start time and was auto-updated to LATE_ARRIVAL.`);
         }
+      }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async handleBookingReminders() {
+    const now = new Date();
+    // UTC time for today and tomorrow to cover timezone boundary cases
+    const startOfToday = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0));
+    const startOfTomorrow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0));
+
+    const details = await this.bookingDetailModel.find({
+      bookingDate: { $gte: startOfToday, $lte: startOfTomorrow },
+      isReminderSent: { $ne: true }
+    }).populate({
+      path: 'bookingId',
+      match: { status: BookingStatus.CONFIRMED, isGuest: false }
+    }).populate('courtId').exec();
+
+    for (const d of details) {
+      if (!d.bookingId) continue;
+      const booking = d.bookingId as any;
+
+      try {
+        const [h, m] = d.startTime.split(':').map(Number);
+        
+        let year = startOfToday.getUTCFullYear();
+        let month = startOfToday.getUTCMonth();
+        let day = startOfToday.getUTCDate();
+        
+        const dateStr = d.bookingDate as unknown as string;
+        if (typeof dateStr === 'string') {
+          if (dateStr.includes('T')) {
+            const dateObj = new Date(dateStr);
+            year = dateObj.getUTCFullYear();
+            month = dateObj.getUTCMonth();
+            day = dateObj.getUTCDate();
+          } else {
+            [year, month, day] = dateStr.split('-').map(Number);
+            month -= 1;
+          }
+        } else {
+           year = d.bookingDate.getUTCFullYear();
+           month = d.bookingDate.getUTCMonth();
+           day = d.bookingDate.getUTCDate();
+        }
+
+        // Vietnam time offset is +7. The server might be in UTC. 
+        // We calculate absolute UTC time for the slot.
+        // If bookingDate is stored as UTC 00:00:00 of the local day, 
+        // the start time in UTC is startH - 7
+        const startDateTimeMs = Date.UTC(year, month, day, h, m) - (7 * 60 * 60 * 1000);
+        
+        const diffMs = startDateTimeMs - now.getTime();
+        const diffMinutes = diffMs / (1000 * 60);
+
+        // Notify if it's within 15 minutes and hasn't started yet
+        if (diffMinutes > 0 && diffMinutes <= 15) {
+          const venueId = (d.courtId as any)?.venueId;
+          let venueName = 'Cơ sở';
+          let venueAddress = '';
+          if (venueId) {
+             const venue = await this.venueModel.findById(venueId).exec();
+             if (venue) {
+               venueName = venue.name;
+               venueAddress = venue.address;
+             }
+          }
+
+          this.notificationsService.sendAndSaveNotification(
+            booking.playerId.toString(),
+            '⏰ Sắp tới giờ chơi rồi!',
+            `Bạn có lịch đánh cầu tại ${venueName} vào lúc ${d.startTime}. Vui lòng chuẩn bị và đến đúng giờ nhé!`,
+            NotificationType.SYSTEM_ALERT,
+            { bookingId: booking._id.toString() }
+          ).catch(console.error);
+
+          // Gửi Email nhắc nhở
+          this.mailService.sendBookingReminderEmail(booking, d.startTime, venueName, venueAddress).catch(console.error);
+
+          d.isReminderSent = true;
+          await d.save();
+        }
+      } catch (e) {
+        console.error('[BookingsService] Error processing reminder for booking detail', d._id, e);
       }
     }
   }

@@ -64,6 +64,9 @@ export class Booking {
   @Prop({ required: false })
   customerEmail: string;
 
+  @Prop({ default: false })
+  isReviewed: boolean;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 }

@@ -5,12 +5,15 @@ import { Payment, PaymentDocument, PaymentStatus, PaymentMethod } from './schema
 import { Booking, BookingDocument, BookingStatus } from '../bookings/schemas/booking.schema';
 import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { CreatePaymentUrlDto } from './dto/payment.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/schemas/notification.schema';
 
 @Injectable()
 export class PaymentsService {
   constructor(
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
+    private notificationsService: NotificationsService,
   ) { }
 
   async createPaymentUrl(dto: CreatePaymentUrlDto): Promise<ApiResponseType> {
@@ -137,11 +140,46 @@ export class PaymentsService {
       throw new HttpException('ID đơn đặt sân không hợp lệ', HttpStatus.BAD_REQUEST);
     }
 
-    const payment = await this.paymentModel.findOne({ bookingId: bookingId }).sort({ createdAt: -1 }).exec();
+    const payment = await this.paymentModel.findOne({ bookingId: new Types.ObjectId(bookingId) }).sort({ createdAt: -1 }).exec();
     if (!payment) {
       throw new HttpException('Không tìm thấy thông tin thanh toán cho đơn này', HttpStatus.NOT_FOUND);
     }
 
     return createApiResponse(payment, 'Lấy trạng thái thanh toán thành công', HttpStatus.OK);
+  }
+
+  async markRefundSuccess(bookingId: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(bookingId)) {
+      throw new HttpException('ID đơn đặt sân không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+
+    const payment = await this.paymentModel.findOne({ bookingId: new Types.ObjectId(bookingId) }).sort({ createdAt: -1 }).exec();
+    if (!payment) {
+      throw new HttpException('Không tìm thấy thông tin thanh toán cho đơn này', HttpStatus.NOT_FOUND);
+    }
+
+    if (payment.status !== PaymentStatus.REFUNDING) {
+      throw new HttpException(`Không thể xác nhận hoàn tiền cho đơn đang ở trạng thái ${payment.status}. Chỉ được xác nhận khi đang ở trạng thái REFUNDING.`, HttpStatus.BAD_REQUEST);
+    }
+
+    payment.status = PaymentStatus.REFUNDED;
+    await payment.save();
+
+    // Cập nhật trạng thái booking thành REFUNDED
+    const booking = await this.bookingModel.findByIdAndUpdate(payment.bookingId, { status: BookingStatus.REFUNDED }).populate('venueId').exec();
+
+    // Gửi thông báo cho khách hàng
+    if (booking && booking.playerId) {
+      const venueName = (booking.venueId as any)?.name || 'Cơ sở';
+      this.notificationsService.sendAndSaveNotification(
+        booking.playerId.toString(),
+        '💸 Hoàn tiền thành công',
+        `Tiền đặt sân tại ${venueName} đã được hoàn về tài khoản của bạn.`,
+        NotificationType.SYSTEM_ALERT,
+        { bookingId: booking._id.toString() }
+      ).catch(console.error);
+    }
+
+    return createApiResponse(null, 'Xác nhận hoàn tiền thành công', HttpStatus.OK);
   }
 }

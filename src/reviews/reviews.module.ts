@@ -4,12 +4,14 @@ import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
 import { Review, ReviewSchema } from './schemas/review.schema';
 import { Venue, VenueSchema } from '../venues/schemas/venue.schema';
+import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Review.name, schema: ReviewSchema },
       { name: Venue.name, schema: VenueSchema },
+      { name: Booking.name, schema: BookingSchema },
     ]),
   ],
   controllers: [ReviewsController],

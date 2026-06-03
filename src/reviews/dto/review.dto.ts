@@ -7,6 +7,11 @@ export class CreateReviewDto {
   @IsString()
   venueId: string;
 
+  @ApiProperty({ example: '60d5ecb8b3945a278c8574e9', description: 'ID of the completed booking' })
+  @IsNotEmpty()
+  @IsString()
+  bookingId: string;
+
   @ApiProperty({ example: 5, description: 'Rating stars (1-5)' })
   @IsNotEmpty()
   @IsNumber()

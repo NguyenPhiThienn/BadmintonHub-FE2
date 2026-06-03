@@ -10,6 +10,7 @@ import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { ChatSession, ChatSessionDocument, SessionStatus } from './schemas/chat-session.schema';
 import { Booking, BookingDocument, BookingStatus } from '../bookings/schemas/booking.schema';
 import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -21,6 +22,7 @@ export class AiService {
     @InjectModel(ChatSession.name) private chatSessionModel: Model<ChatSessionDocument>,
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
     @InjectModel(Venue.name) private venueModel: Model<VenueDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) { }
 
   // ----------------------------------------------------------------
@@ -189,40 +191,104 @@ export class AiService {
     const context: Record<string, any> = {};
     const lowerMsg = message.toLowerCase();
 
-    // Inject real-time venue list
-    try {
-      const venuesRes = await this.venuesService.findAll({ limit: 8, status: 'ACTIVE' });
-      const venues = venuesRes?.data?.venues || [];
-      context.availableVenues = venues.map((v: any) => ({
-        id: v._id,
-        name: v.name,
-        address: v.address,
-        pricePerHour: v.pricePerHour,
-        rating: v.averageRating,
-      }));
-    } catch { context.availableVenues = []; }
-
-    // If user asks about their bookings and is logged in
-    if (userId && (lowerMsg.includes('đơn') || lowerMsg.includes('lịch') || lowerMsg.includes('đặt'))) {
+    // Always inject user profile when logged in
+    let userRole = 'GUEST';
+    if (userId) {
       try {
-        const myBookings = await this.bookingModel
-          .find({ playerId: new Types.ObjectId(userId) })
-          .sort({ createdAt: -1 })
-          .limit(5)
-          .populate('venueId', 'name address')
-          .exec();
-
-        context.myRecentBookings = myBookings.map((b: any) => ({
-          bookingId: `BH${b._id.toString().slice(-6).toUpperCase()}`,
-          venue: b.venueId?.name || 'Unknown',
-          status: b.status,
-          finalPrice: b.finalPrice,
-          createdAt: b.createdAt,
-        }));
-      } catch { context.myRecentBookings = []; }
+        const user = await this.userModel.findById(userId).select('fullName email phone role').exec();
+        if (user) {
+          context.currentUser = {
+            name: user.fullName,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+          };
+          userRole = user.role;
+        }
+      } catch { /* ignore */ }
     }
 
-    // Keyword-based context: cancellation policy
+    // --- ROLE-SPECIFIC CONTEXT ---
+
+    if (userRole === 'ADMIN') {
+      // 1. ADMIN CONTEXT: System Stats & Pending Actions
+      if (lowerMsg.includes('hệ thống') || lowerMsg.includes('tổng quan') || lowerMsg.includes('báo cáo') || lowerMsg.includes('chờ duyệt')) {
+        try {
+          const [pendingOwners, pendingClosures, totalUsers, activeVenues] = await Promise.all([
+            this.venueModel.countDocuments({ status: 'PENDING' }),
+            this.venueModel.countDocuments({ status: 'PENDING_CLOSURE' }),
+            this.userModel.countDocuments(),
+            this.venueModel.countDocuments({ status: 'ACTIVE' }),
+          ]);
+          context.adminData = {
+            totalUsers,
+            activeVenues,
+            pendingOwnerRequests: pendingOwners,
+            pendingClosureRequests: pendingClosures,
+          };
+        } catch { /* ignore */ }
+      }
+    } else if (userRole === 'COURT_OWNER' || userRole === 'OWNER') {
+      // 2. OWNER CONTEXT: Their Venues & Recent Bookings
+      try {
+        const myVenues = await this.venueModel.find({ ownerId: new Types.ObjectId(userId) }).select('_id name status').exec();
+        const venueIds = myVenues.map(v => v._id);
+        
+        context.ownerData = {
+          myVenues: myVenues.map(v => ({ id: v._id.toString(), name: v.name, status: v.status })),
+        };
+
+        if (lowerMsg.includes('đơn') || lowerMsg.includes('lịch') || lowerMsg.includes('doanh thu')) {
+          const recentBookings = await this.bookingModel
+            .find({ venueId: { $in: venueIds } })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('playerId', 'fullName')
+            .exec();
+
+          context.ownerData.recentBookings = recentBookings.map((b: any) => ({
+            bookingId: `BH${b._id.toString().slice(-6).toUpperCase()}`,
+            customerName: b.playerId?.fullName || 'Khách',
+            status: b.status,
+            finalPrice: b.finalPrice,
+          }));
+        }
+      } catch { /* ignore */ }
+    } else {
+      // 3. PLAYER & GUEST CONTEXT: Available Venues & Their Bookings
+      try {
+        const venuesRes = await this.venuesService.findAll({ limit: 8, status: 'ACTIVE' });
+        const venues = venuesRes?.data?.venues || [];
+        context.availableVenues = venues.map((v: any) => ({
+          id: v._id,
+          name: v.name,
+          address: v.address,
+          pricePerHour: v.pricePerHour,
+          rating: v.averageRating,
+        }));
+      } catch { context.availableVenues = []; }
+
+      if (userId && (lowerMsg.includes('đơn') || lowerMsg.includes('lịch') || lowerMsg.includes('đặt'))) {
+        try {
+          const myBookings = await this.bookingModel
+            .find({ playerId: new Types.ObjectId(userId) })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('venueId', 'name address')
+            .exec();
+
+          context.myRecentBookings = myBookings.map((b: any) => ({
+            bookingId: `BH${b._id.toString().slice(-6).toUpperCase()}`,
+            venue: b.venueId?.name || 'Unknown',
+            status: b.status,
+            finalPrice: b.finalPrice,
+            createdAt: b.createdAt,
+          }));
+        } catch { context.myRecentBookings = []; }
+      }
+    }
+
+    // --- GENERAL KNOWLEDGE CONTEXT ---
     if (lowerMsg.includes('hủy') || lowerMsg.includes('hoàn tiền')) {
       context.cancellationPolicy = {
         rule: 'Hủy trước 24h: Hoàn 100%. Hủy trong vòng 24h: Hoàn 0%. Đơn VNPAY: Tiền hoàn về tài khoản trong 3-5 ngày làm việc.',
@@ -230,7 +296,6 @@ export class AiService {
       };
     }
 
-    // Keyword-based context: pricing
     if (lowerMsg.includes('giá') || lowerMsg.includes('bao nhiêu') || lowerMsg.includes('phí')) {
       context.generalPricing = 'Giá sân dao động từ 50,000đ - 150,000đ/giờ tùy khung giờ và loại sân. Khung giờ vàng (17h-22h) thường cao hơn 20-30%.';
     }
@@ -242,31 +307,62 @@ export class AiService {
   // PRIVATE: Build System Prompt
   // ----------------------------------------------------------------
   private _buildSystemPrompt(context: Record<string, any>): string {
-    const venueList = context.availableVenues?.length
-      ? context.availableVenues.map((v: any) =>
-          `  - ${v.name} | Địa chỉ: ${v.address} | Giá: ${v.pricePerHour?.toLocaleString('vi-VN')}đ/giờ | ⭐ ${v.rating || 'Chưa có'}`
-        ).join('\n')
-      : '  - Hiện chưa có dữ liệu sân.';
+    const userRole = context.currentUser?.role || 'GUEST';
 
-    const myBookings = context.myRecentBookings?.length
-      ? context.myRecentBookings.map((b: any) =>
-          `  - #${b.bookingId} | ${b.venue} | Trạng thái: ${b.status} | Giá: ${b.finalPrice?.toLocaleString('vi-VN')}đ`
-        ).join('\n')
-      : null;
+    let roleSpecificPrompt = '';
+    let roleSpecificData = '';
 
-    return `Bạn là "BadmintonHub AI" - trợ lý ảo thông minh, thân thiện của hệ thống đặt sân cầu lông BadmintonHub.
+    if (userRole === 'ADMIN') {
+      roleSpecificPrompt = `Bạn đang hỗ trợ một QUẢN TRỊ VIÊN (ADMIN) của hệ thống BadmintonHub. Nhiệm vụ của bạn là hỗ trợ báo cáo, thống kê và giám sát hệ thống. Báo cáo ngắn gọn, súc tích.`;
+      if (context.adminData) {
+        roleSpecificData = `📊 DỮ LIỆU HỆ THỐNG HIỆN TẠI:
+  - Tổng số người dùng: ${context.adminData.totalUsers}
+  - Tổng cơ sở đang hoạt động: ${context.adminData.activeVenues}
+  - Yêu cầu mở sân chờ duyệt: ${context.adminData.pendingOwnerRequests} (Nên nhắc admin duyệt)
+  - Yêu cầu đóng sân chờ duyệt: ${context.adminData.pendingClosureRequests}`;
+      }
+    } else if (userRole === 'COURT_OWNER' || userRole === 'OWNER') {
+      roleSpecificPrompt = `Bạn đang hỗ trợ một CHỦ SÂN (OWNER) trên hệ thống BadmintonHub. Nhiệm vụ của bạn là hỗ trợ họ quản lý sân, theo dõi đơn đặt và doanh thu của riêng họ.`;
+      if (context.ownerData) {
+        const myVenuesStr = context.ownerData.myVenues?.map((v: any) => `- Sân: ${v.name} (Trạng thái: ${v.status})`).join('\n') || 'Chưa có cơ sở nào.';
+        const bookingsStr = context.ownerData.recentBookings?.map((b: any) => `- #${b.bookingId} | Khách: ${b.customerName} | Trạng thái: ${b.status} | Thu: ${b.finalPrice?.toLocaleString()}đ`).join('\n') || 'Không có đơn đặt sân gần đây.';
+        roleSpecificData = `🏢 CÁC SÂN ĐANG QUẢN LÝ:
+${myVenuesStr}
+📋 CÁC ĐƠN ĐẶT SÂN GẦN NHẤT CỦA KHÁCH:
+${bookingsStr}`;
+      }
+    } else {
+      // PLAYER / GUEST
+      roleSpecificPrompt = `Bạn đang hỗ trợ KHÁCH HÀNG (PLAYER) đặt sân. Hướng dẫn họ chọn sân và giải đáp thắc mắc.`;
+      
+      const venueList = context.availableVenues?.length
+        ? context.availableVenues.map((v: any) => `  - ${v.name} | ${v.address} | ${v.pricePerHour?.toLocaleString()}đ/giờ`).join('\n')
+        : '  - Hiện chưa có dữ liệu sân.';
+      
+      const myBookings = context.myRecentBookings?.length
+        ? context.myRecentBookings.map((b: any) => `  - #${b.bookingId} | ${b.venue} | ${b.status} | ${b.finalPrice?.toLocaleString()}đ`).join('\n')
+        : null;
+
+      roleSpecificData = `📍 DANH SÁCH SÂN NỔI BẬT ĐỂ TƯ VẤN:
+${venueList}
+${myBookings ? `📋 LỊCH ĐẶT SÂN GẦN ĐÂY CỦA KHÁCH:\n${myBookings}` : ''}`;
+    }
+
+    return `Bạn là "BadmintonHub AI" - trợ lý ảo thông minh, thân thiện của hệ thống BadmintonHub.
 
 NGUYÊN TẮC:
-- Trả lời bằng tiếng Việt, thân thiện, súc tích, dùng emoji phù hợp 🏸😊.
-- Chỉ tư vấn về cầu lông và dịch vụ BadmintonHub. Từ chối lịch sự nếu hỏi ngoài chủ đề.
-- Luôn sử dụng DỮ LIỆU THỰC TẾ bên dưới để trả lời, không bịa đặt.
+- Trả lời bằng tiếng Việt, súc tích, chuyên nghiệp nhưng thân thiện, dùng emoji 🏸😊.
+- Chỉ tư vấn về BadmintonHub. Từ chối lịch sự nếu hỏi ngoài chủ đề.
+- Luôn sử dụng DỮ LIỆU THỰC TẾ bên dưới, tuyệt đối không bịa thông tin.
 
-📍 DANH SÁCH SÂN ĐANG HOẠT ĐỘNG (Dữ liệu thực từ DB):
-${venueList}
+${roleSpecificPrompt}
 
-${myBookings ? `📋 LỊCH ĐẶT SÂN GẦN ĐÂY CỦA KHÁCH HÀNG:\n${myBookings}\n` : ''}
-${context.cancellationPolicy ? `📜 CHÍNH SÁCH HỦY ĐƠN:\n  - ${context.cancellationPolicy.rule}\n  - ${context.cancellationPolicy.noShowRule}\n` : ''}
-${context.generalPricing ? `💰 THÔNG TIN GIÁ: ${context.generalPricing}\n` : ''}`;
+${context.currentUser ? `👤 NGƯỜI ĐANG CHAT: ${context.currentUser.name} (${context.currentUser.role})` : '👤 KHÁCH VÃNG LAI'}
+
+${roleSpecificData}
+
+${context.cancellationPolicy ? `📜 CHÍNH SÁCH HỆ THỐNG:\n  - ${context.cancellationPolicy.rule}\n  - ${context.cancellationPolicy.noShowRule}\n` : ''}
+${context.generalPricing ? `💰 THÔNG TIN GIÁ CHUNG: ${context.generalPricing}\n` : ''}`;
   }
 
   // ----------------------------------------------------------------

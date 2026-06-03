@@ -24,6 +24,9 @@ export class BookingDetail {
 
   @Prop({ required: true })
   price: number; // Price of this specific slot
+
+  @Prop({ default: false })
+  isReminderSent: boolean;
 }
 
 export const BookingDetailSchema = SchemaFactory.createForClass(BookingDetail);

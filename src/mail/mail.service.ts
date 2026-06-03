@@ -378,4 +378,92 @@ export class MailService {
       return true;
     }
   }
+
+  async sendBookingReminderEmail(booking: any, startTime: string, venueName: string, venueAddress: string): Promise<boolean> {
+    const toEmail = booking.customerEmail || booking.playerId?.email;
+    if (!toEmail || toEmail.endsWith('@guest.bmhub.vn')) {
+      return false;
+    }
+
+    const customerName = booking.customerName || booking.playerId?.fullName || 'Quý khách';
+    const bookingCode = `BH${booking._id.toString().slice(-6).toUpperCase()}`;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Nhắc Nhở Lịch Đánh Cầu</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0F0F1A; font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #B3B3C6;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #161624; margin: 40px auto; border-radius: 16px; border: 1px solid #242438; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <tr>
+            <td style="background: linear-gradient(135deg, #1E1E2E 0%, #0F0F1A 100%); padding: 30px; text-align: center; border-bottom: 1px solid #242438;">
+              <h1 style="color: #44D7B6; margin: 0; font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">BadmintonHub</h1>
+              <p style="color: #B3B3C6; margin: 5px 0 0 0; font-size: 14px;">Nhắc nhở lịch chơi sắp tới</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <p style="color: #E2E2F0; font-size: 16px; margin: 0 0 20px 0;">Xin chào <strong>${customerName}</strong>,</p>
+              
+              <p style="color: #44D7B6; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0; font-weight: bold;">
+                ⏰ Sắp tới giờ chơi rồi! Trận đánh cầu của bạn sẽ bắt đầu trong ít phút nữa.
+              </p>
+              
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: rgba(68, 215, 182, 0.05); border: 1px dashed rgba(68, 215, 182, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                <tr>
+                  <td style="padding-bottom: 10px; color: #B3B3C6; font-size: 13px;"><strong>Mã đơn hàng:</strong></td>
+                  <td style="padding-bottom: 10px; color: #44D7B6; font-size: 15px; font-weight: bold;">${bookingCode}</td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom: 10px; color: #B3B3C6; font-size: 13px;"><strong>Giờ bắt đầu:</strong></td>
+                  <td style="padding-bottom: 10px; color: #E2E2F0; font-size: 16px; font-weight: bold;">${startTime}</td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom: 10px; color: #B3B3C6; font-size: 13px;"><strong>Cơ sở:</strong></td>
+                  <td style="padding-bottom: 10px; color: #E2E2F0; font-size: 14px; font-weight: bold;">${venueName}</td>
+                </tr>
+                <tr>
+                  <td style="color: #B3B3C6; font-size: 13px;"><strong>Địa chỉ:</strong></td>
+                  <td style="color: #E2E2F0; font-size: 13px; font-style: italic;">${venueAddress}</td>
+                </tr>
+              </table>
+
+              <p style="color: #B3B3C6; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                Vui lòng chuẩn bị vợt, giày và khởi động kỹ trước khi ra sân để tránh chấn thương nhé. Chúc bạn có một buổi giao lưu vui vẻ!
+              </p>
+              
+              <p style="color: #6C6C82; font-size: 12px; margin: 0; padding-top: 20px; border-top: 1px solid #242438;">
+                Cảm ơn bạn đã sử dụng dịch vụ của BadmintonHub!
+              </p>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    if (this.transporter) {
+      try {
+        await this.transporter.sendMail({
+          from: `"BadmintonHub Notification" <${process.env.MAIL_USER}>`,
+          to: toEmail,
+          subject: `[BadmintonHub] Nhắc nhở lịch đánh cầu sắp tới #${bookingCode}`,
+          html: htmlContent,
+        });
+        return true;
+      } catch (err) {
+        console.error(`[MailService] Error sending reminder email to ${toEmail}:`, err);
+        return false;
+      }
+    } else {
+      console.log(`\n======================================================`);
+      console.log(`[MailService Simulation] - Gửi email NHẮC NHỞ LỊCH CHƠI!`);
+      console.log(`To: ${toEmail}`);
+      console.log(`Subject: [BadmintonHub] Nhắc nhở lịch đánh cầu sắp tới #${bookingCode}`);
+      console.log(`======================================================\n`);
+      return true;
+    }
+  }
 }

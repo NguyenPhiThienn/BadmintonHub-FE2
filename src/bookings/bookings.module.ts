@@ -12,6 +12,7 @@ import { PromotionsModule } from '../promotions/promotions.module';
 import { UsersModule } from '../users/users.module';
 import { MailModule } from '../mail/mail.module';
 import { Coupon, CouponSchema } from '../coupons/schemas/coupon.schema';
+import { SlotLock, SlotLockSchema } from '../availability/schemas/slot-lock.schema';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { AdminBookingsController } from './admin-bookings.controller';
 
@@ -22,6 +23,7 @@ import { AdminBookingsController } from './admin-bookings.controller';
       { name: BookingDetail.name, schema: BookingDetailSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Coupon.name, schema: CouponSchema },
+      { name: SlotLock.name, schema: SlotLockSchema },
     ]),
     CourtsModule,
     VenuesModule,

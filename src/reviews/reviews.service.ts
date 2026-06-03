@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Review, ReviewDocument } from './schemas/review.schema';
 import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
+import { Booking, BookingDocument, BookingStatus } from '../bookings/schemas/booking.schema';
 import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { CreateReviewDto } from './dto/review.dto';
 
@@ -11,13 +12,14 @@ export class ReviewsService {
   constructor(
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
     @InjectModel(Venue.name) private venueModel: Model<VenueDocument>,
+    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
   ) { }
 
   async create(playerId: string, dto: CreateReviewDto): Promise<ApiResponseType> {
-    const { venueId, rating, comment } = dto;
+    const { venueId, bookingId, rating, comment } = dto;
 
-    if (!Types.ObjectId.isValid(venueId)) {
-      throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
+    if (!Types.ObjectId.isValid(venueId) || !Types.ObjectId.isValid(bookingId)) {
+      throw new HttpException('ID cơ sở hoặc ID đơn đặt sân không hợp lệ', HttpStatus.BAD_REQUEST);
     }
 
     const venue = await this.venueModel.findById(venueId).exec();
@@ -25,12 +27,46 @@ export class ReviewsService {
       throw new HttpException('Không tìm thấy cơ sở', HttpStatus.NOT_FOUND);
     }
 
-    const newReview = await this.reviewModel.create({
-      venueId: new Types.ObjectId(venueId),
+    // Luồng Shopee: 1. Chỉ được đánh giá khi đơn này đã hoàn thành và chưa được đánh giá
+    const targetBooking = await this.bookingModel.findOne({
+      _id: new Types.ObjectId(bookingId),
       playerId: new Types.ObjectId(playerId),
-      rating,
-      comment,
+      venueId: new Types.ObjectId(venueId),
+      status: BookingStatus.COMPLETED
     });
+
+    if (!targetBooking) {
+      throw new HttpException('Đơn đặt sân không tồn tại, không thuộc về bạn, hoặc chưa hoàn thành.', HttpStatus.FORBIDDEN);
+    }
+
+    if (targetBooking.isReviewed) {
+      throw new HttpException('Bạn đã đánh giá cho đơn đặt sân này rồi.', HttpStatus.BAD_REQUEST);
+    }
+
+    // Luồng Shopee: 2. Mỗi user chỉ được 1 đánh giá, nếu đánh giá tiếp thì là cập nhật
+    let review = await this.reviewModel.findOne({
+      playerId: new Types.ObjectId(playerId),
+      venueId: new Types.ObjectId(venueId)
+    });
+
+    let isUpdate = false;
+    if (review) {
+      review.rating = rating;
+      review.comment = comment;
+      await review.save();
+      isUpdate = true;
+    } else {
+      review = await this.reviewModel.create({
+        venueId: new Types.ObjectId(venueId),
+        playerId: new Types.ObjectId(playerId),
+        rating,
+        comment,
+      });
+    }
+
+    // Mark the booking as reviewed
+    targetBooking.isReviewed = true;
+    await targetBooking.save();
 
     // Update venue's average rating
     const allReviews = await this.reviewModel.find({ venueId: new Types.ObjectId(venueId) }).exec();
@@ -40,7 +76,8 @@ export class ReviewsService {
 
     await this.venueModel.findByIdAndUpdate(venueId, { averageRating: avgRating });
 
-    return createApiResponse(newReview, 'Gửi đánh giá thành công', HttpStatus.CREATED);
+    const message = isUpdate ? 'Cập nhật đánh giá thành công' : 'Gửi đánh giá thành công';
+    return createApiResponse(review, message, HttpStatus.OK);
   }
 
   async findByVenue(venueId: string): Promise<ApiResponseType> {

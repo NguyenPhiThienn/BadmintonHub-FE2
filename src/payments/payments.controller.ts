@@ -4,7 +4,8 @@ import { PaymentsService } from './payments.service';
 import { CreatePaymentUrlDto } from './dto/payment.dto';
 import { ApiResponseType } from '../utils/response.util';
 import { JwtGuard } from '../auth/jwt-auth.guard';
-import { Public } from '../auth/decorators/auth.decorators';
+import { RolesGuard } from '../auth/roles.guard';
+import { Public, Roles } from '../auth/decorators/auth.decorators';
 
 @ApiTags('Payment Module (Quản lý Thanh toán Online)')
 @Controller('payments')
@@ -44,5 +45,15 @@ export class PaymentsController {
   @Get(':bookingId')
   async getStatus(@Param('bookingId') bookingId: string): Promise<ApiResponseType> {
     return await this.paymentsService.getPaymentStatus(bookingId);
+  }
+
+  @ApiOperation({ summary: 'Admin xác nhận đã hoàn tiền thủ công (chuyển REFUNDING sang REFUNDED)' })
+  @ApiResponse({ status: 200, description: 'Cập nhật thành công' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post(':bookingId/refund-success') // Dùng POST (hoặc PATCH) để thực hiện action
+  async markRefundSuccess(@Param('bookingId') bookingId: string): Promise<ApiResponseType> {
+    return await this.paymentsService.markRefundSuccess(bookingId);
   }
 }

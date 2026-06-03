@@ -8,6 +8,7 @@ import { AvailabilityModule } from '../availability/availability.module';
 import { VenuesModule } from '../venues/venues.module';
 import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { Venue, VenueSchema } from '../venues/schemas/venue.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Venue, VenueSchema } from '../venues/schemas/venue.schema';
       { name: ChatSession.name, schema: ChatSessionSchema },
       { name: Booking.name, schema: BookingSchema },
       { name: Venue.name, schema: VenueSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [AiController],

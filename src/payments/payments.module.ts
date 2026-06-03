@@ -5,6 +5,7 @@ import { PaymentsService } from './payments.service';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 import { BookingsModule } from '../bookings/bookings.module';
 import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
       { name: Booking.name, schema: BookingSchema },
     ]),
     BookingsModule,
+    NotificationsModule,
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService],
