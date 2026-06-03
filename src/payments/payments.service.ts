@@ -29,16 +29,18 @@ export class PaymentsService {
       throw new HttpException('Đơn đặt sân đã bị hủy', HttpStatus.BAD_REQUEST);
     }
 
-    // Check if payment already exists
-    let payment = await this.paymentModel.findOne({ bookingId: booking._id, status: PaymentStatus.PENDING }).exec();
-    if (!payment) {
-      payment = await this.paymentModel.create({
-        bookingId: booking._id,
-        amount: booking.finalPrice,
-        method: method,
-        status: PaymentStatus.PENDING,
-      });
-    }
+    // Clean up old pending/failed payments when switching methods to avoid duplicates
+    await this.paymentModel.deleteMany({ 
+      bookingId: booking._id, 
+      status: { $ne: PaymentStatus.SUCCESS } 
+    }).exec();
+
+    const payment = await this.paymentModel.create({
+      bookingId: booking._id,
+      amount: booking.finalPrice,
+      method: method,
+      status: PaymentStatus.PENDING,
+    });
 
     // URL generation based on method
     let paymentUrl = '';

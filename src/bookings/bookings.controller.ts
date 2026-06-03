@@ -6,7 +6,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { UserRole } from '../users/schemas/user.schema';
 import { ApiResponseType } from '../utils/response.util';
 import { BookingsService } from './bookings.service';
-import { CreateBookingDto, UpdateBookingStatusDto } from './dto/booking.dto';
+import { CreateBookingDto, UpdateBookingStatusDto, ApplyCouponDto } from './dto/booking.dto';
 
 @ApiTags('Booking Module (Quản lý Đặt sân)')
 @Controller('bookings')
@@ -22,6 +22,22 @@ export class BookingsController {
     return await this.bookingsService.create(req.user?.id, dto);
   }
 
+  @ApiOperation({ summary: 'Lấy danh sách mã khuyến mãi khả dụng cho cơ sở sân' })
+  @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
+  @UseGuards(OptionalJwtGuard)
+  @Get('available-coupons/:venueId')
+  async getAvailableCoupons(@Param('venueId') venueId: string): Promise<ApiResponseType> {
+    return await this.bookingsService.getAvailableCoupons(venueId);
+  }
+
+  @ApiOperation({ summary: 'Kiểm tra và áp dụng mã khuyến mãi' })
+  @ApiResponse({ status: 200, description: 'Áp dụng mã thành công' })
+  @UseGuards(OptionalJwtGuard)
+  @Post('apply-coupon')
+  async applyCoupon(@Body() dto: ApplyCouponDto): Promise<ApiResponseType> {
+    return await this.bookingsService.applyCoupon(dto);
+  }
+
   @ApiOperation({ summary: 'Xem lịch sử đặt sân của người chơi' })
   @ApiResponse({ status: 200, description: 'Lấy lịch sử thành công' })
   @UseGuards(JwtGuard, RolesGuard)
@@ -33,8 +49,10 @@ export class BookingsController {
     @Query('limit') limit: number = 10,
     @Query('status') status?: string,
     @Query('search') search?: string,
+    @Query('isWeekly') isWeekly?: string,
+    @Query('paymentMethod') paymentMethod?: string,
   ): Promise<ApiResponseType> {
-    return await this.bookingsService.getMyBookings(req.user.id, Number(page), Number(limit), status, search);
+    return await this.bookingsService.getMyBookings(req.user.id, Number(page), Number(limit), status, search, isWeekly, paymentMethod);
   }
 
   @ApiOperation({ summary: 'Lấy thống kê cá nhân của người chơi (Tổng giờ chơi...)' })
@@ -77,6 +95,19 @@ export class BookingsController {
     return await this.bookingsService.updateStatus(req.user.id, id, dto, req.user.role);
   }
 
+  @ApiOperation({ summary: 'Yêu cầu hoàn tiền khi hủy đơn đã thanh toán' })
+  @ApiResponse({ status: 200, description: 'Yêu cầu hoàn tiền thành công' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.PLAYER, UserRole.ADMIN, UserRole.COURT_OWNER)
+  @Post(':id/refund-request')
+  async requestRefund(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() dto: any
+  ): Promise<ApiResponseType> {
+    return await this.bookingsService.requestRefund(req.user.id, id, dto, req.user.role);
+  }
+
   @ApiOperation({ summary: 'Lấy tất cả đơn đặt sân của chủ sân (Tất cả cơ sở)' })
   @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
   @UseGuards(JwtGuard, RolesGuard)
@@ -89,8 +120,9 @@ export class BookingsController {
     @Query('status') status?: string,
     @Query('venueId') venueId?: string,
     @Query('search') search?: string,
+    @Query('paymentMethod') paymentMethod?: string,
   ): Promise<ApiResponseType> {
-    return await this.bookingsService.getOwnerBookings(req.user.id, Number(page), Number(limit), { status, venueId, search });
+    return await this.bookingsService.getOwnerBookings(req.user.id, Number(page), Number(limit), { status, venueId, search, paymentMethod });
   }
 
   @ApiOperation({ summary: 'Tạo đơn đặt sân thủ công hoặc Khóa sân (Chủ sân)' })

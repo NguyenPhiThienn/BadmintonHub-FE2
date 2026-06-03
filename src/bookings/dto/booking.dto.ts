@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray, ValidateNested, IsOptional, IsDateString, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, ValidateNested, IsOptional, IsDateString, IsEnum, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { BookingStatus } from '../schemas/booking.schema';
@@ -35,6 +35,11 @@ export class CreateBookingDto {
   @IsOptional()
   @IsString()
   promotionId?: string;
+
+  @ApiProperty({ example: '60d5ecb8b3945a278c8574f0', description: 'ID of the coupon', required: false })
+  @IsOptional()
+  @IsString()
+  couponId?: string;
 
   @ApiProperty({ type: [BookingDetailDto], description: 'List of booking details' })
   @IsNotEmpty()
@@ -73,4 +78,53 @@ export class UpdateBookingStatusDto {
   @IsNotEmpty()
   @IsEnum(BookingStatus)
   status: BookingStatus;
+
+  @ApiProperty({ example: 'Lý do hủy đơn...', required: false })
+  @IsOptional()
+  @IsString()
+  cancelReason?: string;
+
+  @ApiProperty({ example: 'SUCCESS', required: false })
+  @IsOptional()
+  @IsString()
+  paymentStatus?: string;
+}
+
+export class RefundRequestDto {
+  @ApiProperty({ example: 'Vietcombank' })
+  @IsNotEmpty()
+  @IsString()
+  bankName: string;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsNotEmpty()
+  @IsString()
+  accountNumber: string;
+
+  @ApiProperty({ example: 'NGUYEN VAN A' })
+  @IsNotEmpty()
+  @IsString()
+  accountName: string;
+
+  @ApiProperty({ example: 'Tôi bận đột xuất' })
+  @IsNotEmpty()
+  @IsString()
+  reason: string;
+}
+
+export class ApplyCouponDto {
+  @ApiProperty({ example: 'SALE20' })
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @ApiProperty({ example: '60d5ecb8b3945a278c8574e9' })
+  @IsNotEmpty()
+  @IsString()
+  venueId: string;
+
+  @ApiProperty({ example: 100000 })
+  @IsNotEmpty()
+  @IsNumber()
+  totalAmount: number;
 }

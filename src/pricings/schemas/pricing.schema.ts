@@ -20,6 +20,9 @@ export class Pricing {
 
   @Prop({ required: true })
   pricePerHour: number;
+
+  @Prop({ required: false })
+  label?: string;
 }
 
 export const PricingSchema = SchemaFactory.createForClass(Pricing);

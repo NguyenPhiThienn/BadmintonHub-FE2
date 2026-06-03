@@ -11,7 +11,8 @@ import { PricingsModule } from '../pricings/pricings.module';
 import { PromotionsModule } from '../promotions/promotions.module';
 import { UsersModule } from '../users/users.module';
 import { MailModule } from '../mail/mail.module';
-
+import { Coupon, CouponSchema } from '../coupons/schemas/coupon.schema';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { AdminBookingsController } from './admin-bookings.controller';
 
 @Module({
@@ -20,6 +21,7 @@ import { AdminBookingsController } from './admin-bookings.controller';
       { name: Booking.name, schema: BookingSchema },
       { name: BookingDetail.name, schema: BookingDetailSchema },
       { name: Payment.name, schema: PaymentSchema },
+      { name: Coupon.name, schema: CouponSchema },
     ]),
     CourtsModule,
     VenuesModule,
@@ -27,6 +29,7 @@ import { AdminBookingsController } from './admin-bookings.controller';
     PromotionsModule,
     UsersModule,
     MailModule,
+    NotificationsModule,
   ],
   controllers: [BookingsController, AdminBookingsController],
   providers: [BookingsService],

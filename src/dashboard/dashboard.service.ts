@@ -60,11 +60,12 @@ export class DashboardService {
       matchFilter.createdAt = { $gte: startDateFilter, $lte: endDateFilter };
     }
 
-    // Lấy tổng doanh thu từ bookings CONFIRMED hoặc COMPLETED
+    // Lấy tổng doanh thu từ bookings CONFIRMED hoặc COMPLETED và đã thanh toán
     const revenueData = await this.bookingModel.aggregate([
       {
         $match: matchFilter
       },
+      ...this.getRevenueMatchStage(),
       {
         $group: {
           _id: null,
@@ -597,18 +598,48 @@ export class DashboardService {
       });
     }
 
-    // Stats pipeline - tính tổng từ booking.finalPrice theo phương thức thanh toán
+    // Filter by search
+    if (query.search) {
+      const searchTerm = query.search.trim();
+      const transactionIdMatch = searchTerm.replace(/^#BH/i, '');
+      pipeline.push({
+        $match: {
+          $or: [
+            { customerName: { $regex: searchTerm, $options: 'i' } },
+            { customerPhone: { $regex: searchTerm, $options: 'i' } },
+            { 'player.fullName': { $regex: searchTerm, $options: 'i' } },
+            { 'player.phone': { $regex: searchTerm, $options: 'i' } },
+            { $expr: { $regexMatch: { input: { $toString: '$_id' }, regex: transactionIdMatch, options: 'i' } } }
+          ]
+        }
+      });
+    }
+
+    // Stats pipeline - tính tổng từ booking.finalPrice theo phương thức thanh toán VÀ trạng thái thanh toán SUCCESS
     const statsPipeline = [
       ...pipeline,
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$finalPrice' },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $in: [{ $arrayElemAt: ['$paymentInfo.status', 0] }, ['SUCCESS', 'PAID']] },
+                '$finalPrice',
+                0
+              ]
+            }
+          },
           count: { $sum: 1 },
           cashRevenue: {
             $sum: {
               $cond: [
-                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'CASH'] },
+                {
+                  $and: [
+                    { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'CASH'] },
+                    { $in: [{ $arrayElemAt: ['$paymentInfo.status', 0] }, ['SUCCESS', 'PAID']] }
+                  ]
+                },
                 '$finalPrice',
                 0
               ]
@@ -617,7 +648,12 @@ export class DashboardService {
           vnpayRevenue: {
             $sum: {
               $cond: [
-                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'VNPAY'] },
+                {
+                  $and: [
+                    { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'VNPAY'] },
+                    { $in: [{ $arrayElemAt: ['$paymentInfo.status', 0] }, ['SUCCESS', 'PAID']] }
+                  ]
+                },
                 '$finalPrice',
                 0
               ]
@@ -626,7 +662,12 @@ export class DashboardService {
           momoRevenue: {
             $sum: {
               $cond: [
-                { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'MOMO'] },
+                {
+                  $and: [
+                    { $eq: [{ $arrayElemAt: ['$paymentInfo.method', 0] }, 'MOMO'] },
+                    { $in: [{ $arrayElemAt: ['$paymentInfo.status', 0] }, ['SUCCESS', 'PAID']] }
+                  ]
+                },
                 '$finalPrice',
                 0
               ]
@@ -655,7 +696,8 @@ export class DashboardService {
           customerPhone: { $ifNull: ['$customerPhone', '$player.phone'] },
           venue: {
             _id: '$venue._id',
-            name: '$venue.name'
+            name: '$venue.name',
+            address: '$venue.address'
           },
           owner: {
             _id: '$owner._id',
@@ -768,6 +810,20 @@ export class DashboardService {
       },
       { $unwind: '$booking' },
       {
+        $lookup: {
+          from: 'payments',
+          localField: 'bookingId',
+          foreignField: 'bookingId',
+          as: 'payment'
+        }
+      },
+      { $unwind: { path: '$payment', preserveNullAndEmptyArrays: true } },
+      {
+        $match: {
+          'payment.status': { $in: ['SUCCESS', 'PAID'] }
+        }
+      },
+      {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$bookingDate' } },
           revenue: { $sum: '$price' },
@@ -807,5 +863,350 @@ export class DashboardService {
         }
       }
     ];
+  }
+
+  async getOverviewStats(ownerId: string, venueId?: string): Promise<ApiResponseType> {
+    const ownerObjectId = new Types.ObjectId(ownerId);
+    let venueFilter: any = { ownerId: ownerObjectId };
+    if (venueId) {
+      venueFilter._id = new Types.ObjectId(venueId);
+    }
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
+
+    // Current period (this month)
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfPreviousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    // Filter for current month bookings
+    const currentMonthFilter = {
+      venueId: { $in: venueIds },
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] },
+      createdAt: { $gte: startOfCurrentMonth }
+    };
+
+    // Filter for previous month bookings
+    const previousMonthFilter = {
+      venueId: { $in: venueIds },
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] },
+      createdAt: { $gte: startOfPreviousMonth, $lt: startOfCurrentMonth }
+    };
+
+    const [currentBookings, previousBookings] = await Promise.all([
+      this.bookingModel.find(currentMonthFilter).exec(),
+      this.bookingModel.find(previousMonthFilter).exec()
+    ]);
+
+    const currentRevenue = currentBookings.reduce((sum, b) => sum + b.finalPrice, 0);
+    const previousRevenue = previousBookings.reduce((sum, b) => sum + b.finalPrice, 0);
+    const currentCount = currentBookings.length;
+    const previousCount = previousBookings.length;
+
+    const revenueTrend = previousRevenue === 0 ? 100 : ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+    const bookingsTrend = previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100;
+
+    return createApiResponse({
+      totalRevenue: currentRevenue,
+      revenueTrend: parseFloat(revenueTrend.toFixed(1)),
+      totalBookings: currentCount,
+      bookingsTrend: parseFloat(bookingsTrend.toFixed(1)),
+      totalVenues: venues.length
+    }, 'Thống kê tổng quan thành công', HttpStatus.OK);
+  }
+
+  async getRecentBookings(ownerId: string, venueId?: string): Promise<ApiResponseType> {
+    const ownerObjectId = new Types.ObjectId(ownerId);
+    let venueFilter: any = { ownerId: ownerObjectId };
+    if (venueId) {
+      venueFilter._id = new Types.ObjectId(venueId);
+    }
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
+
+    const recentBookings = await this.bookingModel.find({ venueId: { $in: venueIds } })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('venueId', 'name')
+      .populate('playerId', 'fullName email')
+      .exec();
+
+    const formattedBookings = await Promise.all(recentBookings.map(async (b: any) => {
+      const details = await this.bookingDetailModel.find({ bookingId: b._id }).sort({ bookingDate: 1 }).limit(1).exec();
+      return {
+        bookingId: b._id,
+        customerName: b.playerId ? b.playerId.fullName : (b.customerName || 'Khách vãng lai'),
+        venueName: b.venueId ? b.venueId.name : 'Unknown',
+        playDate: details.length > 0 ? details[0].bookingDate : b.createdAt,
+        timeSlot: details.length > 0 ? `${details[0].startTime}-${details[0].endTime}` : 'N/A',
+        status: b.status
+      };
+    }));
+
+    return createApiResponse(formattedBookings, 'Lấy đơn đặt sân gần đây thành công', HttpStatus.OK);
+  }
+
+  async getTopCustomers(ownerId: string, venueId?: string): Promise<ApiResponseType> {
+    const ownerObjectId = new Types.ObjectId(ownerId);
+    let venueFilter: any = { ownerId: ownerObjectId };
+    if (venueId) {
+      venueFilter._id = new Types.ObjectId(venueId);
+    }
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
+
+    const topVIPsAggregation = await this.bookingModel.aggregate([
+      { $match: { venueId: { $in: venueIds }, status: BookingStatus.COMPLETED, playerId: { $ne: null } } },
+      { $group: { _id: '$playerId', totalSpent: { $sum: '$finalPrice' }, totalBookings: { $sum: 1 } } },
+      { $sort: { totalSpent: -1 } },
+      { $limit: 5 },
+      { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+      { $unwind: '$user' },
+      { $project: { name: '$user.fullName', phone: '$user.phone', totalSpent: 1, totalBookings: 1 } }
+    ]);
+
+    const topRisksAggregation = await this.bookingModel.aggregate([
+      { $match: { venueId: { $in: venueIds }, status: { $in: [BookingStatus.NO_SHOW, BookingStatus.CANCELLED] }, playerId: { $ne: null } } },
+      { $group: { _id: '$playerId', totalViolations: { $sum: 1 } } },
+      { $sort: { totalViolations: -1 } },
+      { $limit: 5 },
+      { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+      { $unwind: '$user' },
+      { $project: { name: '$user.fullName', phone: '$user.phone', totalViolations: 1 } }
+    ]);
+
+    return createApiResponse({ topVIPs: topVIPsAggregation, topRisks: topRisksAggregation }, 'Lấy xếp hạng khách hàng thành công', HttpStatus.OK);
+  }
+
+  async getPeakHours(ownerId: string, venueId?: string): Promise<ApiResponseType> {
+    const ownerObjectId = new Types.ObjectId(ownerId);
+    let venueFilter: any = { ownerId: ownerObjectId };
+    if (venueId) {
+      venueFilter._id = new Types.ObjectId(venueId);
+    }
+    const venues = await this.venueModel.find(venueFilter).exec();
+    const venueIds = venues.map(v => v._id);
+
+    const matchFilter: any = {
+      venueId: { $in: venueIds },
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }
+    };
+
+    const activeBookings = await this.bookingModel.find(matchFilter).select('_id').exec();
+    const bookingIds = activeBookings.map(b => b._id);
+
+    const details = await this.bookingDetailModel.find({ bookingId: { $in: bookingIds } }).select('startTime').exec();
+
+    let morning = 0; // 6h-12h
+    let afternoon = 0; // 12h-17h
+    let evening = 0; // 17h-22h
+
+    details.forEach(d => {
+      const hour = parseInt(d.startTime.split(':')[0]);
+      if (hour >= 6 && hour < 12) morning++;
+      else if (hour >= 12 && hour < 17) afternoon++;
+      else if (hour >= 17 && hour <= 22) evening++;
+    });
+
+    const total = morning + afternoon + evening;
+    const peakHours = total === 0 ? [] : [
+      { name: 'Sáng (06:00 - 12:00)', value: Math.round((morning / total) * 100) },
+      { name: 'Chiều (12:00 - 17:00)', value: Math.round((afternoon / total) * 100) },
+      { name: 'Tối (17:00 - 22:00)', value: Math.round((evening / total) * 100) }
+    ];
+
+    return createApiResponse(peakHours, 'Thống kê khung giờ vàng thành công', HttpStatus.OK);
+  }
+
+  // --- NEW ADMIN DASHBOARD METHODS ---
+
+  async getSystemOverview(query: any): Promise<ApiResponseType> {
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfPreviousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    // Date filters if provided, otherwise default to current month
+    let currentStartDate = startOfCurrentMonth;
+    let currentEndDate = now;
+    
+    if (query.startDate && query.endDate) {
+      currentStartDate = new Date(query.startDate);
+      currentEndDate = new Date(query.endDate);
+      // For custom ranges, previous period is exactly same length before current start date
+      const diffTime = Math.abs(currentEndDate.getTime() - currentStartDate.getTime());
+      const previousStartDate = new Date(currentStartDate.getTime() - diffTime);
+      const previousEndDate = new Date(currentStartDate.getTime() - 1);
+      // Overwrite default previous period
+      var prevStart = previousStartDate;
+      var prevEnd = previousEndDate;
+    } else {
+      var prevStart = startOfPreviousMonth;
+      var prevEnd = new Date(startOfCurrentMonth.getTime() - 1);
+    }
+
+    const currentFilter = { status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }, createdAt: { $gte: currentStartDate, $lte: currentEndDate } };
+    const previousFilter = { status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] }, createdAt: { $gte: prevStart, $lte: prevEnd } };
+
+    const [currentBookings, previousBookings, totalUsers, activeVenues, previousVenues] = await Promise.all([
+      this.bookingModel.find(currentFilter).exec(),
+      this.bookingModel.find(previousFilter).exec(),
+      this.userModel.aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: 1 },
+            players: { $sum: { $cond: [{ $eq: ['$role', 'PLAYER'] }, 1, 0] } },
+            owners: { $sum: { $cond: [{ $in: ['$role', ['COURT_OWNER', 'OWNER']] }, 1, 0] } }
+          }
+        }
+      ]),
+      this.venueModel.countDocuments({ status: 'ACTIVE' }),
+      this.venueModel.countDocuments({ status: 'ACTIVE', createdAt: { $lt: currentStartDate } })
+    ]);
+
+    const currentRevenue = currentBookings.reduce((sum, b) => sum + b.finalPrice, 0);
+    const previousRevenue = previousBookings.reduce((sum, b) => sum + b.finalPrice, 0);
+    const currentCount = currentBookings.length;
+    const previousCount = previousBookings.length;
+
+    const revenueTrend = previousRevenue === 0 ? 100 : ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+    const bookingsTrend = previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100;
+    const venuesGrowth = previousVenues === 0 ? 100 : ((activeVenues - previousVenues) / previousVenues) * 100;
+
+    const userData = totalUsers[0] || { total: 0, players: 0, owners: 0 };
+
+    return createApiResponse({
+      totalRevenue: currentRevenue,
+      revenueGrowth: parseFloat(revenueTrend.toFixed(1)),
+      totalBookings: currentCount,
+      bookingGrowth: parseFloat(bookingsTrend.toFixed(1)),
+      totalUsers: {
+        total: userData.total,
+        players: userData.players,
+        owners: userData.owners
+      },
+      activeVenues,
+      venuesGrowth: parseFloat(venuesGrowth.toFixed(1))
+    }, 'Thống kê tổng quan Admin thành công', HttpStatus.OK);
+  }
+
+  async getAdminPendingActions(): Promise<ApiResponseType> {
+    const [pendingOwnerRequests, pendingClosureRequests, flaggedUsers] = await Promise.all([
+      this.venueModel.countDocuments({ status: 'PENDING' }),
+      this.venueModel.countDocuments({ status: 'PENDING_CLOSURE' }),
+      this.userModel.countDocuments({ status: 'BLOCKED' })
+    ]);
+
+    return createApiResponse({
+      pendingOwnerRequests,
+      pendingClosureRequests,
+      flaggedUsers
+    }, 'Lấy danh sách việc cần làm thành công', HttpStatus.OK);
+  }
+
+  async getAdminChartData(query: any): Promise<ApiResponseType> {
+    const now = new Date();
+    let startDate = new Date();
+    startDate.setDate(now.getDate() - 6); // default to last 7 days including today
+    let endDate = now;
+
+    if (query.startDate && query.endDate) {
+      startDate = new Date(query.startDate);
+      endDate = new Date(query.endDate);
+    } else if (query.range === '30') {
+      startDate = new Date();
+      startDate.setDate(now.getDate() - 29);
+    } else if (query.range === 'month') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+
+    const matchFilter: any = {
+      status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] },
+      createdAt: { $gte: startDate, $lte: endDate }
+    };
+
+    const bookings = await this.bookingModel.find(matchFilter).select('createdAt finalPrice').exec();
+
+    // Group by date
+    const dailyData = new Map();
+    
+    // Initialize dates
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      dailyData.set(dateStr, { date: dateStr, revenue: 0, bookings: 0 });
+    }
+
+    bookings.forEach(b => {
+      const dateStr = b.createdAt.toISOString().split('T')[0];
+      if (dailyData.has(dateStr)) {
+        const current = dailyData.get(dateStr);
+        current.revenue += b.finalPrice;
+        current.bookings += 1;
+      }
+    });
+
+    const result = Array.from(dailyData.values()).sort((a, b) => a.date.localeCompare(b.date));
+
+    return createApiResponse(result, 'Lấy dữ liệu biểu đồ thành công', HttpStatus.OK);
+  }
+
+  async getAdminLeaderboards(query: any): Promise<ApiResponseType> {
+    const limit = parseInt(query.limit) || 5;
+    
+    const topVenuesAggregation = await this.bookingModel.aggregate([
+      { $match: { status: { $in: [BookingStatus.CONFIRMED, BookingStatus.COMPLETED] } } },
+      { $group: { _id: '$venueId', totalRevenue: { $sum: '$finalPrice' }, totalBookings: { $sum: 1 } } },
+      { $sort: { totalRevenue: -1 } },
+      { $limit: limit },
+      { $lookup: { from: 'venues', localField: '_id', foreignField: '_id', as: 'venue' } },
+      { $unwind: '$venue' },
+      { $lookup: { from: 'users', localField: 'venue.ownerId', foreignField: '_id', as: 'owner' } },
+      { $unwind: { path: '$owner', preserveNullAndEmptyArrays: true } },
+      { 
+        $project: { 
+          venueId: '$_id', 
+          venueName: '$venue.name', 
+          ownerName: { $ifNull: ['$owner.fullName', 'Unknown'] },
+          totalRevenue: 1, 
+          totalBookings: 1,
+          _id: 0
+        } 
+      }
+    ]);
+
+    const riskVenuesAggregation = await this.bookingModel.aggregate([
+      { $group: { 
+          _id: '$venueId', 
+          totalBookings: { $sum: 1 },
+          totalCancelled: { $sum: { $cond: [{ $in: ['$status', ['CANCELLED', 'NO_SHOW']] }, 1, 0] } }
+        } 
+      },
+      { $match: { totalBookings: { $gt: 5 } } }, // Filter out new venues with very few bookings
+      { $project: {
+          venueId: '$_id',
+          totalBookings: 1,
+          totalCancelled: 1,
+          cancelRate: { $multiply: [{ $divide: ['$totalCancelled', '$totalBookings'] }, 100] }
+        }
+      },
+      { $sort: { cancelRate: -1, totalCancelled: -1 } },
+      { $limit: limit },
+      { $lookup: { from: 'venues', localField: 'venueId', foreignField: '_id', as: 'venue' } },
+      { $unwind: '$venue' },
+      { 
+        $project: { 
+          venueId: 1, 
+          venueName: '$venue.name', 
+          cancelRate: { $round: ['$cancelRate', 1] },
+          totalCancelled: 1,
+          _id: 0
+        } 
+      }
+    ]);
+
+    return createApiResponse({ topVenues: topVenuesAggregation, riskVenues: riskVenuesAggregation }, 'Lấy bảng xếp hạng cơ sở thành công', HttpStatus.OK);
   }
 }

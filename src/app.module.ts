@@ -21,9 +21,10 @@ import { PromotionsModule } from './promotions/promotions.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { UploadModule } from './upload/upload.module';
 import { UsersModule } from './users/users.module';
-import { NotificationModule } from './utils/notification.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { VenuesModule } from './venues/venues.module';
 import { MailModule } from './mail/mail.module';
+import { CouponsModule } from './coupons/coupons.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -39,7 +40,7 @@ import { MailModule } from './mail/mail.module';
     CourtsModule,
     PricingsModule,
     PromotionsModule,
-    NotificationModule,
+    NotificationsModule,
     UploadModule,
     AvailabilityModule,
     BookingsModule,
@@ -51,6 +52,7 @@ import { MailModule } from './mail/mail.module';
     AuditLogsModule,
     OwnerRequestsModule,
     MailModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [

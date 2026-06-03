@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -55,6 +55,12 @@ export class User {
 
   @Prop()
   blockedBy: string;  // Admin ID who blocked this user
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Venue' }], default: [] })
+  favoriteVenues: Types.ObjectId[];
+
+  @Prop({ type: [String], default: [] })
+  fcmTokens: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

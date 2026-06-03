@@ -25,8 +25,16 @@ export class PaymentsController {
   async callback(@Query() query: any, @Res() res: any): Promise<any> {
     await this.paymentsService.handleCallback(query);
     const bookingId = query.vnp_TxnRef || query.orderId;
-    const frontendUrl = process.env.FRONTEND_URL || 'https://badmintonhubs.vercel.app';
-    return res.redirect(`${frontendUrl}/booking/success?bookingId=${bookingId}`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    
+    const isSuccess = query.vnp_ResponseCode === '00' || query.vnp_TransactionStatus === '00' || query.errorCode === '0';
+    
+    if (isSuccess) {
+      return res.redirect(`${frontendUrl}/booking/success?bookingId=${bookingId}`);
+    } else {
+      // Truyền thêm param status=failed để FE biết là thanh toán không thành công
+      return res.redirect(`${frontendUrl}/booking/success?bookingId=${bookingId}&status=failed`);
+    }
   }
 
   @ApiOperation({ summary: 'Kiểm tra trạng thái thanh toán của một đơn đặt sân' })

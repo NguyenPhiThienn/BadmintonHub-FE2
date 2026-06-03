@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards, Delete, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OwnerRequestsService } from './owner-requests.service';
 import { CreateOwnerRequestDto, ReviewOwnerRequestDto } from './dto/owner-request.dto';
@@ -27,6 +27,20 @@ export class OwnerRequestsController {
   @Get('my-request')
   async getMyRequest(@Req() req: any): Promise<ApiResponseType> {
     return await this.ownerRequestsService.getMyRequest(req.user.id);
+  }
+
+  @ApiOperation({ summary: 'Chỉnh sửa và Nộp lại đơn đăng ký chủ sân (Player)' })
+  @ApiResponse({ status: 200, description: 'Cập nhật đơn thành công' })
+  @Put('my-request')
+  async updateMyRequest(@Req() req: any, @Body() dto: CreateOwnerRequestDto): Promise<ApiResponseType> {
+    return await this.ownerRequestsService.updateMyRequest(req.user.id, dto);
+  }
+
+  @ApiOperation({ summary: 'Xóa / Hủy đơn đăng ký chủ sân (Player)' })
+  @ApiResponse({ status: 200, description: 'Xóa đơn thành công' })
+  @Delete('my-request')
+  async deleteMyRequest(@Req() req: any): Promise<ApiResponseType> {
+    return await this.ownerRequestsService.deleteMyRequest(req.user.id);
   }
 
   @ApiOperation({ summary: 'Xem danh sách đơn đăng ký (Admin)' })

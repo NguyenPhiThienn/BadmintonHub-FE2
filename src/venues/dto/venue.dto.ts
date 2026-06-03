@@ -48,12 +48,12 @@ export class CreateVenueDto {
 
   @ApiProperty({ example: '05:00' })
   @IsNotEmpty()
-  @Matches(/^([01]\d|2[0-3]):?([0-5]\d)$/, { message: 'openTime must be HH:mm' })
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$|^24:00$/, { message: 'openTime must be HH:mm or 24:00' })
   openTime: string;
 
   @ApiProperty({ example: '22:00' })
   @IsNotEmpty()
-  @Matches(/^([01]\d|2[0-3]):?([0-5]\d)$/, { message: 'closeTime must be HH:mm' })
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$|^24:00$/, { message: 'closeTime must be HH:mm or 24:00' })
   closeTime: string;
 
   @ApiProperty({ example: 100000 })

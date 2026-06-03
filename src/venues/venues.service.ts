@@ -8,6 +8,11 @@ import { CreateVenueDto, UpdateVenueDto } from './dto/venue.dto';
 import { VenueImage, VenueImageDocument } from './schemas/venue-image.schema';
 import { Venue, VenueDocument, VenueStatus } from './schemas/venue.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
+import { Booking, BookingDocument, BookingStatus } from '../bookings/schemas/booking.schema';
+import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
+import { Coupon, CouponDocument, CouponStatus, DiscountType } from '../coupons/schemas/coupon.schema';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/schemas/notification.schema';
 import { MailService } from '../mail/mail.service';
 
 @Injectable()
@@ -17,6 +22,10 @@ export class VenuesService {
     @InjectModel(VenueImage.name) private venueImageModel: Model<VenueImageDocument>,
     @InjectModel(Court.name) private courtModel: Model<CourtDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
+    @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
+    @InjectModel(Coupon.name) private couponModel: Model<CouponDocument>,
+    private notificationsService: NotificationsService,
     private mailService: MailService,
   ) { }
 
@@ -123,20 +132,16 @@ export class VenuesService {
       ]);
     }
 
-    // Get available counts and images for each venue
+    // Get available counts, courts list and images for each venue
     const venuesWithAvailability = await Promise.all(venues.map(async (v) => {
       const venueObj = typeof v.toObject === 'function' ? v.toObject() : v;
-      const [available, totalCourts, images] = await Promise.all([
-        this.courtModel.countDocuments({
-          venueId: venueObj._id,
-          status: CourtStatus.AVAILABLE
-        }),
-        this.courtModel.countDocuments({
-          venueId: venueObj._id
-        }),
+      const [courts, images] = await Promise.all([
+        this.courtModel.find({ venueId: venueObj._id }).select('name type status').exec(),
         this.venueImageModel.find({ venueId: venueObj._id }).exec()
       ]);
-      return { ...venueObj, available, totalCourts, images };
+      const available = courts.filter(c => c.status === CourtStatus.AVAILABLE).length;
+      const totalCourts = courts.length;
+      return { ...venueObj, available, totalCourts, courts, images };
     }));
 
     return createApiResponse(
@@ -339,5 +344,171 @@ export class VenuesService {
   async resetAllRatings(): Promise<ApiResponseType> {
     await this.venueModel.updateMany({}, { $set: { averageRating: 0 } }).exec();
     return createApiResponse({ updated: true }, 'Đã reset tất cả ratings về 0', HttpStatus.OK);
+  }
+  async requestClosure(id: string, userId: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    const venue = await this.venueModel.findById(id).exec();
+    if (!venue || venue.ownerId.toString() !== userId) {
+      throw new HttpException('Không tìm thấy cơ sở hoặc bạn không có quyền', HttpStatus.FORBIDDEN);
+    }
+    
+    venue.status = VenueStatus.PENDING_CLOSURE;
+    await venue.save();
+
+    // Notify admins
+    const admins = await this.userModel.find({ role: 'ADMIN' }).select('_id').exec();
+    for (const admin of admins) {
+      this.notificationsService.sendAndSaveNotification(
+        admin._id.toString(),
+        '🏢 Yêu cầu đóng cửa cơ sở',
+        `Chủ sân đã yêu cầu đóng cửa cơ sở ${venue.name}. Vui lòng kiểm tra và phê duyệt.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
+    }
+
+    return createApiResponse(null, 'Đã gửi yêu cầu đóng cửa cơ sở. Vui lòng chờ phê duyệt (tối đa 3 ngày).', HttpStatus.OK);
+  }
+
+  async cancelClosure(id: string, userId: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    const venue = await this.venueModel.findById(id).exec();
+    if (!venue || venue.ownerId.toString() !== userId) {
+      throw new HttpException('Không tìm thấy cơ sở hoặc bạn không có quyền', HttpStatus.FORBIDDEN);
+    }
+    
+    if (venue.status !== VenueStatus.PENDING_CLOSURE) {
+      throw new HttpException('Cơ sở không ở trạng thái chờ duyệt đóng cửa', HttpStatus.BAD_REQUEST);
+    }
+
+    venue.status = VenueStatus.ACTIVE;
+    await venue.save();
+
+    // Notify admins that the owner cancelled the request
+    const admins = await this.userModel.find({ role: 'ADMIN' }).select('_id').exec();
+    for (const admin of admins) {
+      this.notificationsService.sendAndSaveNotification(
+        admin._id.toString(),
+        '✅ Hủy yêu cầu đóng cửa cơ sở',
+        `Chủ sân đã HỦY yêu cầu đóng cửa cơ sở ${venue.name}. Cơ sở này hiện đã hoạt động trở lại.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
+    }
+
+    return createApiResponse(null, 'Đã hủy yêu cầu đóng cửa thành công. Cơ sở đã hoạt động bình thường.', HttpStatus.OK);
+  }
+
+  async approveClosure(id: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    const venue = await this.venueModel.findById(id).exec();
+    if (!venue) {
+      throw new HttpException('Không tìm thấy cơ sở', HttpStatus.NOT_FOUND);
+    }
+
+    venue.status = VenueStatus.CLOSED;
+    await venue.save();
+
+    // 1. Find all active bookings (PENDING, CONFIRMED)
+    const activeBookings = await this.bookingModel.find({
+      venueId: venue._id,
+      status: { $in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] }
+    }).exec();
+
+    // 2. Process each booking
+    for (const booking of activeBookings) {
+      // Cancel booking
+      booking.status = BookingStatus.CANCELLED;
+      booking.cancelReason = 'Cơ sở ngưng hoạt động';
+      booking.cancelledBy = 'SYSTEM';
+      await booking.save();
+
+      // Check payment status
+      const payment = await this.paymentModel.findOne({ bookingId: booking._id }).sort({ createdAt: -1 }).exec();
+      const isPaidViaVNPay = payment && payment.method === 'VNPAY' && payment.status === 'SUCCESS';
+      
+      if (isPaidViaVNPay) {
+        // Mock refund VNPAY (in reality, trigger VNPAY refund API here)
+        payment.status = 'REFUNDED' as any;
+        await payment.save();
+      }
+
+      // Create 5% compensation coupon for the user
+      const couponCode = `COMP5_${booking._id.toString().slice(-6).toUpperCase()}`;
+      const validUntil = new Date();
+      validUntil.setDate(validUntil.getDate() + 30); // Valid for 30 days
+      
+      await this.couponModel.create({
+        code: couponCode,
+        ownerId: venue.ownerId, // required by schema
+        venueId: null, // Apply to all venues of this owner (since the original venue is closed)
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 5,
+        maxDiscountAmount: 50000, // schema uses maxDiscountAmount
+        startDate: new Date(),
+        endDate: validUntil,
+        usageLimit: 1,
+        usedCount: 0,
+        status: CouponStatus.ACTIVE,
+      });
+
+      // Send Notification to user if they are registered
+      if (booking.playerId) {
+        const message = isPaidViaVNPay 
+          ? `Rất tiếc, cơ sở ${venue.name} đã ngưng hoạt động nên đơn đặt sân của bạn bị hủy. Tiền (100%) sẽ được hoàn về tài khoản của bạn. Để tạ lỗi, hệ thống tặng bạn mã giảm giá 5%: ${couponCode}`
+          : `Rất tiếc, cơ sở ${venue.name} đã ngưng hoạt động nên đơn đặt sân của bạn bị hủy. Để tạ lỗi, hệ thống tặng bạn mã giảm giá 5%: ${couponCode} cho lần đặt sân tiếp theo.`;
+
+        this.notificationsService.sendAndSaveNotification(
+          booking.playerId.toString(),
+          '⚠️ Hủy đơn do cơ sở ngưng hoạt động',
+          message,
+          NotificationType.BOOKING_CANCELLED
+        ).catch(console.error);
+      }
+    }
+
+    // Notify owner
+    this.notificationsService.sendAndSaveNotification(
+      venue.ownerId.toString(),
+      '🏢 Cơ sở đã đóng cửa',
+      `Yêu cầu đóng cửa cơ sở ${venue.name} của bạn đã được duyệt. Tất cả đơn đặt sân hiện tại đã bị hủy.`,
+      NotificationType.SYSTEM_ALERT
+    ).catch(console.error);
+
+    return createApiResponse(null, 'Đã duyệt đóng cửa cơ sở thành công', HttpStatus.OK);
+  }
+
+  async requestReopen(id: string, userId: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new HttpException('ID cơ sở không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    const venue = await this.venueModel.findById(id).exec();
+    if (!venue || venue.ownerId.toString() !== userId) {
+      throw new HttpException('Không tìm thấy cơ sở hoặc bạn không có quyền', HttpStatus.FORBIDDEN);
+    }
+    
+    if (venue.status !== VenueStatus.CLOSED) {
+      throw new HttpException('Cơ sở không ở trạng thái ĐÃ ĐÓNG', HttpStatus.BAD_REQUEST);
+    }
+
+    venue.status = VenueStatus.PENDING; // Send back to pending state for admin to review
+    await venue.save();
+
+    // Notify admins
+    const admins = await this.userModel.find({ role: 'ADMIN' }).select('_id').exec();
+    for (const admin of admins) {
+      this.notificationsService.sendAndSaveNotification(
+        admin._id.toString(),
+        '🏢 Xin mở lại cơ sở đã đóng',
+        `Chủ sân đã yêu cầu xin mở lại cơ sở ${venue.name}. Vui lòng kiểm tra và phê duyệt.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
+    }
+
+    return createApiResponse(null, 'Đã gửi yêu cầu mở lại cơ sở. Vui lòng chờ phê duyệt.', HttpStatus.OK);
   }
 }

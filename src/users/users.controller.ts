@@ -30,6 +30,20 @@ export class UsersController {
     return await this.usersService.updateProfile(req.user.id, dto);
   }
 
+  @ApiOperation({ summary: 'Lưu FCM Token để nhận thông báo đẩy' })
+  @ApiResponse({ status: 200, description: 'Lưu FCM Token thành công' })
+  @Post('fcm-token')
+  async saveFcmToken(@Req() req: any, @Body('token') token: string): Promise<ApiResponseType> {
+    return await this.usersService.saveFcmToken(req.user.id, token);
+  }
+
+  @ApiOperation({ summary: 'Xóa FCM Token khi đăng xuất' })
+  @ApiResponse({ status: 200, description: 'Xóa FCM Token thành công' })
+  @Delete('fcm-token')
+  async removeFcmToken(@Req() req: any, @Body('token') token: string): Promise<ApiResponseType> {
+    return await this.usersService.removeFcmToken(req.user.id, token);
+  }
+
   @ApiOperation({ summary: 'Thêm người dùng mới (Admin)' })
   @ApiResponse({ status: 201, description: 'Thêm thành công' })
   @Roles(UserRole.ADMIN)
@@ -50,6 +64,31 @@ export class UsersController {
     @Query('status') status?: string
   ): Promise<ApiResponseType> {
     return await this.usersService.getAllUsers(Number(page), Number(limit), search, role, status);
+  }
+
+  // =============================================
+  // FAVORITE VENUES
+  // =============================================
+
+  @ApiOperation({ summary: 'Lấy danh sách sân yêu thích của user hiện tại' })
+  @ApiResponse({ status: 200, description: 'Lấy danh sách thành công' })
+  @Get('favorites')
+  async getFavoriteVenues(
+    @Req() req: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<ApiResponseType> {
+    return await this.usersService.getFavoriteVenues(req.user.id, Number(page), Number(limit));
+  }
+
+  @ApiOperation({ summary: 'Thêm hoặc xóa sân yêu thích (Toggle)' })
+  @ApiResponse({ status: 200, description: 'Toggle thành công' })
+  @Post('favorites/toggle')
+  async toggleFavoriteVenue(
+    @Req() req: any,
+    @Body() body: { venueId: string },
+  ): Promise<ApiResponseType> {
+    return await this.usersService.toggleFavoriteVenue(req.user.id, body.venueId);
   }
 
   @ApiOperation({ summary: 'Xem chi tiết người dùng (Admin)' })
@@ -87,4 +126,7 @@ export class UsersController {
   async remove(@Param('id') id: string): Promise<ApiResponseType> {
     return await this.usersService.remove(id);
   }
+
+
 }
+

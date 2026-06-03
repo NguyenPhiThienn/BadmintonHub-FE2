@@ -15,6 +15,8 @@ export enum PaymentStatus {
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',
   REFUNDED = 'REFUNDED',
+  REFUNDING = 'REFUNDING',
+  DEBT = 'DEBT',
 }
 
 @Schema({ timestamps: { createdAt: true, updatedAt: false } })
@@ -33,6 +35,14 @@ export class Payment {
 
   @Prop()
   transaction_id: string;
+
+  @Prop({ type: Object })
+  refundInfo: {
+    bankName: string;
+    accountNumber: string;
+    accountName: string;
+    reason: string;
+  };
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

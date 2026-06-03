@@ -7,11 +7,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Booking, BookingStatus } from '../bookings/schemas/booking.schema';
 import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
-import { Court } from '../courts/schemas/court.schema';
+import { Court, CourtStatus } from '../courts/schemas/court.schema';
+import { VenueImage, VenueImageDocument } from '../venues/schemas/venue-image.schema';
 import { BookingDetail } from '../bookings/schemas/booking-detail.schema';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { AuditAction } from '../audit-logs/schemas/audit-log.schema';
 import { AppGateway } from '../gateways/app.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/schemas/notification.schema';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -21,9 +24,11 @@ export class UsersService {
     @InjectModel(Booking.name) private bookingModel: Model<Booking>,
     @InjectModel(Venue.name) private venueModel: Model<VenueDocument>,
     @InjectModel(Court.name) private courtModel: Model<Court>,
+    @InjectModel(VenueImage.name) private venueImageModel: Model<VenueImageDocument>,
     @InjectModel(BookingDetail.name) private bookingDetailModel: Model<BookingDetail>,
     private auditLogsService: AuditLogsService,
     private appGateway: AppGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<ApiResponseType> {
@@ -55,6 +60,26 @@ export class UsersService {
       throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
     }
     return createApiResponse(user, 'Lấy thông tin thành công', HttpStatus.OK);
+  }
+
+  async saveFcmToken(userId: string, token: string): Promise<ApiResponseType> {
+    if (!token) {
+      throw new HttpException('Token không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    await this.userModel.findByIdAndUpdate(userId, {
+      $addToSet: { fcmTokens: token }
+    });
+    return createApiResponse(null, 'Lưu FCM Token thành công', HttpStatus.OK);
+  }
+
+  async removeFcmToken(userId: string, token: string): Promise<ApiResponseType> {
+    if (!token) {
+      throw new HttpException('Token không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { fcmTokens: token }
+    });
+    return createApiResponse(null, 'Xóa FCM Token thành công', HttpStatus.OK);
   }
 
   async updateProfile(userId: string, dto: UpdateUserDto): Promise<ApiResponseType> {
@@ -119,19 +144,38 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<ApiResponseType> {
+    const oldUser = await this.userModel.findById(id).exec();
+    if (!oldUser) {
+      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+    }
+
     const { password, ...rest } = dto as any;
     const updateData: any = { ...rest };
     if (password && password.trim()) {
       updateData.passwordHash = await bcrypt.hash(password.trim(), 10);
     }
     const user = await this.userModel.findByIdAndUpdate(id, { $set: updateData }, { new: true }).select('-passwordHash').exec();
-    if (!user) {
-      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
-    }
 
     // Gửi sự kiện cập nhật vai trò qua Socket
-    if (dto.role) {
+    if (dto.role && dto.role !== oldUser.role) {
       this.appGateway.sendToUser(id, 'user:role_changed', { role: user.role });
+    }
+
+    // Gửi thông báo đẩy về các cập nhật
+    const updateDetails = [];
+    if (dto.role && dto.role !== oldUser.role) updateDetails.push(`Quyền hạn (${dto.role})`);
+    if (dto.status && dto.status !== oldUser.status) updateDetails.push(`Trạng thái (${dto.status})`);
+    if (dto.fullName && dto.fullName !== oldUser.fullName) updateDetails.push(`Họ tên`);
+    if (dto.phone && dto.phone !== oldUser.phone) updateDetails.push(`Số điện thoại`);
+    if (password && password.trim()) updateDetails.push(`Mật khẩu`);
+    
+    if (updateDetails.length > 0) {
+      this.notificationsService.sendAndSaveNotification(
+        id,
+        '🛡️ Thông tin tài khoản được cập nhật',
+        `Quản trị viên đã cập nhật thông tin tài khoản của bạn: ${updateDetails.join(', ')}.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
     }
 
     return createApiResponse(user, 'Cập nhật người dùng thành công', HttpStatus.OK);
@@ -174,6 +218,13 @@ export class UsersService {
 
       await this.userModel.findByIdAndUpdate(userId, { $set: blockData }).exec();
 
+      this.notificationsService.sendAndSaveNotification(
+        userId,
+        '🔒 Tài khoản bị khóa',
+        `Tài khoản của bạn đã bị khóa ${data.blockType === BlockType.TEMPORARY ? `tạm thời${data.days ? ` trong ${data.days} ngày` : ''}` : 'vĩnh viễn'}. Lý do: ${data.reason || 'Vi phạm chính sách'}.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
+
       // Ghi audit log
       await this.auditLogsService.create({
         action: AuditAction.USER_BLOCK,
@@ -208,6 +259,13 @@ export class UsersService {
           blockedBy: null,
         },
       }).exec();
+
+      this.notificationsService.sendAndSaveNotification(
+        userId,
+        '✅ Tài khoản được mở khóa',
+        `Tài khoản của bạn đã được quản trị viên mở khóa. Bạn có thể sử dụng dịch vụ bình thường.`,
+        NotificationType.SYSTEM_ALERT
+      ).catch(console.error);
 
       // Ghi audit log
       await this.auditLogsService.create({
@@ -272,5 +330,106 @@ export class UsersService {
     await this.userModel.findByIdAndDelete(id).exec();
     
     return createApiResponse(null, 'Xóa người dùng và các dữ liệu liên quan thành công', HttpStatus.OK);
+  }
+
+  // =============================================
+  // FAVORITE VENUES
+  // =============================================
+
+  async toggleFavoriteVenue(userId: string, venueId: string): Promise<ApiResponseType> {
+    if (!Types.ObjectId.isValid(venueId)) {
+      throw new HttpException('ID sân không hợp lệ', HttpStatus.BAD_REQUEST);
+    }
+
+    // Kiểm tra sân có tồn tại và đang hoạt động không
+    const venue = await this.venueModel.findById(venueId).exec();
+    if (!venue) {
+      throw new HttpException('Sân không tồn tại', HttpStatus.NOT_FOUND);
+    }
+
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+    }
+
+    const venueObjectId = new Types.ObjectId(venueId);
+    const isFavorite = user.favoriteVenues.some((id) => id.equals(venueObjectId));
+
+    if (isFavorite) {
+      // Đã yêu thích → Xóa khỏi danh sách
+      await this.userModel.findByIdAndUpdate(userId, {
+        $pull: { favoriteVenues: venueObjectId },
+      }).exec();
+      return createApiResponse(
+        { isFavorite: false },
+        'Đã xóa khỏi danh sách yêu thích',
+        HttpStatus.OK,
+      );
+    } else {
+      // Chưa yêu thích → Thêm vào danh sách
+      await this.userModel.findByIdAndUpdate(userId, {
+        $addToSet: { favoriteVenues: venueObjectId },
+      }).exec();
+      return createApiResponse(
+        { isFavorite: true },
+        'Đã thêm vào danh sách yêu thích',
+        HttpStatus.OK,
+      );
+    }
+  }
+
+  async getFavoriteVenues(userId: string, page: number = 1, limit: number = 10): Promise<ApiResponseType> {
+    const skip = (page - 1) * limit;
+
+    const user = await this.userModel
+      .findById(userId)
+      .select('favoriteVenues')
+      .exec();
+
+    if (!user) {
+      throw new HttpException('Người dùng không tồn tại', HttpStatus.NOT_FOUND);
+    }
+
+    const favoriteIds = user.favoriteVenues || [];
+    const total = favoriteIds.length;
+
+    // Lấy các venue với đầy đủ thông tin (populate giống API get venues)
+    const venues = await this.venueModel
+      .find({ _id: { $in: favoriteIds } })
+      .skip(skip)
+      .limit(limit)
+      .select('-__v')
+      .exec();
+
+    // Map thêm field isFavorite: true, cùng với courts và images
+    const venuesWithFavorite = await Promise.all(venues.map(async (v) => {
+      const venueObj = typeof v.toObject === 'function' ? v.toObject() : v;
+      const [courts, images] = await Promise.all([
+        this.courtModel.find({ venueId: venueObj._id }).select('name type status').exec(),
+        this.venueImageModel.find({ venueId: venueObj._id }).exec()
+      ]);
+      const available = courts.filter(c => c.status === CourtStatus.AVAILABLE).length;
+      const totalCourts = courts.length;
+      return { 
+        ...venueObj, 
+        available, 
+        totalCourts, 
+        courts, 
+        images,
+        isFavorite: true 
+      };
+    }));
+
+    return createApiResponse(
+      {
+        venues: venuesWithFavorite,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+      'Lấy danh sách sân yêu thích thành công',
+      HttpStatus.OK,
+    );
   }
 }

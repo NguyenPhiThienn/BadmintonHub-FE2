@@ -8,6 +8,8 @@ import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
 import { BlockAvailabilityDto, GetAvailabilityDto, LockSlotDto } from './dto/availability.dto';
 import { SlotLock, SlotLockDocument } from './schemas/slot-lock.schema';
+import { AppGateway } from '../gateways/app.gateway';
+import { Pricing, PricingDocument } from '../pricings/schemas/pricing.schema';
 
 @Injectable()
 export class AvailabilityService {
@@ -17,6 +19,8 @@ export class AvailabilityService {
     @InjectModel(BookingDetail.name) private bookingDetailModel: Model<BookingDetailDocument>,
     @InjectModel(CourtUnavailableTime.name) private unavailableTimeModel: Model<CourtUnavailableTimeDocument>,
     @InjectModel(SlotLock.name) private slotLockModel: Model<SlotLockDocument>,
+    @InjectModel(Pricing.name) private pricingModel: Model<PricingDocument>,
+    private appGateway: AppGateway,
   ) { }
 
   async getAvailability(dto: GetAvailabilityDto): Promise<ApiResponseType> {
@@ -66,8 +70,8 @@ export class AvailabilityService {
 
       const activeBookings = bookings.filter((b: any) => {
         if (!b.bookingId) return false;
-        // Các trạng thái không chiếm slot: CANCELLED, NO_SHOW
-        if (['CANCELLED', 'NO_SHOW'].includes(b.bookingId.status)) return false;
+        // Các trạng thái không chiếm slot: CANCELLED, NO_SHOW, COMPLETED
+        if (['CANCELLED', 'NO_SHOW', 'COMPLETED'].includes(b.bookingId.status)) return false;
 
         const bDate = new Date(b.bookingDate);
         const isSameDay = bDate >= queryDate && bDate <= queryDateEnd;
@@ -93,6 +97,11 @@ export class AvailabilityService {
         courtId: court._id,
         date: date
       }).exec();
+
+      const venueIdToQuery = (court.venueId as any)._id ? (court.venueId as any)._id.toString() : court.venueId.toString();
+      const pricings = await this.pricingModel.find({ venueId: venueIdToQuery }).exec();
+      const jsDay = queryDate.getUTCDay();
+      const mappedDay = jsDay === 0 ? 6 : jsDay - 1;
 
       const slots = [];
       const [openH, openM] = openTime.split(':').map(Number);
@@ -134,11 +143,19 @@ export class AvailabilityService {
 
         const lock = locks.find(l => l.startTime === slotStart);
 
+        const applicablePricing = pricings.find(p => {
+          if (p.dayOfWeek !== null && p.dayOfWeek !== undefined && p.dayOfWeek !== mappedDay) return false;
+          return p.startTime <= slotStart && p.endTime >= slotEnd;
+        });
+        
+        const pricePerHour = applicablePricing ? applicablePricing.pricePerHour : (court.venueId as any).pricePerHour;
+
         slots.push({
           startTime: slotStart,
           endTime: slotEnd,
           status: isBooked ? 'BOOKED' : (isBlocked ? 'BLOCKED' : (isLockedByOther ? 'LOCKED' : 'AVAILABLE')),
           userId: lock ? lock.userId : undefined,
+          pricePerHour: pricePerHour,
         });
 
         currentH = nextH;
@@ -218,8 +235,8 @@ export class AvailabilityService {
 
     const activeBookings = bookings.filter((b: any) => {
       if (!b.bookingId) return false;
-      // Các trạng thái không chiếm slot: CANCELLED, NO_SHOW
-      if (['CANCELLED', 'NO_SHOW'].includes(b.bookingId.status)) return false;
+      // Các trạng thái không chiếm slot: CANCELLED, NO_SHOW, COMPLETED
+      if (['CANCELLED', 'NO_SHOW', 'COMPLETED'].includes(b.bookingId.status)) return false;
 
       const bDate = new Date(b.bookingDate);
       const isSameDay = bDate >= queryDate && bDate <= queryDateEnd;
@@ -265,6 +282,9 @@ export class AvailabilityService {
       { new: true, upsert: true }
     ).exec();
 
+    // Emit event to all clients so they instantly see the slot as LOCKED
+    this.appGateway.server.emit('slot:locked', { courtId, date, startTime, userId });
+
     return createApiResponse(lock, 'Khóa giờ thành công', HttpStatus.CREATED);
   }
 
@@ -281,6 +301,9 @@ export class AvailabilityService {
       startTime,
       userId
     }).exec();
+
+    // Emit event to all clients so they instantly see the slot as AVAILABLE
+    this.appGateway.server.emit('slot:unlocked', { courtId, date, startTime, userId });
 
     return createApiResponse(null, 'Mở khóa giờ thành công', HttpStatus.OK);
   }

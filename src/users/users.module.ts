@@ -7,6 +7,7 @@ import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { Venue, VenueSchema } from '../venues/schemas/venue.schema';
 import { Court, CourtSchema } from '../courts/schemas/court.schema';
 import { BookingDetail, BookingDetailSchema } from '../bookings/schemas/booking-detail.schema';
+import { VenueImage, VenueImageSchema } from '../venues/schemas/venue-image.schema';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { AuditLogsModule } from '../audit-logs/audit-logs.module';
       { name: Venue.name, schema: VenueSchema },
       { name: Court.name, schema: CourtSchema },
       { name: BookingDetail.name, schema: BookingDetailSchema },
+      { name: VenueImage.name, schema: VenueImageSchema },
     ]),
     AuditLogsModule,
   ],

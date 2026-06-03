@@ -27,6 +27,21 @@ export class OwnerRequest {
   @Prop({ required: true })
   businessLicense: string;
 
+  @Prop({ required: true })
+  bankName: string;
+
+  @Prop({ required: true })
+  bankAccountNumber: string;
+
+  @Prop({ required: true })
+  bankAccountName: string;
+
+  @Prop({ required: true })
+  taxCode: string;
+
+  @Prop({ required: true, default: true })
+  isAgreedToTerms: boolean;
+
   @Prop({ required: true, enum: OwnerRequestStatus, default: OwnerRequestStatus.PENDING })
   status: OwnerRequestStatus;
 

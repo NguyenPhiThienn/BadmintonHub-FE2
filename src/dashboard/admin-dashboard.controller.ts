@@ -15,21 +15,32 @@ import { DashboardService } from './dashboard.service';
 export class AdminDashboardController {
   constructor(private readonly dashboardService: DashboardService) { }
 
-  @ApiOperation({ summary: 'Lấy thông tin tổng quan hệ thống (Revenue, Bookings, Users)' })
+  @ApiOperation({ summary: 'Chỉ số Tổng quan hệ thống (System Overview)' })
   @ApiResponse({ status: 200, description: 'Lấy dữ liệu thành công' })
-  @Get('summary')
-  async getSummary(@Query() query: any): Promise<ApiResponseType> {
-    return await this.dashboardService.getAdminSummary(query);
+  @Get('overview')
+  async getOverview(@Query() query: any): Promise<ApiResponseType> {
+    return await this.dashboardService.getSystemOverview(query);
   }
 
-  @ApiOperation({ summary: 'Lấy dữ liệu biểu đồ phân tích' })
+  @ApiOperation({ summary: 'Việc cần làm của Admin (Pending Actions)' })
   @ApiResponse({ status: 200, description: 'Lấy dữ liệu thành công' })
-  @Get('charts')
-  async getCharts(
-    @Query('type') type: string = 'revenue',
-    @Query('period') period: string = 'month'
-  ): Promise<ApiResponseType> {
-    return await this.dashboardService.getAdminCharts(type, period);
+  @Get('pending-actions')
+  async getPendingActions(): Promise<ApiResponseType> {
+    return await this.dashboardService.getAdminPendingActions();
+  }
+
+  @ApiOperation({ summary: 'Dữ liệu Biểu đồ (Revenue & Bookings Chart)' })
+  @ApiResponse({ status: 200, description: 'Lấy dữ liệu thành công' })
+  @Get('chart')
+  async getChart(@Query() query: any): Promise<ApiResponseType> {
+    return await this.dashboardService.getAdminChartData(query);
+  }
+
+  @ApiOperation({ summary: 'Bảng Xếp Hạng Cơ Sở (Leaderboards)' })
+  @ApiResponse({ status: 200, description: 'Lấy dữ liệu thành công' })
+  @Get('leaderboards')
+  async getLeaderboards(@Query() query: any): Promise<ApiResponseType> {
+    return await this.dashboardService.getAdminLeaderboards(query);
   }
 
   @ApiOperation({ summary: 'Lấy báo cáo doanh thu chi tiết (Bộ lọc)' })

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PricingsService } from './pricings.service';
 import { CreatePricingDto, UpdatePricingDto } from './dto/pricing.dto';
@@ -39,5 +39,15 @@ export class PricingsController {
   @Put('pricings/:id')
   async update(@Param('id') id: string, @Req() req: any, @Body() dto: UpdatePricingDto): Promise<ApiResponseType> {
     return await this.pricingsService.update(id, req.user, dto);
+  }
+
+  @ApiOperation({ summary: 'Xóa khung giá (Chủ sân)' })
+  @ApiResponse({ status: 200, description: 'Xóa thành công' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.COURT_OWNER, UserRole.ADMIN)
+  @Delete('pricings/:id')
+  async remove(@Param('id') id: string, @Req() req: any): Promise<ApiResponseType> {
+    return await this.pricingsService.remove(id, req.user);
   }
 }

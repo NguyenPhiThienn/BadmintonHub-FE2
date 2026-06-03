@@ -10,6 +10,8 @@ export enum VenueStatus {
   INACTIVE = 'INACTIVE',
   REJECTED = 'REJECTED',
   SUSPENDED = 'SUSPENDED',
+  PENDING_CLOSURE = 'PENDING_CLOSURE',
+  CLOSED = 'CLOSED',
 }
 
 @Schema({ timestamps: true })

@@ -22,6 +22,30 @@ export class CreateOwnerRequestDto {
   @IsNotEmpty({ message: 'Ảnh giấy phép kinh doanh không được để trống' })
   @IsString()
   businessLicense: string;
+
+  @ApiProperty({ example: 'Vietcombank', description: 'Tên ngân hàng' })
+  @IsNotEmpty({ message: 'Tên ngân hàng không được để trống' })
+  @IsString()
+  bankName: string;
+
+  @ApiProperty({ example: '123456789', description: 'Số tài khoản ngân hàng' })
+  @IsNotEmpty({ message: 'Số tài khoản ngân hàng không được để trống' })
+  @IsString()
+  bankAccountNumber: string;
+
+  @ApiProperty({ example: 'NGUYEN VAN A', description: 'Tên chủ tài khoản' })
+  @IsNotEmpty({ message: 'Tên chủ tài khoản không được để trống' })
+  @IsString()
+  bankAccountName: string;
+
+  @ApiProperty({ example: '031202001234', description: 'Mã số thuế' })
+  @IsNotEmpty({ message: 'Mã số thuế không được để trống' })
+  @IsString()
+  taxCode: string;
+
+  @ApiProperty({ example: true, description: 'Đồng ý với các điều khoản' })
+  @IsNotEmpty({ message: 'Phải xác nhận đồng ý với các điều khoản' })
+  isAgreedToTerms: boolean;
 }
 
 export class ReviewOwnerRequestDto {

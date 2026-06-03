@@ -62,6 +62,53 @@ export class OwnerRequestsService {
     return createApiResponse(request, 'Lấy thông tin đăng ký của tôi thành công', HttpStatus.OK);
   }
 
+  async updateMyRequest(userId: string, dto: CreateOwnerRequestDto): Promise<ApiResponseType> {
+    const existingRequest = await this.ownerRequestModel.findOne({ userId }).sort({ createdAt: -1 }).exec();
+    
+    if (!existingRequest) {
+      throw new HttpException('Bạn chưa có đơn đăng ký nào', HttpStatus.NOT_FOUND);
+    }
+
+    if (existingRequest.status === OwnerRequestStatus.APPROVED) {
+      throw new HttpException('Đơn của bạn đã được duyệt, không thể chỉnh sửa', HttpStatus.BAD_REQUEST);
+    }
+
+    // Check duplicate identityCard ignoring the current request
+    const duplicateIdentity = await this.ownerRequestModel.findOne({
+      identityCard: dto.identityCard,
+      status: { $ne: OwnerRequestStatus.REJECTED },
+      _id: { $ne: existingRequest._id }
+    }).exec();
+
+    if (duplicateIdentity) {
+      throw new HttpException('Số CCCD này đã được sử dụng trong một hồ sơ đăng ký khác', HttpStatus.BAD_REQUEST);
+    }
+
+    Object.assign(existingRequest, dto);
+    existingRequest.status = OwnerRequestStatus.PENDING;
+    existingRequest.rejectReason = undefined;
+
+    await existingRequest.save();
+
+    return createApiResponse(existingRequest, 'Cập nhật và nộp lại đơn đăng ký thành công', HttpStatus.OK);
+  }
+
+  async deleteMyRequest(userId: string): Promise<ApiResponseType> {
+    const existingRequest = await this.ownerRequestModel.findOne({ userId }).sort({ createdAt: -1 }).exec();
+
+    if (!existingRequest) {
+      throw new HttpException('Bạn chưa có đơn đăng ký nào', HttpStatus.NOT_FOUND);
+    }
+
+    if (existingRequest.status === OwnerRequestStatus.APPROVED) {
+      throw new HttpException('Đơn của bạn đã được duyệt, không thể xóa', HttpStatus.BAD_REQUEST);
+    }
+
+    await existingRequest.deleteOne();
+
+    return createApiResponse(null, 'Đã hủy đơn đăng ký thành công', HttpStatus.OK);
+  }
+
   async findAll(query: any): Promise<ApiResponseType> {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || 10;

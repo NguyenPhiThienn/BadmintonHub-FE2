@@ -170,6 +170,13 @@ export class AuthService {
     const now = new Date();
     await this.userModel.findByIdAndUpdate(userId, { lastLogin: now });
 
+    const payload = {
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    };
+    const newAccessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
+
     return createApiResponse({
       id: user._id,
       fullName: user.fullName,
@@ -179,6 +186,7 @@ export class AuthService {
       avatarUrl: user.avatarUrl,
       status: user.status,
       lastLogin: now,
+      accessToken: newAccessToken,
     }, 'Lấy thông tin thành công', HttpStatus.OK);
   }
 

@@ -1,10 +1,16 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
+import { Model, Types } from 'mongoose';
 import { addDays, format } from 'date-fns';
 import Groq from 'groq-sdk';
 import { AvailabilityService } from '../availability/availability.service';
-import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { VenuesService } from '../venues/venues.service';
+import { ApiResponseType, createApiResponse } from '../utils/response.util';
+import { ChatSession, ChatSessionDocument, SessionStatus } from './schemas/chat-session.schema';
+import { Booking, BookingDocument, BookingStatus } from '../bookings/schemas/booking.schema';
+import { Venue, VenueDocument } from '../venues/schemas/venue.schema';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AiService {
@@ -12,324 +18,329 @@ export class AiService {
     private configService: ConfigService,
     private venuesService: VenuesService,
     private availabilityService: AvailabilityService,
+    @InjectModel(ChatSession.name) private chatSessionModel: Model<ChatSessionDocument>,
+    @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
+    @InjectModel(Venue.name) private venueModel: Model<VenueDocument>,
   ) { }
 
-  async getBookingRecommendation(venueId: string): Promise<ApiResponseType> {
+  // ----------------------------------------------------------------
+  // CHAT WITH HISTORY (Main endpoint)
+  // ----------------------------------------------------------------
+  async chatWithHistory(
+    message: string,
+    sessionId?: string,
+    userId?: string,
+  ): Promise<ApiResponseType> {
     try {
-      const tomorrow = addDays(new Date(), 1);
-      const dateStr = format(tomorrow, 'yyyy-MM-dd');
+      // 1. Find or create session
+      let session: ChatSessionDocument;
+      const sid = sessionId || uuidv4();
 
-      const apiKey = this.configService.get<string>('GROQ_API_KEY');
+      const existingSession = sessionId
+        ? await this.chatSessionModel.findOne({ sessionId, status: SessionStatus.ACTIVE }).exec()
+        : null;
 
-      if (!apiKey) {
-        throw new Error('GROQ_API_KEY is missing');
+      if (existingSession) {
+        session = existingSession;
+      } else {
+        session = await this.chatSessionModel.create({
+          sessionId: sid,
+          userId: userId ? new Types.ObjectId(userId) : undefined,
+          messages: [],
+          status: SessionStatus.ACTIVE,
+        });
       }
 
-      // 1. Fetch Venue Info
-      const venueRes = await this.venuesService.findOne(venueId);
-      const venue = venueRes?.data;
+      // 2. Build context from DB (RAG pattern)
+      const context = await this._buildContext(message, userId);
 
-      if (!venue) {
-        throw new Error('Venue not found');
-      }
+      // 3. Build Groq messages array from history
+      const groq = new Groq({ apiKey: this.configService.get<string>('GROQ_API_KEY') });
+      const systemPrompt = this._buildSystemPrompt(context);
 
-      // 2. Call Groq
-      const groq = new Groq({ apiKey });
-      const prompt = `
-        Bạn là một chuyên gia về cầu lông và trợ lý AI thông minh của ứng dụng BadmintonHub.
-        Hãy đề xuất một khung giờ đặt sân tuyệt vời nhất vào ngày mai (${dateStr}) cho sân "${venue.name}" (Địa chỉ: ${venue.address}, Giá tham khảo: ${venue.pricePerHour} VND/giờ).
-        Sân hiện có ${venue.available} sân trống.
-        Đánh giá của sân: ${venue.averageRating} sao.
+      const groqMessages: any[] = [{ role: 'system', content: systemPrompt }];
+      // Only send last 10 messages to avoid token limit
+      const recentHistory = session.messages.slice(-10);
+      recentHistory.forEach(m => groqMessages.push({ role: m.role, content: m.content }));
+      groqMessages.push({ role: 'user', content: message });
 
-        Yêu cầu:
-        1. Trả về JSON với định dạng sau:
-        {
-          "date": "${dateStr}",
-          "startTime": "HH:00",
-          "endTime": "HH:00",
-          "reason": "Giải thích RẤT CHI TIẾT (khoảng 3-4 câu) tại sao khung giờ này lại tuyệt vời. Phân tích về thời tiết, không khí sân, trải nghiệm chơi cầu lông.",
-          "matchScore": Điểm từ 90 đến 99,
-          "benefits": [
-            "Lợi ích 1 (rất chi tiết, phân tích rõ ràng, khoảng 15-20 chữ)",
-            "Lợi ích 2 (rất chi tiết, phân tích rõ ràng, khoảng 15-20 chữ)",
-            "Lợi ích 3 (rất chi tiết, phân tích rõ ràng, khoảng 15-20 chữ)"
-          ]
-        }
-        2. Thời gian bắt đầu (startTime) và kết thúc (endTime) phải cách nhau đúng 1 hoặc 2 tiếng. (VD: 18:00 - 20:00).
-        3. Văn phong chuyên nghiệp, thu hút, tạo cảm hứng cho người chơi.
-        4. CHỈ TRẢ VỀ JSON, KHÔNG CÓ TEXT NÀO KHÁC.
-      `;
-
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "llama-3.3-70b-versatile",
-        response_format: { type: "json_object" }
+      // 4. Call Groq AI
+      const completion = await groq.chat.completions.create({
+        messages: groqMessages,
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.7,
+        max_tokens: 1024,
       });
 
-      const content = chatCompletion.choices[0]?.message?.content;
-      if (!content) throw new Error('Empty response from Groq');
+      const reply = completion.choices[0]?.message?.content
+        || 'Xin lỗi bạn, tôi không thể xử lý câu hỏi này lúc này 😓';
 
-      const recommendation = JSON.parse(content);
+      // 5. Save both messages to DB
+      session.messages.push({ role: 'user', content: message, timestamp: new Date() } as any);
+      session.messages.push({ role: 'assistant', content: reply, timestamp: new Date() } as any);
+      await session.save();
 
-      return createApiResponse(recommendation, 'AI đề xuất khung giờ đặt sân thành công', HttpStatus.OK);
+      return createApiResponse(
+        {
+          reply,
+          sessionId: session.sessionId,
+          messageCount: session.messages.length,
+          // Debug: show what context was injected (for Postman/thầy demo)
+          _debug_context: context,
+        },
+        'AI phản hồi thành công',
+        HttpStatus.OK,
+      );
     } catch (error) {
-      console.error('AI Booking Recommendation Error:', error);
-
-      // Fallback
-      const tomorrow = addDays(new Date(), 1);
-      const dateStr = format(tomorrow, 'yyyy-MM-dd');
-      return createApiResponse({
-        date: dateStr,
-        startTime: '19:00',
-        endTime: '21:00',
-        reason: 'Khung giờ vàng 19:00 - 21:00 luôn là sự lựa chọn hàng đầu của các lông thủ. Sau một ngày làm việc và học tập, đây là lúc cơ thể cần được vận động để giải tỏa căng thẳng. Không khí tại sân lúc này cực kỳ nhộn nhịp, hệ thống đèn chiếu sáng được bật tối đa để đảm bảo chất lượng trận đấu.',
-        matchScore: 98,
-        benefits: [
-          'Thời tiết buổi tối vô cùng mát mẻ, không còn cái nóng oi bức, giúp bạn duy trì thể lực lâu hơn trên sân.',
-          'Sân đông vui, nhộn nhịp, tạo cảm hứng thi đấu cực lớn và dễ dàng tìm kiếm đối tác giao lưu trình độ cao.',
-          'Ánh sáng nhân tạo hoạt động 100% công suất mang lại tầm nhìn hoàn hảo nhất cho các pha cầu nhanh và đập cầu.'
-        ]
-      }, 'AI đề xuất khung giờ đặt sân thành công (Mock)', HttpStatus.OK);
+      console.error('AI Chat Error:', error);
+      return createApiResponse(
+        { reply: 'Hệ thống AI đang bận, vui lòng thử lại sau!', sessionId },
+        'Lỗi AI',
+        HttpStatus.OK,
+      );
     }
+  }
+
+  // ----------------------------------------------------------------
+  // GET HISTORY
+  // ----------------------------------------------------------------
+  async getHistory(sessionId: string): Promise<ApiResponseType> {
+    const session = await this.chatSessionModel.findOne({ sessionId }).exec();
+    if (!session) {
+      return createApiResponse(
+        { sessionId, messages: [] },
+        'Không tìm thấy phiên chat',
+        HttpStatus.OK,
+      );
+    }
+    return createApiResponse(
+      {
+        sessionId: session.sessionId,
+        status: session.status,
+        messageCount: session.messages.length,
+        messages: session.messages,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+      },
+      'Lấy lịch sử chat thành công',
+      HttpStatus.OK,
+    );
+  }
+
+  // ----------------------------------------------------------------
+  // END SESSION
+  // ----------------------------------------------------------------
+  async endSession(sessionId: string): Promise<ApiResponseType> {
+    const session = await this.chatSessionModel.findOne({ sessionId }).exec();
+    if (!session) {
+      return createApiResponse(null, 'Không tìm thấy phiên chat', HttpStatus.OK);
+    }
+    session.status = SessionStatus.CLOSED;
+    session.closedAt = new Date();
+    await session.save();
+    return createApiResponse(
+      { sessionId, closedAt: session.closedAt, totalMessages: session.messages.length },
+      'Đã kết thúc phiên chat',
+      HttpStatus.OK,
+    );
+  }
+
+  async getSessions(userId: string, limit = 20, page = 1): Promise<ApiResponseType> {
+    const skip = (page - 1) * limit;
+
+    const [sessions, total] = await Promise.all([
+      this.chatSessionModel
+        .find({ userId: new Types.ObjectId(userId) })
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('sessionId messages status createdAt updatedAt')
+        .exec(),
+      this.chatSessionModel.countDocuments({ userId: new Types.ObjectId(userId) }),
+    ]);
+
+    const result = sessions.map((s) => {
+      const firstUserMsg = s.messages.find((m) => m.role === 'user');
+      const lastMsg = s.messages[s.messages.length - 1];
+      return {
+        sessionId: s.sessionId,
+        title: firstUserMsg
+          ? firstUserMsg.content.slice(0, 60) + (firstUserMsg.content.length > 60 ? '...' : '')
+          : 'Cuộc trò chuyện mới',
+        lastMessage: lastMsg?.content?.slice(0, 80) || '',
+        messageCount: s.messages.length,
+        status: s.status,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+      };
+    });
+
+    return createApiResponse(
+      { sessions: result, total, page, limit },
+      'Lấy danh sách phiên chat thành công',
+      HttpStatus.OK,
+    );
+  }
+
+  // ----------------------------------------------------------------
+  // PRIVATE: Build Context from DB (RAG)
+  // ----------------------------------------------------------------
+  private async _buildContext(message: string, userId?: string): Promise<Record<string, any>> {
+    const context: Record<string, any> = {};
+    const lowerMsg = message.toLowerCase();
+
+    // Inject real-time venue list
+    try {
+      const venuesRes = await this.venuesService.findAll({ limit: 8, status: 'ACTIVE' });
+      const venues = venuesRes?.data?.venues || [];
+      context.availableVenues = venues.map((v: any) => ({
+        id: v._id,
+        name: v.name,
+        address: v.address,
+        pricePerHour: v.pricePerHour,
+        rating: v.averageRating,
+      }));
+    } catch { context.availableVenues = []; }
+
+    // If user asks about their bookings and is logged in
+    if (userId && (lowerMsg.includes('đơn') || lowerMsg.includes('lịch') || lowerMsg.includes('đặt'))) {
+      try {
+        const myBookings = await this.bookingModel
+          .find({ playerId: new Types.ObjectId(userId) })
+          .sort({ createdAt: -1 })
+          .limit(5)
+          .populate('venueId', 'name address')
+          .exec();
+
+        context.myRecentBookings = myBookings.map((b: any) => ({
+          bookingId: `BH${b._id.toString().slice(-6).toUpperCase()}`,
+          venue: b.venueId?.name || 'Unknown',
+          status: b.status,
+          finalPrice: b.finalPrice,
+          createdAt: b.createdAt,
+        }));
+      } catch { context.myRecentBookings = []; }
+    }
+
+    // Keyword-based context: cancellation policy
+    if (lowerMsg.includes('hủy') || lowerMsg.includes('hoàn tiền')) {
+      context.cancellationPolicy = {
+        rule: 'Hủy trước 24h: Hoàn 100%. Hủy trong vòng 24h: Hoàn 0%. Đơn VNPAY: Tiền hoàn về tài khoản trong 3-5 ngày làm việc.',
+        noShowRule: 'Nếu khách không tới 3 lần (đơn tiền mặt), tài khoản sẽ bị khóa tạm thời.',
+      };
+    }
+
+    // Keyword-based context: pricing
+    if (lowerMsg.includes('giá') || lowerMsg.includes('bao nhiêu') || lowerMsg.includes('phí')) {
+      context.generalPricing = 'Giá sân dao động từ 50,000đ - 150,000đ/giờ tùy khung giờ và loại sân. Khung giờ vàng (17h-22h) thường cao hơn 20-30%.';
+    }
+
+    return context;
+  }
+
+  // ----------------------------------------------------------------
+  // PRIVATE: Build System Prompt
+  // ----------------------------------------------------------------
+  private _buildSystemPrompt(context: Record<string, any>): string {
+    const venueList = context.availableVenues?.length
+      ? context.availableVenues.map((v: any) =>
+          `  - ${v.name} | Địa chỉ: ${v.address} | Giá: ${v.pricePerHour?.toLocaleString('vi-VN')}đ/giờ | ⭐ ${v.rating || 'Chưa có'}`
+        ).join('\n')
+      : '  - Hiện chưa có dữ liệu sân.';
+
+    const myBookings = context.myRecentBookings?.length
+      ? context.myRecentBookings.map((b: any) =>
+          `  - #${b.bookingId} | ${b.venue} | Trạng thái: ${b.status} | Giá: ${b.finalPrice?.toLocaleString('vi-VN')}đ`
+        ).join('\n')
+      : null;
+
+    return `Bạn là "BadmintonHub AI" - trợ lý ảo thông minh, thân thiện của hệ thống đặt sân cầu lông BadmintonHub.
+
+NGUYÊN TẮC:
+- Trả lời bằng tiếng Việt, thân thiện, súc tích, dùng emoji phù hợp 🏸😊.
+- Chỉ tư vấn về cầu lông và dịch vụ BadmintonHub. Từ chối lịch sự nếu hỏi ngoài chủ đề.
+- Luôn sử dụng DỮ LIỆU THỰC TẾ bên dưới để trả lời, không bịa đặt.
+
+📍 DANH SÁCH SÂN ĐANG HOẠT ĐỘNG (Dữ liệu thực từ DB):
+${venueList}
+
+${myBookings ? `📋 LỊCH ĐẶT SÂN GẦN ĐÂY CỦA KHÁCH HÀNG:\n${myBookings}\n` : ''}
+${context.cancellationPolicy ? `📜 CHÍNH SÁCH HỦY ĐƠN:\n  - ${context.cancellationPolicy.rule}\n  - ${context.cancellationPolicy.noShowRule}\n` : ''}
+${context.generalPricing ? `💰 THÔNG TIN GIÁ: ${context.generalPricing}\n` : ''}`;
+  }
+
+  // ----------------------------------------------------------------
+  // LEGACY methods (kept for backward compatibility)
+  // ----------------------------------------------------------------
+  async chat(message: string, history?: { role: 'user' | 'assistant'; content: string }[]): Promise<ApiResponseType> {
+    return this.chatWithHistory(message, undefined, undefined);
+  }
+
+  async chatbot(message: string): Promise<ApiResponseType> {
+    return this.chatWithHistory(message);
   }
 
   async getRecommendations(data: any): Promise<ApiResponseType> {
     try {
       const { preferences, lat, lng } = data;
       const apiKey = this.configService.get<string>('GROQ_API_KEY');
-
-      if (!apiKey) {
-        console.error('AI Recommendation Error: GROQ_API_KEY is missing');
-        return this.getMockRecommendations();
-      }
-
       const groq = new Groq({ apiKey });
-      const venuesResponse = await this.venuesService.findAll({
-        lat,
-        lng,
-        limit: 15,
-        status: 'ACTIVE'
+      const venuesResponse = await this.venuesService.findAll({ lat, lng, limit: 15, status: 'ACTIVE' });
+      const venues = venuesResponse.data.venues || [];
+      if (!venues.length) return createApiResponse([], 'Không tìm thấy sân', HttpStatus.OK);
+
+      const prompt = `Bạn là chuyên gia cầu lông của BadmintonHub. Chọn 3 sân phù hợp nhất từ danh sách dưới.
+THÔNG TIN: Vị trí (${lat}, ${lng}), Sở thích: ${preferences || 'bất kỳ'}.
+DANH SÁCH SÂN: ${JSON.stringify(venues.map((v: any) => ({ id: v._id, name: v.name, address: v.address, pricePerHour: v.pricePerHour, averageRating: v.averageRating })))}
+Trả về JSON array với: venueId, name, matchScore (1-100), reason, detailedAnalysis. CHỈ JSON.`;
+
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        response_format: { type: 'json_object' },
       });
 
-      const venues = venuesResponse.data.venues;
+      const parsedContent = JSON.parse(completion.choices[0]?.message?.content || '{}');
+      const recs = Array.isArray(parsedContent) ? parsedContent
+        : parsedContent.recommendations || Object.values(parsedContent).find(Array.isArray) || [];
 
-      if (!venues || venues.length === 0) {
-        console.log('AI Recommendation: No active venues found in DB');
-        return createApiResponse([], 'Không tìm thấy sân nào để gợi ý', HttpStatus.OK);
-      }
-
-      console.log(`AI Recommendation: Analyzing ${venues.length} venues via Groq...`);
-
-      const prompt = `
-        Bạn là một chuyên gia về cầu lông và trợ lý AI của ứng dụng BadmintonHub.
-        Dựa trên thông tin người dùng và danh sách các sân dưới đây, hãy chọn ra 3 sân phù hợp nhất và đưa ra phân tích chi tiết.
-
-        THÔNG TIN NGƯỜI DÙNG:
-        - Vị trí hiện tại (lat, lng): ${lat}, ${lng}
-        - Sở thích: ${preferences || 'Không có sở thích cụ thể'}
-
-        DANH SÁCH CÁC SÂN HIỆN CÓ (Dữ liệu thật):
-        ${JSON.stringify(venues.map(v => ({
-        id: v._id,
-        name: v.name,
-        address: v.address,
-        pricePerHour: v.pricePerHour,
-        description: v.description,
-        averageRating: v.averageRating,
-        distance: v.distance
-      })), null, 2)}
-
-        YÊU CẦU QUAN TRỌNG:
-        1. Trả về kết quả dưới dạng JSON array.
-        2. Mỗi phần tử phải có:
-           - venueId: BẮT BUỘC phải là giá trị "id" từ danh sách sân ở trên. KHÔNG ĐƯỢC TỰ TẠO ID MỚI.
-           - name: Tên sân tương ứng.
-           - matchScore: Điểm phù hợp (1-100).
-           - reason: Lý do tóm tắt (ngắn gọn).
-           - detailedAnalysis: Phân tích chi tiết (2-3 câu).
-        3. CHỈ TRẢ VỀ JSON, KHÔNG CÓ TEXT GIẢI THÍCH NÀO KHÁC.
-      `;
-
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        model: "llama-3.3-70b-versatile",
-        response_format: { type: "json_object" }
-      });
-
-      const content = chatCompletion.choices[0]?.message?.content;
-      if (!content) {
-        throw new Error('Groq response content is empty');
-      }
-
-      let recommendations;
-      const parsedContent = JSON.parse(content);
-
-      // Normalize response format
-      if (Array.isArray(parsedContent)) {
-        recommendations = parsedContent;
-      } else if (parsedContent.recommendations) {
-        recommendations = parsedContent.recommendations;
-      } else {
-        const firstArrayKey = Object.keys(parsedContent).find(key => Array.isArray(parsedContent[key]));
-        recommendations = firstArrayKey ? parsedContent[firstArrayKey] : [parsedContent];
-      }
-
-      console.log('AI Recommendation: Successfully generated recommendations via Groq');
-
-      // Map AI recommendations to full venue data
-      const fullRecommendations = recommendations.map(rec => {
-        const venue = venues.find(v => v._id.toString() === rec.venueId);
-        if (venue) {
-          // Merge venue data with AI analysis
-          return {
-            ...venue.toObject ? venue.toObject() : venue,
-            matchScore: rec.matchScore,
-            reason: rec.reason,
-            detailedAnalysis: rec.detailedAnalysis,
-            isAI: true
-          };
-        }
-        return null;
+      const fullRecs = recs.map((rec: any) => {
+        const venue = venues.find((v: any) => v._id.toString() === rec.venueId);
+        return venue ? { ...(venue.toObject ? venue.toObject() : venue), ...rec, isAI: true } : null;
       }).filter(Boolean);
 
-      return createApiResponse(fullRecommendations, 'AI gợi ý sân thành công', HttpStatus.OK);
+      return createApiResponse(fullRecs, 'AI gợi ý sân thành công', HttpStatus.OK);
     } catch (error) {
-      console.error('Groq Recommendation Error Detail:', error);
-      return this.getMockRecommendations();
+      return createApiResponse([], 'Lỗi gợi ý AI', HttpStatus.OK);
     }
   }
 
-  private getMockRecommendations() {
-    const recommendations = [
-      {
-        venueId: 'sample-id-1',
-        name: 'Sân Cầu Lông Ngôi Sao',
-        reason: 'Gần vị trí của bạn và có giá tốt vào buổi sáng.',
-        matchScore: 95,
-        detailedAnalysis: 'Sân Ngôi Sao nằm rất gần vị trí hiện tại của bạn, giúp tiết kiệm thời gian di chuyển. Ngoài ra, mức giá buổi sáng cực kỳ cạnh tranh, phù hợp với tiêu chí giá rẻ.'
-      },
-      {
-        venueId: 'sample-id-2',
-        name: 'Badminton Hub Quận 7',
-        reason: 'Phù hợp với sở thích sân thảm gỗ của bạn.',
-        matchScore: 88,
-        detailedAnalysis: 'Dựa trên sở thích chơi trên thảm gỗ của bạn, đây là lựa chọn hàng đầu. Sân có chất lượng cơ sở vật chất 5 sao và được cộng đồng đánh giá rất cao.'
-      }
-    ];
-    return createApiResponse(recommendations, 'AI gợi ý sân thành công (Mock)', HttpStatus.OK);
+  async getBookingRecommendation(venueId: string): Promise<ApiResponseType> {
+    try {
+      const tomorrow = addDays(new Date(), 1);
+      const dateStr = format(tomorrow, 'yyyy-MM-dd');
+      const apiKey = this.configService.get<string>('GROQ_API_KEY');
+      const venueRes = await this.venuesService.findOne(venueId);
+      const venue = venueRes?.data;
+      const groq = new Groq({ apiKey });
+
+      const prompt = `Đề xuất khung giờ đặt sân cầu lông tốt nhất vào ngày ${dateStr} cho sân "${venue?.name}" (Giá: ${venue?.pricePerHour} VND/giờ). Trả về JSON: { "date", "startTime", "endTime", "reason", "matchScore", "benefits": [] }. CHỈ JSON.`;
+      const completion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        response_format: { type: 'json_object' },
+      });
+      return createApiResponse(JSON.parse(completion.choices[0]?.message?.content || '{}'), 'Gợi ý thành công', HttpStatus.OK);
+    } catch {
+      return createApiResponse({ date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), startTime: '19:00', endTime: '21:00', reason: 'Khung giờ vàng buổi tối.', matchScore: 95, benefits: ['Mát mẻ', 'Đông vui', 'Ánh sáng tốt'] }, 'Gợi ý thành công (Fallback)', HttpStatus.OK);
+    }
   }
 
   async getDemandAnalytics(venueId: string): Promise<ApiResponseType> {
-    const analytics = {
+    return createApiResponse({
       peakHours: ['17:00 - 19:00', '19:00 - 21:00'],
-      predicted_occupancy: {
-        'Monday': '85%',
-        'Tuesday': '70%',
-        'Wednesday': '90%',
-        'Thursday': '75%',
-        'Friday': '95%',
-        'Saturday': '100%',
-        'Sunday': '100%'
-      },
-      recommendation: 'Bạn nên tăng giá vào khung giờ 18h-20h các ngày cuối tuần.'
-    };
-
-    return createApiResponse(analytics, 'Phân tích nhu cầu thành công', HttpStatus.OK);
-  }
-
-  async chatbot(message: string): Promise<ApiResponseType> {
-    let response = 'Chào bạn! Tôi có thể giúp gì cho bạn về việc đặt sân cầu lông hôm nay?';
-
-    if (message.toLowerCase().includes('giá')) {
-      response = 'Giá sân dao động từ 50k - 150k tùy khung giờ và loại sân. Bạn muốn xem bảng giá của cơ sở nào?';
-    } else if (message.toLowerCase().includes('đặt sân')) {
-      response = 'Để đặt sân, bạn hãy chọn cơ sở yêu thích, chọn khung giờ trống và tiến hành thanh toán nhé.';
-    }
-
-    return createApiResponse({ reply: response }, 'Chatbot phản hồi thành công', HttpStatus.OK);
-  }
-
-  async chat(message: string, history?: { role: 'user' | 'assistant'; content: string }[]): Promise<ApiResponseType> {
-    try {
-      const apiKey = this.configService.get<string>('GROQ_API_KEY');
-      if (!apiKey) {
-        throw new Error('GROQ_API_KEY is missing');
-      }
-
-      // 1. Fetch some active venues to provide in the system prompt for context
-      let venuesContext = '';
-      try {
-        const venuesRes = await this.venuesService.findAll({ limit: 10, status: 'ACTIVE' });
-        const venues = venuesRes?.data?.venues || [];
-        if (venues.length > 0) {
-          venuesContext = venues.map((v: any) => `- Tên sân: ${v.name}, Địa chỉ: ${v.address}, Giá: ${v.pricePerHour} VND/giờ, Đánh giá: ${v.averageRating || 'chưa có'} sao.`).join('\n');
-        }
-      } catch (err) {
-        console.error('Failed to fetch venues for AI context:', err);
-      }
-
-      const groq = new Groq({ apiKey });
-      
-      const systemPrompt = `
-        Bạn là "BadmintonHub AI Assistant" (Trợ lý AI của BadmintonHub) - một trợ lý ảo thông minh, lịch sự, nhiệt tình và cực kỳ am hiểu về bộ môn cầu lông cũng như dịch vụ của hệ thống đặt sân BadmintonHub.
-        
-        Nhiệm vụ chính của bạn:
-        1. Hướng dẫn và tư vấn người dùng chọn và đặt sân cầu lông phù hợp trên hệ thống BadmintonHub.
-        2. Giải đáp thắc mắc về cầu lông (kỹ thuật chơi, luật thi đấu, cách chọn vợt, giày, v.v.).
-        3. Cung cấp thông tin thực tế về các sân nổi bật trong hệ thống dựa trên dữ liệu dưới đây (nếu người dùng hỏi về sân hoặc địa điểm cụ thể).
-        
-        Dữ liệu các sân nổi bật hiện tại của hệ thống:
-        ${venuesContext || '- Hiện tại hệ thống của chúng tôi sở hữu rất nhiều sân cầu lông thảm chất lượng cao, đầy đủ tiện nghi.'}
-        
-        Quy tắc ứng xử và phong cách trả lời:
-        - Luôn sử dụng tiếng Việt tự nhiên, thân thiện, lịch sự và tràn đầy năng lượng.
-        - Có thể sử dụng biểu tượng cảm xúc (emoji) phù hợp như 🏸, 😊, 🚀, ⭐️ để tăng độ sinh động.
-        - Trả lời ngắn gọn, rõ ràng, trực quan, đi thẳng vào câu hỏi của người dùng. Tránh lan man dài dòng.
-        - Nếu câu hỏi nằm ngoài chủ đề cầu lông hoặc đặt sân, hãy khéo léo từ chối và hướng người dùng quay trở lại chủ đề chính (ví dụ: "Tôi là trợ lý AI chuyên về cầu lông, tôi có thể giúp gì cho bạn về đặt sân hôm nay không?").
-        - Khuyến khích người dùng thực hiện đặt sân trực tiếp trên website BadmintonHub để được giữ chỗ và hưởng ưu đãi.
-      `;
-
-      const messages: any[] = [{ role: 'system', content: systemPrompt }];
-      
-      // Add conversation history if available
-      if (history && history.length > 0) {
-        const recentHistory = history.slice(-8); // Keep last 8 messages for context to avoid token bloat
-        recentHistory.forEach(h => {
-          messages.push({ role: h.role, content: h.content });
-        });
-      }
-
-      // Add current user message
-      messages.push({ role: 'user', content: message });
-
-      const chatCompletion = await groq.chat.completions.create({
-        messages,
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.7,
-        max_tokens: 1024,
-      });
-
-      const reply = chatCompletion.choices[0]?.message?.content || 'Xin lỗi bạn, tôi không thể xử lý câu hỏi này lúc này. Bạn vui lòng thử lại nhé!';
-      
-      return createApiResponse({ reply }, 'Phản hồi từ AI thành công', HttpStatus.OK);
-    } catch (error: any) {
-      console.error('AI Chat Error:', error);
-      
-      // Fallback response in case API key is missing or error occurs
-      let fallbackReply = 'Chào bạn! Tôi là trợ lý AI của BadmintonHub. Hiện tại hệ thống AI đang nâng cấp, tôi có thể tư vấn nhanh cho bạn:\\n- Để đặt sân: Vui lòng truy cập trang Sân Cầu Lông, chọn sân, chọn khung giờ trống và thanh toán.\\n- Bảng giá sân: Thường dao động từ 50,000 VND đến 150,000 VND/giờ tùy theo khung giờ tháp/vàng.\\n- Bạn cần tôi hỗ trợ tìm sân hay luật chơi cầu lông nào khác không?';
-      
-      if (message.toLowerCase().includes('giá')) {
-        fallbackReply = 'Dạ, giá thuê sân của hệ thống BadmintonHub dao động từ 50,000đ - 150,000đ/giờ tùy theo khung giờ (buổi sáng/buổi tối) và loại sân thảm. Bạn muốn xem chi tiết giá của cơ sở nào ạ?';
-      } else if (message.toLowerCase().includes('đặt sân') || message.toLowerCase().includes('book')) {
-        fallbackReply = 'Để đặt sân nhanh nhất, bạn hãy chọn mục "Sân Cầu Lông" trên trang chủ, chọn cơ sở bạn muốn chơi, chọn ngày/khung giờ còn trống và tiến hành thanh toán là hoàn tất ạ! 🏸';
-      }
-      
-      return createApiResponse({ reply: fallbackReply }, 'Phản hồi từ AI thành công (Fallback)', HttpStatus.OK);
-    }
+      predicted_occupancy: { Monday: '85%', Friday: '95%', Saturday: '100%', Sunday: '100%' },
+      recommendation: 'Nên tăng giá vào khung 18h-20h cuối tuần.',
+    }, 'Phân tích thành công', HttpStatus.OK);
   }
 }

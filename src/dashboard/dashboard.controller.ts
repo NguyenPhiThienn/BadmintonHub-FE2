@@ -58,4 +58,32 @@ export class DashboardController {
   async getOccupancyRate(@Req() req: any, @Query('venueId') venueId?: string): Promise<ApiResponseType> {
     return await this.dashboardService.getBookingStats(req.user.id, venueId);
   }
+
+  @ApiOperation({ summary: 'KPI Tổng quan kèm xu hướng (Trend)' })
+  @ApiResponse({ status: 200, description: 'Thành công' })
+  @Get('overview')
+  async getOverview(@Req() req: any, @Query('venueId') venueId?: string): Promise<ApiResponseType> {
+    return await this.dashboardService.getOverviewStats(req.user.id, venueId);
+  }
+
+  @ApiOperation({ summary: 'Hoạt động gần đây (Recent Bookings)' })
+  @ApiResponse({ status: 200, description: 'Thành công' })
+  @Get('recent-bookings')
+  async getRecentBookings(@Req() req: any, @Query('venueId') venueId?: string): Promise<ApiResponseType> {
+    return await this.dashboardService.getRecentBookings(req.user.id, venueId);
+  }
+
+  @ApiOperation({ summary: 'Bảng xếp hạng Khách hàng (VIPs & Risks)' })
+  @ApiResponse({ status: 200, description: 'Thành công' })
+  @Get('top-customers')
+  async getTopCustomers(@Req() req: any, @Query('venueId') venueId?: string): Promise<ApiResponseType> {
+    return await this.dashboardService.getTopCustomers(req.user.id, venueId);
+  }
+
+  @ApiOperation({ summary: 'Thống kê Khung giờ vàng (Peak Hours Analysis)' })
+  @ApiResponse({ status: 200, description: 'Thành công' })
+  @Get('peak-hours')
+  async getPeakHours(@Req() req: any, @Query('venueId') venueId?: string): Promise<ApiResponseType> {
+    return await this.dashboardService.getPeakHours(req.user.id, venueId);
+  }
 }

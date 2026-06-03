@@ -12,6 +12,9 @@ export enum BookingStatus {
   CANCELLED = 'CANCELLED',
   COMPLETED = 'COMPLETED',
   NO_SHOW = 'NO_SHOW',
+  LATE_ARRIVAL = 'LATE_ARRIVAL',
+  IN_PROGRESS = 'IN_PROGRESS',
+  REFUNDED = 'REFUNDED',
 }
 
 @Schema({ timestamps: true })
@@ -28,6 +31,9 @@ export class Booking {
   @Prop({ type: Types.ObjectId, ref: 'Promotion', required: false })
   promotionId: Promotion;
 
+  @Prop({ type: Types.ObjectId, ref: 'Coupon', required: false })
+  couponId: any;
+
   @Prop({ required: true })
   totalPrice: number;
 
@@ -39,6 +45,12 @@ export class Booking {
 
   @Prop()
   note: string;
+
+  @Prop()
+  cancelReason: string;
+
+  @Prop({ enum: ['CUSTOMER', 'OWNER', 'SYSTEM', 'ADMIN'] })
+  cancelledBy: string;
 
   @Prop({ default: false })
   isWeekly: boolean;

@@ -8,9 +8,12 @@ import { BookingDetail, BookingDetailSchema } from '../bookings/schemas/booking-
 import { CourtUnavailableTime, CourtUnavailableTimeSchema } from '../courts/schemas/court-unavailable-time.schema';
 import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { SlotLock, SlotLockSchema } from './schemas/slot-lock.schema';
+import { Pricing, PricingSchema } from '../pricings/schemas/pricing.schema';
+import { GatewayModule } from '../gateways/gateways.module';
 
 @Module({
   imports: [
+    GatewayModule,
     MongooseModule.forFeature([
       { name: Court.name, schema: CourtSchema },
       { name: Venue.name, schema: VenueSchema },
@@ -18,6 +21,7 @@ import { SlotLock, SlotLockSchema } from './schemas/slot-lock.schema';
       { name: Booking.name, schema: BookingSchema },
       { name: CourtUnavailableTime.name, schema: CourtUnavailableTimeSchema },
       { name: SlotLock.name, schema: SlotLockSchema },
+      { name: Pricing.name, schema: PricingSchema },
     ]),
   ],
   controllers: [AvailabilityController],

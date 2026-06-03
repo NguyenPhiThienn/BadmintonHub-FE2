@@ -99,4 +99,44 @@ export class VenuesController {
   async resetAllRatings(): Promise<ApiResponseType> {
     return await this.venuesService.resetAllRatings();
   }
+
+  @ApiOperation({ summary: 'Yêu cầu đóng cửa cơ sở (Chủ sân)' })
+  @ApiResponse({ status: 200, description: 'Yêu cầu đóng cửa đã được gửi' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.COURT_OWNER)
+  @Put(':id/request-closure')
+  async requestClosure(@Param('id') id: string, @Req() req: any): Promise<ApiResponseType> {
+    return await this.venuesService.requestClosure(id, req.user.id);
+  }
+
+  @ApiOperation({ summary: 'Hủy yêu cầu đóng cửa cơ sở (Chủ sân)' })
+  @ApiResponse({ status: 200, description: 'Yêu cầu đóng cửa đã được hủy' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.COURT_OWNER)
+  @Put(':id/cancel-closure')
+  async cancelClosure(@Param('id') id: string, @Req() req: any): Promise<ApiResponseType> {
+    return await this.venuesService.cancelClosure(id, req.user.id);
+  }
+
+  @ApiOperation({ summary: 'Duyệt yêu cầu đóng cửa cơ sở (Admin)' })
+  @ApiResponse({ status: 200, description: 'Cơ sở đã được đóng cửa' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Put(':id/approve-closure')
+  async approveClosure(@Param('id') id: string): Promise<ApiResponseType> {
+    return await this.venuesService.approveClosure(id);
+  }
+
+  @ApiOperation({ summary: 'Xin mở lại cơ sở đã đóng (Chủ sân)' })
+  @ApiResponse({ status: 200, description: 'Yêu cầu mở lại đã được gửi' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.COURT_OWNER)
+  @Put(':id/request-reopen')
+  async requestReopen(@Param('id') id: string, @Req() req: any): Promise<ApiResponseType> {
+    return await this.venuesService.requestReopen(id, req.user.id);
+  }
 }
