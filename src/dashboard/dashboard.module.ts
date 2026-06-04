@@ -10,6 +10,7 @@ import { Court, CourtSchema } from '../courts/schemas/court.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { Payment, PaymentSchema } from '../payments/schemas/payment.schema';
 import { RevenueSummary, RevenueSummarySchema } from './schemas/revenue-summary.schema';
+import { OwnerRequest, OwnerRequestSchema } from '../owner-requests/schemas/owner-request.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RevenueSummary, RevenueSummarySchema } from './schemas/revenue-summary.
       { name: User.name, schema: UserSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: RevenueSummary.name, schema: RevenueSummarySchema },
+      { name: OwnerRequest.name, schema: OwnerRequestSchema },
     ]),
   ],
   controllers: [DashboardController, AdminDashboardController],

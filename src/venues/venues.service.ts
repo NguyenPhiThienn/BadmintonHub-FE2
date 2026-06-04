@@ -14,6 +14,7 @@ import { Coupon, CouponDocument, CouponStatus, DiscountType } from '../coupons/s
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/schemas/notification.schema';
 import { MailService } from '../mail/mail.service';
+import { AppGateway } from '../gateways/app.gateway';
 
 @Injectable()
 export class VenuesService {
@@ -27,6 +28,7 @@ export class VenuesService {
     @InjectModel(Coupon.name) private couponModel: Model<CouponDocument>,
     private notificationsService: NotificationsService,
     private mailService: MailService,
+    private appGateway: AppGateway,
   ) { }
 
   async findAll(query: any): Promise<ApiResponseType> {
@@ -323,6 +325,9 @@ export class VenuesService {
       }).catch(() => { }); // Fire and forget
     }
 
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
+
     return createApiResponse(updatedVenue, 'Cập nhật trạng thái thành công', HttpStatus.OK);
   }
 
@@ -368,6 +373,9 @@ export class VenuesService {
       ).catch(console.error);
     }
 
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
+
     return createApiResponse(null, 'Đã gửi yêu cầu đóng cửa cơ sở. Vui lòng chờ phê duyệt (tối đa 3 ngày).', HttpStatus.OK);
   }
 
@@ -397,6 +405,9 @@ export class VenuesService {
         NotificationType.SYSTEM_ALERT
       ).catch(console.error);
     }
+
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
 
     return createApiResponse(null, 'Đã hủy yêu cầu đóng cửa thành công. Cơ sở đã hoạt động bình thường.', HttpStatus.OK);
   }
@@ -478,6 +489,9 @@ export class VenuesService {
       `Yêu cầu đóng cửa cơ sở ${venue.name} của bạn đã được duyệt. Tất cả đơn đặt sân hiện tại đã bị hủy.`,
       NotificationType.SYSTEM_ALERT
     ).catch(console.error);
+
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
 
     return createApiResponse(null, 'Đã duyệt đóng cửa cơ sở thành công', HttpStatus.OK);
   }

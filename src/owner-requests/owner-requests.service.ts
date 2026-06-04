@@ -10,6 +10,7 @@ import { OwnerRequest, OwnerRequestDocument, OwnerRequestStatus } from './schema
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { VenueStatus } from '../venues/schemas/venue.schema';
 import { VenuesService } from '../venues/venues.service';
+import { AppGateway } from '../gateways/app.gateway';
 
 @Injectable()
 export class OwnerRequestsService {
@@ -18,6 +19,7 @@ export class OwnerRequestsService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private usersService: UsersService,
     private venuesService: VenuesService,
+    private appGateway: AppGateway,
   ) {}
 
   async create(userId: string, dto: CreateOwnerRequestDto): Promise<ApiResponseType> {
@@ -50,6 +52,9 @@ export class OwnerRequestsService {
       ...dto,
       status: OwnerRequestStatus.PENDING
     });
+
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
 
     return createApiResponse(newRequest, 'Gửi đơn đăng ký chủ sân thành công', HttpStatus.CREATED);
   }
@@ -225,6 +230,9 @@ export class OwnerRequestsService {
     const populatedRequest = await this.ownerRequestModel.findById(id)
       .populate('userId', 'fullName email phone avatarUrl')
       .exec();
+
+    // Broadcast pending count update to all admins
+    this.appGateway.broadcast('admin:pending-updated', {});
 
     return createApiResponse(populatedRequest, 'Xử lý đơn đăng ký thành công', HttpStatus.OK);
   }

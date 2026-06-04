@@ -11,6 +11,7 @@ import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { Payment, PaymentSchema } from '../payments/schemas/payment.schema';
 import { Coupon, CouponSchema } from '../coupons/schemas/coupon.schema';
 import { MailModule } from '../mail/mail.module';
+import { GatewayModule } from '../gateways/gateways.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MailModule } from '../mail/mail.module';
       { name: Coupon.name, schema: CouponSchema },
     ]),
     MailModule,
+    GatewayModule,
   ],
   controllers: [VenuesController, AdminVenuesController],
   providers: [VenuesService],

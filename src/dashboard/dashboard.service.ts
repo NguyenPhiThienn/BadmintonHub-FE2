@@ -9,6 +9,7 @@ import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { ApiResponseType, createApiResponse } from '../utils/response.util';
 import { Payment, PaymentDocument } from '../payments/schemas/payment.schema';
 import { RevenueSummary, RevenueSummaryDocument } from './schemas/revenue-summary.schema';
+import { OwnerRequest, OwnerRequestDocument, OwnerRequestStatus } from '../owner-requests/schemas/owner-request.schema';
 
 @Injectable()
 export class DashboardService {
@@ -20,6 +21,7 @@ export class DashboardService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     @InjectModel(RevenueSummary.name) private revenueSummaryModel: Model<RevenueSummaryDocument>,
+    @InjectModel(OwnerRequest.name) private ownerRequestModel: Model<OwnerRequestDocument>,
   ) { }
 
   async getRevenue(ownerId: string, venueId?: string, query?: any): Promise<ApiResponseType> {
@@ -1092,7 +1094,7 @@ export class DashboardService {
 
   async getAdminPendingActions(): Promise<ApiResponseType> {
     const [pendingOwnerRequests, pendingClosureRequests, flaggedUsers] = await Promise.all([
-      this.venueModel.countDocuments({ status: 'PENDING' }),
+      this.ownerRequestModel.countDocuments({ status: OwnerRequestStatus.PENDING }),
       this.venueModel.countDocuments({ status: 'PENDING_CLOSURE' }),
       this.userModel.countDocuments({ status: 'BLOCKED' })
     ]);
