@@ -49,5 +49,9 @@ env
 .env
 *.env
 
+# Next.js
+.next/
+out/
+
 # Firebase
 src/config/firebase-service-account.json
