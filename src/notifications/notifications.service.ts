@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import * as admin from 'firebase-admin';
-import * as path from 'path';
 import { Notification, NotificationDocument, NotificationType } from './schemas/notification.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { ApiResponseType, createApiResponse } from '../utils/response.util';
@@ -22,10 +21,23 @@ export class NotificationsService {
   private initializeFirebase() {
     try {
       if (!admin.apps.length) {
-        const serviceAccountPath = path.resolve(__dirname, '..', 'config', 'firebase-service-account.json');
-        
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+        const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+        if (!projectId || !clientEmail || !privateKey) {
+          this.logger.warn('Firebase environment variables not set. Push notifications disabled.');
+          return;
+        }
+
+        const serviceAccount: admin.ServiceAccount = {
+          projectId,
+          privateKey,
+          clientEmail,
+        };
+
         admin.initializeApp({
-          credential: admin.credential.cert(serviceAccountPath),
+          credential: admin.credential.cert(serviceAccount),
         });
         this.logger.log('Firebase Admin SDK initialized successfully');
       }
