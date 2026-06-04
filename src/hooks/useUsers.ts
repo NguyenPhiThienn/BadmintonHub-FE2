@@ -1,0 +1,120 @@
+import { usersApi } from "@/api/users";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
+export const useUsers = (
+  params: { page: number; limit: number; role?: string; search?: string; status?: string },
+  options?: Omit<UseQueryOptions<any, any, any, any>, "queryKey" | "queryFn">
+) => {
+  return useQuery({
+    queryKey: ["users", params],
+    queryFn: () => usersApi.getUsers(params),
+    ...options,
+  });
+};
+
+export const useUserById = (id: string) => {
+  return useQuery({
+    queryKey: ["users", id],
+    queryFn: () => usersApi.getUserById(id),
+    enabled: !!id,
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => 
+      usersApi.updateUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Cập nhật thông tin người dùng thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Cập nhật thông tin người dùng thất bại");
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => usersApi.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Xóa người dùng thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Xóa người dùng thất bại");
+    },
+  });
+};
+
+export const useBlockUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { action: 'block' | 'unblock'; blockType?: string; reason?: string; days?: number } }) => 
+      usersApi.blockUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Cập nhật trạng thái khóa tài khoản thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Cập nhật trạng thái khóa tài khoản thất bại");
+    },
+  });
+};
+
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => usersApi.createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Thêm người dùng thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Thêm người dùng thất bại");
+    },
+  });
+};
+
+export const useResetUserPassword = () => {
+  return useMutation({
+    mutationFn: (id: string) => usersApi.resetPassword(id),
+    onSuccess: () => {
+      toast.success("Đặt lại mật khẩu người dùng thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Đặt lại mật khẩu người dùng thất bại");
+    },
+  });
+};
+
+export const useToggleFavorite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (venueId: string) => usersApi.toggleFavorite(venueId),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["favoriteVenues"] });
+      queryClient.invalidateQueries({ queryKey: ["venues"] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      toast.success(res?.message || "Đã cập nhật danh sách yêu thích");
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Lỗi khi cập nhật danh sách yêu thích");
+    }
+  });
+};
+
+export const useFavoriteVenues = (
+  params?: { page?: number; limit?: number },
+  options?: Omit<UseQueryOptions<any, any, any, any>, "queryKey" | "queryFn">
+) => {
+  return useQuery({
+    queryKey: ["favoriteVenues", params],
+    queryFn: () => usersApi.getFavorites(params),
+    ...options,
+  });
+};

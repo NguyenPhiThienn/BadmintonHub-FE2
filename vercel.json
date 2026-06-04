@@ -1,0 +1,8 @@
+{
+  "rewrites": [],
+  "functions": {
+    "src/app/laboratory-work/preview/[id]/actions.ts": {
+      "maxDuration": 60
+    }
+  }
+}

@@ -1,0 +1,103 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useUser } from "@/context/useUserContext";
+import { useMe } from "@/hooks/useAuth";
+import { useMenuSidebar } from "@/stores/useMenuSidebar";
+import { mdiAccountTie, mdiCalendarMonthOutline, mdiHomeOutline, mdiLogout } from "@mdi/js";
+import { Icon } from "@mdi/react";
+import { HamburgerMenu } from "iconsax-reactjs";
+import Image from "next/image";
+import Link from "next/link";
+import { DropdownNav } from "./DropdownNav";
+import { NotificationBell } from "./NotificationBell";
+export default function CommonHeader() {
+  const { toggle } = useMenuSidebar();
+  const { logoutUser } = useUser();
+  const { data: profileResponse } = useMe();
+  const profile = profileResponse?.data;
+  return (
+    <>
+      <div
+        className="w-full fixed top-0 left-0 right-0 z-50
+      p-3 md:p-4 px-4 bg-darkCardV1 border-b border-b-darkBorderV1 flex justify-between items-center h-[78px]"
+      >
+        <div className="flex items-center w-fit md:w-[250px] justify-between gap-3 md:gap-4">
+          <button
+            onClick={toggle}
+            className="bg-darkBorderV1 flex items-center justify-center hover:bg-darkBorderV1/70 !text-neutral-300/70 !p-0 !h-10 !w-10 rounded-full md:hidden flex-shrink-0"
+          >
+            <HamburgerMenu size="20" color="#fff" />
+          </button>
+          <Image quality={100} draggable={false} src="/images/primary-logo.svg" width={1000} height={1000} alt="Logo" className="h-12 md:w-full md:h-full object-contain rounded pr-2" />
+        </div>
+        <DropdownNav />
+        <div className="flex items-center gap-3 md:gap-4 ml-4">
+          <div className="flex items-center gap-2">
+            <div className="hidden lg:flex flex-col items-end">
+              <span className="text-sm text-neutral-300 font-semibold truncate max-w-[200px]">
+                👋 Xin chào, {profile?.role === "OWNER" || profile?.role === "OWNER" ? "Chủ sân" : (profile?.employee?.position || "Quản trị viên")}
+              </span>
+              <span className="text-xs font-semibold text-accent text-right max-w-[220px] truncate">
+                {profile?.role === "OWNER" ? profile?.fullName : profile?.role === "OWNER" ? (profile?.partnerName || profile?.partner?.partnerName) : (profile?.employee?.fullName || profile?.username || "Quản trị viên")}
+              </span>
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center overflow-hidden border border-accent/70 shadow-[0_0_15px_rgba(68,215,182,0.2)] p-0.5 cursor-pointer transition-transform hover:scale-105 active:scale-95">
+                  <img
+                    src={profile?.role === "OWNER" ? profile?.avatarUrl : (profile?.employee?.avatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${profile?.username || "Sophie"}`)}
+                    alt="Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel className="flex flex-col !p-0 !py-1">
+                  <div className="flex gap-1">
+                    <Icon path={mdiAccountTie} size={0.8} className="flex-shrink-0" />
+                    <span className="text-sm font-semibold capitalize">{profile?.fullName || profile?.employeeName || "Admin"}</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {(profile?.role === "OWNER" || profile?.role === "OWNER" || profile?.role === "ADMIN") && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/" className="cursor-pointer flex items-center gap-2">
+                        <Icon path={mdiHomeOutline} size={0.8} className="flex-shrink-0" />
+                        <span>Trang chủ đặt sân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/my-bookings" className="cursor-pointer flex items-center gap-2">
+                        <Icon path={mdiCalendarMonthOutline} size={0.8} className="flex-shrink-0" />
+                        <span>Lịch sử đặt sân</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
+                <DropdownMenuItem
+                  onClick={logoutUser}
+                  className="hover:!bg-red-500/10 hover:!text-red-400 text-red-400 focus:bg-red-500/10 focus:text-red-400"
+                >
+                  <Icon path={mdiLogout} size={0.8} className="flex-shrink-0" />
+                  <span>Đăng xuất</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <NotificationBell />
+        </div>
+      </div>
+    </>
+  );
+}

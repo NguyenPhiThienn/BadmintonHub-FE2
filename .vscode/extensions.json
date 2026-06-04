@@ -1,4 +1,8 @@
 {
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+    ],
     "unwantedRecommendations": [
         "kilocode.kilo-code"
     ]
