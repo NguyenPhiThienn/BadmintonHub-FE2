@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMe } from "@/hooks/useAuth";
-import { useCreateBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
+import { useCreateBooking, useCreatePaymentUrl, usePreviewRecurringBooking, useCreateRecurringBooking } from "@/hooks/useBooking";
 import {
   useAvailability,
   useLockSlot,
@@ -61,8 +61,10 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
-  const [isWeekly, setIsWeekly] = useState(false);
   const [showBlockedDialog, setShowBlockedDialog] = useState(false);
+  const [bookingType, setBookingType] = useState<'SINGLE' | 'WEEKLY' | 'MONTHLY'>('SINGLE');
+  const [recurringOccurrences, setRecurringOccurrences] = useState(2);
+  const [recurringPaymentSchedule, setRecurringPaymentSchedule] = useState<'FULL' | 'MONTHLY'>('FULL');
 
   // Generate stable session ID for lock mechanism
   const [sessionId] = useState(() => {
@@ -103,6 +105,8 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const { data: pricingRes } = useVenuePricing(id);
   const { mutate: createBooking, isPending: isBookingLoading } = useCreateBooking();
   const { mutate: createPaymentUrl, isPending: isPaymentLoading } = useCreatePaymentUrl();
+  const { mutate: previewRecurring, data: previewData } = usePreviewRecurringBooking();
+  const { mutate: createRecurringBooking, isPending: isRecurringLoading } = useCreateRecurringBooking();
   const { mutateAsync: lockSlot } = useLockSlot();
   const { mutateAsync: unlockSlot } = useUnlockSlot();
 
@@ -220,49 +224,91 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
   const handleBooking = (couponId?: string) => {
     if (selectedSlots.length === 0) return;
 
-    const payload: any = {
-      venueId: id,
-      details: selectedSlots.map(slot => ({
-        courtId: slot.courtId,
-        bookingDate: format(selectedDate, 'yyyy-MM-dd'),
-        startTime: slot.time,
-        endTime: `${(parseInt(slot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`
-      })),
-      note: "",
-      isWeekly,
-      customerName,
-      customerPhone,
-      customerEmail
-    };
+    if (bookingType === 'SINGLE') {
+      // Đặt lẻ
+      const payload: any = {
+        venueId: id,
+        details: selectedSlots.map(slot => ({
+          courtId: slot.courtId,
+          bookingDate: format(selectedDate, 'yyyy-MM-dd'),
+          startTime: slot.time,
+          endTime: `${(parseInt(slot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`
+        })),
+        note: "",
+        customerName,
+        customerPhone,
+        customerEmail
+      };
 
-    if (couponId) {
-      payload.couponId = couponId;
-    }
-
-    createBooking(payload, {
-      onSuccess: (res: any) => {
-        if (res?.data?._id) {
-          const bookingId = res.data._id;
-          createPaymentUrl({ bookingId, method: paymentMethod }, {
-            onSuccess: (paymentRes: any) => {
-              if (paymentMethod === "VNPAY" && paymentRes?.data?.paymentUrl) {
-                window.location.href = paymentRes.data.paymentUrl;
-              } else {
-                toast.success("Đặt sân thành công!");
-                setSelectedSlots([]);
-                router.push(`/booking/success?bookingId=${bookingId}`);
-              }
-            },
-            onError: (err: any) => {
-              toast.error(err?.message || "Lỗi tạo thanh toán. Vui lòng thử lại.");
-            }
-          });
-        }
-      },
-      onError: (err: any) => {
-        toast.error(err?.message || "Đặt sân thất bại. Vui lòng thử lại.");
+      if (couponId) {
+        payload.couponId = couponId;
       }
-    });
+
+      createBooking(payload, {
+        onSuccess: (res: any) => {
+          if (res?.data?._id) {
+            const bookingId = res.data._id;
+            createPaymentUrl({ bookingId, method: paymentMethod }, {
+              onSuccess: (paymentRes: any) => {
+                if (paymentMethod === "VNPAY" && paymentRes?.data?.paymentUrl) {
+                  window.location.href = paymentRes.data.paymentUrl;
+                } else {
+                  toast.success("Đặt sân thành công!");
+                  setSelectedSlots([]);
+                  router.push(`/booking/success?bookingId=${bookingId}`);
+                }
+              },
+              onError: (err: any) => {
+                toast.error(err?.message || "Lỗi tạo thanh toán. Vui lòng thử lại.");
+              }
+            });
+          }
+        },
+        onError: (err: any) => {
+          toast.error(err?.message || "Đặt sân thất bại. Vui lòng thử lại.");
+        }
+      });
+    } else {
+      // Đặt theo tuần/tháng - khách vãng lai, không lấy thông tin khách hàng
+      const firstSlot = selectedSlots[0];
+      const payload = {
+        venueId: id,
+        courtId: firstSlot.courtId,
+        type: bookingType,
+        occurrences: recurringOccurrences,
+        startDate: format(selectedDate, 'yyyy-MM-dd'),
+        startTime: firstSlot.time,
+        endTime: `${(parseInt(firstSlot.time.split(':')[0]) + 1).toString().padStart(2, '0')}:00`,
+        paymentSchedule: recurringPaymentSchedule,
+      };
+
+      createRecurringBooking(payload, {
+        onSuccess: (res: any) => {
+          const firstBookingId = res?.data?.firstBookingId || res?.data?.bookingIds?.[0];
+
+          if (firstBookingId) {
+            createPaymentUrl({ bookingId: firstBookingId, method: "VNPAY" }, {
+              onSuccess: (paymentRes: any) => {
+                if (paymentRes?.data?.paymentUrl) {
+                  window.location.href = paymentRes.data.paymentUrl;
+                } else {
+                  toast.success("Đặt sân cố định thành công!");
+                  setSelectedSlots([]);
+                  setBookingType('SINGLE');
+                  router.push(`/booking/success?bookingId=${firstBookingId}`);
+                }
+              },
+              onError: (err: any) => {
+                toast.error(err?.message || "Lỗi tạo thanh toán. Vui lòng thử lại.");
+              }
+            });
+          }
+        },
+        onError: (err: any) => {
+          toast.error(err?.message || "Đặt sân cố định thất bại. Vui lòng thử lại.");
+        }
+      });
+    }
   };
 
   // Refs to track current selection for unmount cleanup
@@ -384,7 +430,7 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           venue={venue}
           totalPrice={totalPrice}
           onBooking={handleBooking}
-          isBookingLoading={isBookingLoading || isPaymentLoading}
+          isBookingLoading={isBookingLoading || isPaymentLoading || isRecurringLoading}
           isBlocked={isPlayerBlocked}
           dates={dates}
           selectedDate={selectedDate}
@@ -405,9 +451,13 @@ const VenueDetailsPage = ({ id }: VenueDetailsPageProps) => {
           setCustomerPhone={setCustomerPhone}
           customerEmail={customerEmail}
           setCustomerEmail={setCustomerEmail}
-          isWeekly={isWeekly}
-          setIsWeekly={setIsWeekly}
           userId={userId}
+          bookingType={bookingType}
+          setBookingType={setBookingType}
+          recurringOccurrences={recurringOccurrences}
+          setRecurringOccurrences={setRecurringOccurrences}
+          recurringPaymentSchedule={recurringPaymentSchedule}
+          setRecurringPaymentSchedule={setRecurringPaymentSchedule}
         />
 
         <ReviewSection venueId={id} ref={reviewSectionRef} venueOwnerId={typeof venue?.ownerId === 'string' ? venue?.ownerId : (venue?.ownerId as any)?._id} />

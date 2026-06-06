@@ -3,9 +3,10 @@ import {
   IBookingRequest,
   IOwnerBookingQuery,
   IManualBookingRequest,
-  IUpdateBookingStatusRequest
+  IUpdateBookingStatusRequest,
+  IRecurringBookingCreateRequest
 } from "@/types/booking";
-import { sendGet, sendPost, sendPut } from "./axios";
+import { sendGet, sendPost, sendPut, sendDelete } from "./axios";
 
 export const bookingApi = {
   createBooking: (data: IBookingRequest) =>
@@ -47,4 +48,24 @@ export const paymentApi = {
     sendPost("/payments/create-url", data),
   confirmRefundSuccess: (bookingId: string) =>
     sendPost(`/payments/${bookingId}/refund-success`, {}),
+};
+
+export const recurringBookingApi = {
+  preview: (data: {
+    venueId: string;
+    courtId: string;
+    type: string;
+    occurrences: number;
+    startDate: string;
+    startTime: string;
+    endTime: string;
+  }) => sendPost("/recurring-bookings/preview", data),
+  create: (data: IRecurringBookingCreateRequest) =>
+    sendPost("/recurring-bookings", data),
+  getMyRecurringBookings: (params?: { page?: number; limit?: number }) =>
+    sendGet("/recurring-bookings", params),
+  getOne: (id: string) =>
+    sendGet(`/recurring-bookings/${id}`),
+  cancel: (id: string) =>
+    sendDelete(`/recurring-bookings/${id}`),
 };

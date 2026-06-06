@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
 import { IAvailability, ICourt, ISlot } from "@/types/venue";
@@ -16,9 +16,12 @@ import {
   mdiStarOutline,
   mdiTicketPercentOutline,
   mdiClose,
-  mdiCheckCircle
+  mdiCheckCircle,
+  mdiCalendarSync,
+  mdiRepeat,
+  mdiCalendarMonth
 } from "@mdi/js";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, addWeeks, addMonths } from "date-fns";
 import { vi } from "date-fns/locale";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -51,10 +54,16 @@ interface BookingSectionProps {
   setCustomerPhone: (phone: string) => void;
   customerEmail: string;
   setCustomerEmail: (email: string) => void;
-  isWeekly: boolean;
-  setIsWeekly: (isWeekly: boolean) => void;
   userId: string;
+  bookingType: 'SINGLE' | 'WEEKLY' | 'MONTHLY';
+  setBookingType: (type: 'SINGLE' | 'WEEKLY' | 'MONTHLY') => void;
+  recurringOccurrences: number;
+  setRecurringOccurrences: (n: number) => void;
+  recurringPaymentSchedule: 'FULL' | 'MONTHLY';
+  setRecurringPaymentSchedule: (s: 'FULL' | 'MONTHLY') => void;
 }
+
+type BookingType = 'SINGLE' | 'WEEKLY' | 'MONTHLY';
 
 const CourtTimeGrid = ({
   court,
@@ -194,9 +203,13 @@ export const BookingSection = ({
   setCustomerPhone,
   customerEmail,
   setCustomerEmail,
-  isWeekly,
-  setIsWeekly,
-  userId
+  userId,
+  bookingType,
+  setBookingType,
+  recurringOccurrences,
+  setRecurringOccurrences,
+  recurringPaymentSchedule,
+  setRecurringPaymentSchedule
 }: BookingSectionProps) => {
   // Fetch available coupons
   const { data: couponsRes } = useAvailableCoupons(venueId);
@@ -223,6 +236,11 @@ export const BookingSection = ({
   }
 
   const finalPrice = totalPrice - discountAmount;
+
+  // Calculate final total with recurring multiplier
+  const finalTotalPrice = bookingType === 'SINGLE' 
+    ? finalPrice 
+    : finalPrice * recurringOccurrences;
 
   // Render Coupon Selection Button
   const renderCouponSelection = () => {
@@ -464,33 +482,37 @@ export const BookingSection = ({
                 <Label className="text-neutral-400 text-xs uppercase tracking-wider font-bold">Phương thức thanh toán</Label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
+                    disabled={bookingType !== 'SINGLE'}
                     onClick={() => setPaymentMethod("CASH")}
                     className={cn(
                       "flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all",
                       paymentMethod === "CASH"
                         ? "bg-accent/10 border-accent text-accent"
-                        : "bg-darkBackgroundV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-600"
+                        : "bg-darkBackgroundV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-600",
+                      bookingType !== 'SINGLE' && "opacity-40 cursor-not-allowed"
                     )}
                   >
                     <Image src="/images/money-logo.webp" alt="Cash" width={28} height={28} className="object-contain" />
                     <span className="font-semibold text-xs text-center leading-tight">Tiền mặt<br />(Tại sân)</span>
                   </button>
                   <button
-                    disabled={isWeekly}
                     onClick={() => setPaymentMethod("VNPAY")}
                     className={cn(
                       "flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all",
-                      isWeekly
-                        ? "opacity-50 cursor-not-allowed bg-darkBackgroundV1 border-darkBorderV1 text-neutral-500"
-                        : paymentMethod === "VNPAY"
-                          ? "bg-accent/10 border-accent text-accent"
-                          : "bg-darkBackgroundV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-600"
+                      paymentMethod === "VNPAY"
+                        ? "bg-accent/10 border-accent text-accent"
+                        : "bg-darkBackgroundV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-600"
                     )}
                   >
                     <Image src="/images/vnpay-logo.webp" alt="VNPay" width={28} height={28} className="object-contain" />
                     <span className="font-semibold text-xs text-center leading-tight">Thanh toán online<br />(VNPay)</span>
                   </button>
                 </div>
+                {bookingType !== 'SINGLE' && (
+                  <p className="text-xs text-neutral-500 text-center">
+                    Đặt theo tuần/tháng chỉ hỗ trợ thanh toán VNPay
+                  </p>
+                )}
               </div>
 
               {/* Customer Info */}
@@ -523,37 +545,21 @@ export const BookingSection = ({
                 </div>
               </div>
 
-              {/* Weekly Checkout */}
-              <div className="pt-2">
-                <button
-                  onClick={() => {
-                    const newIsWeekly = !isWeekly;
-                    setIsWeekly(newIsWeekly);
-                    if (newIsWeekly && paymentMethod === "VNPAY") {
-                      setPaymentMethod("CASH");
-                    }
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl border transition-all w-full text-left",
-                    isWeekly
-                      ? "bg-accent/10 border-accent text-accent"
-                      : "bg-darkBackgroundV1 border-darkBorderV1 text-neutral-400 hover:border-neutral-600"
-                  )}
-                >
-                  <div className={cn(
-                    "w-5 h-5 rounded flex-shrink-0 flex items-center justify-center transition-all",
-                    isWeekly ? "bg-accent text-white" : "border-2 border-neutral-600"
-                  )}>
-                    {isWeekly && <Icon path={mdiBadminton} size={0.6} />}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">Đặt lịch cố định (Hàng tuần)</p>
-                    <p className="text-[11px] opacity-70 mt-0.5">Tự động tạo lịch cho các tuần tiếp theo</p>
-                  </div>
-                </button>
-              </div>
-
               {renderCouponSelection()}
+
+              {/* Recurring Type Selection */}
+              <RecurringBookingSelector
+                selectedSlots={selectedSlots}
+                selectedDate={selectedDate}
+                onSelect={(data) => onRecurringBooking(data)}
+                slotPrice={selectedSlots.length > 0 ? selectedSlots[0].price : currentPrice}
+                bookingType={bookingType}
+                setBookingType={setBookingType}
+                occurrences={recurringOccurrences}
+                setOccurrences={setRecurringOccurrences}
+                paymentSchedule={recurringPaymentSchedule}
+                setPaymentSchedule={setRecurringPaymentSchedule}
+              />
 
               {/* Total & Action */}
               <div className="pt-6 border-t border-darkBorderV1">
@@ -576,11 +582,13 @@ export const BookingSection = ({
                 <div className="flex justify-between items-end mb-5">
                   <div className="space-y-1">
                     <p className="text-neutral-400 text-sm font-medium">Tổng cộng</p>
-                    <p className="text-neutral-500 text-[11px] font-bold">{selectedSlots.length} slot đã chọn</p>
+                    <p className="text-neutral-500 text-[11px] font-bold">
+                      {selectedSlots.length} slot × {bookingType === 'SINGLE' ? 1 : recurringOccurrences} {bookingType !== 'SINGLE' ? (bookingType === 'WEEKLY' ? 'tuần' : 'tháng') : ''}
+                    </p>
                   </div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-white tracking-tight leading-none">
-                      {finalPrice.toLocaleString("vi-VN")}
+                      {finalTotalPrice.toLocaleString("vi-VN")}
                     </span>
                     <span className="text-neutral-500 text-sm font-bold uppercase">VNĐ</span>
                   </div>
@@ -596,7 +604,7 @@ export const BookingSection = ({
                   ) : (
                     <Icon path={mdiSoccerField} size={0.9} />
                   )}
-                  {isBookingLoading ? "Đang xử lý đặt sân..." : "Xác nhận đặt sân"}
+                  {isBookingLoading ? "Đang xử lý đặt sân..." : `Xác nhận đặt sân${bookingType !== 'SINGLE' ? (bookingType === 'WEEKLY' ? ' (theo tuần)' : ' (theo tháng)') : ''}`}
                 </Button>
                 {isBlocked && (
                   <p className="text-red-500 text-xs text-center mt-3 font-medium">
@@ -726,3 +734,210 @@ export const BookingSection = ({
   );
 };
 
+// Recurring Booking Selector Component
+const RecurringBookingSelector = ({
+  selectedSlots,
+  selectedDate,
+  onSelect,
+  slotPrice,
+  bookingType,
+  setBookingType,
+  occurrences,
+  setOccurrences,
+  paymentSchedule,
+  setPaymentSchedule
+}: {
+  selectedSlots: { courtId: string, time: string, price: number }[];
+  selectedDate: Date;
+  onSelect: (data: { type: 'WEEKLY' | 'MONTHLY'; occurrences: number; paymentSchedule: 'FULL' | 'MONTHLY' }) => void;
+  slotPrice: number;
+  bookingType: 'SINGLE' | 'WEEKLY' | 'MONTHLY';
+  setBookingType: (type: 'SINGLE' | 'WEEKLY' | 'MONTHLY') => void;
+  occurrences: number;
+  setOccurrences: (n: number) => void;
+  paymentSchedule: 'FULL' | 'MONTHLY';
+  setPaymentSchedule: (s: 'FULL' | 'MONTHLY') => void;
+}) => {
+
+  const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+  // Calculate preview dates
+  const previewDates = useMemo(() => {
+    if (bookingType === 'SINGLE') return [];
+    
+    const dates = [];
+    let currentDate = new Date(selectedDate);
+    
+    for (let i = 0; i < occurrences; i++) {
+      dates.push({
+        date: format(currentDate, 'dd/MM'),
+        dayOfWeek: days[currentDate.getDay()],
+        fullDate: new Date(currentDate)
+      });
+      
+      if (bookingType === 'WEEKLY') {
+        currentDate = addWeeks(currentDate, 1);
+      } else {
+        currentDate = addMonths(currentDate, 1);
+      }
+    }
+    
+    return dates;
+  }, [selectedDate, bookingType, occurrences]);
+
+  // Calculate total price for recurring bookings
+  const recurringTotalPrice = useMemo(() => {
+    if (bookingType === 'SINGLE' || selectedSlots.length === 0) return 0;
+    const slotsPerOccurrence = selectedSlots.length;
+    return slotsPerOccurrence * slotPrice * occurrences;
+  }, [bookingType, selectedSlots.length, slotPrice, occurrences]);
+
+  // Handle booking type change
+  const handleTypeChange = (type: BookingType) => {
+    setBookingType(type);
+    if (type === 'SINGLE') {
+      setOccurrences(1);
+      setPaymentSchedule('FULL');
+    } else if (type === 'WEEKLY') {
+      setOccurrences(2);
+      setPaymentSchedule('FULL');
+    } else {
+      setOccurrences(1);
+      setPaymentSchedule('MONTHLY');
+    }
+  };
+
+  return (
+    <div className="space-y-4 pt-2 border-t border-darkBorderV1/50">
+      <div className="flex items-center gap-2">
+        <Icon path={mdiCalendarSync} size={0.8} className="text-accent" />
+        <Label className="text-neutral-400 text-xs uppercase tracking-wider font-bold">
+          Đặt sân cố định
+        </Label>
+      </div>
+
+      {/* Booking Type Tabs */}
+      <div className="flex gap-2 p-1 bg-darkBackgroundV1 rounded-xl">
+        {[
+          { id: 'SINGLE', label: 'Đặt lẻ', icon: mdiSoccerField },
+          { id: 'WEEKLY', label: 'Theo tuần', icon: mdiRepeat },
+          { id: 'MONTHLY', label: 'Theo tháng', icon: mdiCalendarMonth },
+        ].map((type) => (
+          <button
+            key={type.id}
+            onClick={() => handleTypeChange(type.id as BookingType)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg transition-all text-sm font-semibold",
+              bookingType === type.id
+                ? "bg-accent text-white shadow-md"
+                : "text-neutral-400 hover:text-white hover:bg-white/5"
+            )}
+          >
+            <Icon path={type.icon} size={0.7} />
+            {type.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Occurrences Selection */}
+      {bookingType !== 'SINGLE' && (
+        <div className="space-y-3 p-4 bg-darkBackgroundV1/50 rounded-xl border border-darkBorderV1/30">
+          <div className="flex items-center justify-between">
+            <span className="text-neutral-400 text-sm">
+              {bookingType === 'WEEKLY' ? 'Số tuần:' : 'Số tháng:'}
+            </span>
+            <div className="flex gap-2">
+              {(bookingType === 'WEEKLY' ? [2, 3, 4] : [1, 2, 3, 4, 5, 6]).map((num) => (
+                <button
+                  key={num}
+                  onClick={() => setOccurrences(num)}
+                  className={cn(
+                    "w-10 h-10 rounded-lg font-bold text-sm transition-all",
+                    occurrences === num
+                      ? "bg-accent text-white"
+                      : "bg-darkCardV1 text-neutral-400 hover:bg-darkBorderV1"
+                  )}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Total Price Preview */}
+          <div className="flex items-center justify-between p-3 bg-accent/5 rounded-lg border border-accent/20">
+            <span className="text-neutral-400 text-sm">Tổng cộng:</span>
+            <span className="text-accent font-bold text-lg">
+              {recurringTotalPrice.toLocaleString("vi-VN")} VNĐ
+            </span>
+          </div>
+
+          {/* Preview Dates */}
+          <div className="space-y-2">
+            <span className="text-neutral-500 text-xs">
+              {bookingType === 'WEEKLY' ? 'Các ngày sẽ đặt:' : 'Các tháng sẽ đặt:'}
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {previewDates.map((d, i) => (
+                <div
+                  key={i}
+                  className="px-3 py-1.5 bg-accent/10 border border-accent/30 rounded-lg text-xs"
+                >
+                  <span className="text-accent font-semibold">{d.dayOfWeek}</span>
+                  <span className="text-neutral-400 ml-1">{d.date}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Payment Schedule (for MONTHLY only) */}
+          {bookingType === 'MONTHLY' && (
+            <div className="pt-3 border-t border-darkBorderV1/30 space-y-2">
+              <span className="text-neutral-400 text-sm">Hình thức thanh toán:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPaymentSchedule('FULL')}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all border",
+                    paymentSchedule === 'FULL'
+                      ? "bg-accent/10 border-accent text-accent"
+                      : "bg-darkCardV1 border-darkBorderV1 text-neutral-400"
+                  )}
+                >
+                  Thanh toán 1 lần
+                </button>
+                <button
+                  onClick={() => setPaymentSchedule('MONTHLY')}
+                  className={cn(
+                    "flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all border",
+                    paymentSchedule === 'MONTHLY'
+                      ? "bg-accent/10 border-accent text-accent"
+                      : "bg-darkCardV1 border-darkBorderV1 text-neutral-400"
+                  )}
+                >
+                  Trả theo tháng
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Info Note */}
+          <div className="pt-2 text-xs text-neutral-500 flex items-start gap-2">
+            <Icon path={mdiInformationOutline} size={0.6} className="mt-0.5 flex-shrink-0" />
+            <span>
+              {bookingType === 'WEEKLY' && (
+                <>Đặt cố định tối đa 4 tuần. Thanh toán VNPay ngay cho toàn bộ.</>
+              )}
+              {bookingType === 'MONTHLY' && paymentSchedule === 'FULL' && (
+                <>Thanh toán VNPay ngay cho toàn bộ {occurrences} tháng.</>
+              )}
+              {bookingType === 'MONTHLY' && paymentSchedule === 'MONTHLY' && (
+                <>Tạo {occurrences} hóa đơn, mỗi tháng 1 hóa đơn. Thanh toán tháng đầu ngay.</>
+              )}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

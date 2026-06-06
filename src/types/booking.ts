@@ -115,3 +115,79 @@ export interface IMyStatistics {
   totalBookings: number;
   totalSpent: number;
 }
+
+// Recurring Booking Types
+export type RecurringType = 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+export type RecurringStatus = 'ACTIVE' | 'PAUSED' | 'CANCELLED' | 'COMPLETED';
+export type PaymentScheduleType = 'FULL' | 'MONTHLY';
+
+export interface IRecurringScheduleItem {
+  occurrence: number;
+  date: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
+
+export interface IRecurringBookingPreview {
+  schedule: IRecurringScheduleItem[];
+  totalAmount: number;
+  perOccurrenceAmount: number;
+  totalOccurrences: number;
+}
+
+export interface IRecurringBooking {
+  _id?: string;
+  playerId?: string;
+  venueId?: string | IVenue;
+  courtId?: string | ICourt;
+  type?: RecurringType;
+  occurrences?: number;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  paymentSchedule?: PaymentScheduleType;
+  totalAmount?: number;
+  totalPerOccurrence?: number;
+  status?: RecurringStatus;
+  isActive?: boolean;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  bookingIds?: string[];
+  bookings?: IBooking[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IRecurringBookingCreateRequest {
+  venueId: string;
+  courtId: string;
+  type: RecurringType;
+  occurrences: number;
+  startDate: string;
+  startTime: string;
+  endTime: string;
+  paymentSchedule: PaymentScheduleType;
+  couponCode?: string;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+}
+
+export interface IRecurringBookingResponse {
+  recurringBookingId?: string;
+  schedule?: IRecurringScheduleItem[];
+  totalAmount?: number;
+  perOccurrenceAmount?: number;
+  paymentSchedule?: PaymentScheduleType;
+  bookingIds?: string[];
+  bookings?: IBooking[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}

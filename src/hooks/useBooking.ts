@@ -1,9 +1,10 @@
-import { adminBookingApi, bookingApi, paymentApi, promotionApi } from "@/api/booking";
+import { adminBookingApi, bookingApi, paymentApi, promotionApi, recurringBookingApi } from "@/api/booking";
 import {
   IAdminBookingQuery,
   IBookingRequest,
   IManualBookingRequest,
-  IUpdateBookingStatusRequest
+  IUpdateBookingStatusRequest,
+  IRecurringBookingCreateRequest
 } from "@/types/booking";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -151,6 +152,51 @@ export const useConfirmRefundSuccess = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["booking"] });
+    },
+  });
+};
+
+// Recurring Booking Hooks
+export const usePreviewRecurringBooking = () => {
+  return useMutation({
+    mutationFn: (data: {
+      venueId: string;
+      courtId: string;
+      type: string;
+      occurrences: number;
+      startDate: string;
+      startTime: string;
+      endTime: string;
+    }) => recurringBookingApi.preview(data),
+  });
+};
+
+export const useCreateRecurringBooking = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: IRecurringBookingCreateRequest) => recurringBookingApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["recurring-bookings"] });
+    },
+  });
+};
+
+export const useMyRecurringBookings = (params?: { page?: number; limit?: number }) => {
+  return useQuery({
+    queryKey: ["recurring-bookings", params],
+    queryFn: () => recurringBookingApi.getMyRecurringBookings(params),
+  });
+};
+
+export const useCancelRecurringBooking = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => recurringBookingApi.cancel(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recurring-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
     },
   });
 };
