@@ -1,6 +1,6 @@
 import { bookingApi } from "@/api/booking";
 import { ownerApi } from "@/api/owner";
-import { IOwnerBookingQuery } from "@/interface/booking";
+import { IOwnerBookingQuery } from "@/types/booking";
 import { useQuery } from "@tanstack/react-query";
 
 export const useRevenueStats = (params?: {

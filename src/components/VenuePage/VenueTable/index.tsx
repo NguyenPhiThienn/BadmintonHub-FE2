@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import {
     mdiCheck,
     mdiClose,

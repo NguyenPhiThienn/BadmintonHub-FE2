@@ -22,7 +22,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useEmployees, useResetPasswordBulk } from "@/hooks/useEmployees";
-import { IEmployee } from "@/interface/employee";
+import { IEmployee } from "@/types/employee";
 import { mdiAccountMultipleOutline, mdiCheckboxMarkedCircleOutline, mdiCheckCircleOutline, mdiClose, mdiKeyVariant, mdiLockReset } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useState } from "react";

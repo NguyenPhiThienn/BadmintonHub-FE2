@@ -1,4 +1,4 @@
-import { MenuItem } from "@/interface/types";
+import { MenuItem } from "@/types/menu";
 import {
   mdiAccountCircleOutline,
   mdiAccountGroupOutline,

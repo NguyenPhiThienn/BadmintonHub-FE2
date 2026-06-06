@@ -4,7 +4,7 @@ import {
   IBookingRequest,
   IManualBookingRequest,
   IUpdateBookingStatusRequest
-} from "@/interface/booking";
+} from "@/types/booking";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateBooking = () => {

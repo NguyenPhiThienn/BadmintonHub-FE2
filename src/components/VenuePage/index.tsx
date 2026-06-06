@@ -33,7 +33,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useUser } from "@/context/useUserContext";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useAdminVenues, useCreateVenue, useDeleteVenue, useMyVenues, useUpdateVenue, useUpdateVenueStatus, useRequestClosure, useApproveClosure, useCancelClosure, useRequestReopen } from "@/hooks/useVenue";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { mdiAlertCircleOutline, mdiChevronRight, mdiMagnify, mdiPlus, mdiRefresh, mdiClose, mdiTune } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
@@ -63,7 +63,7 @@ const VenuePageContent = ({ type = "admin" }: VenuePageProps) => {
 
     const [searchQuery, setSearchQuery] = useState(searchParams?.get("search") || "");
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState(searchParams?.get("status") || "all");
     const [locationFilter, setLocationFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(Number(searchParams?.get("page")) || 1);
     const [pageSize] = useState(10);
@@ -106,6 +106,12 @@ const VenuePageContent = ({ type = "admin" }: VenuePageProps) => {
             params.delete("search");
         }
 
+        if (statusFilter && statusFilter !== "all") {
+            params.set("status", statusFilter);
+        } else {
+            params.delete("status");
+        }
+
         if (currentPage > 1) {
             params.set("page", currentPage.toString());
         } else {
@@ -114,7 +120,7 @@ const VenuePageContent = ({ type = "admin" }: VenuePageProps) => {
 
         const queryString = params.toString();
         router.push(pathname + (queryString ? `?${queryString}` : ""), { scroll: false });
-    }, [debouncedSearchQuery, currentPage, pathname, router, searchParams]);
+    }, [debouncedSearchQuery, statusFilter, currentPage, pathname, router, searchParams]);
 
     const adminQuery = useAdminVenues({
         page: currentPage || 1,
@@ -293,7 +299,11 @@ const VenuePageContent = ({ type = "admin" }: VenuePageProps) => {
             openTime: data.openTime,
             closeTime: data.closeTime,
             pricePerHour: Number(data.pricePerHour),
-            courts: sanitizedCourts
+            courts: sanitizedCourts,
+            venueImages: data.venueImages || [],
+            venueImageFiles: data.venueImageFiles,
+            businessLicense: data.businessLicense || "",
+            businessLicenseFile: data.businessLicenseFile,
         };
 
         if (venueDialogMode === "create") {

@@ -23,7 +23,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useCoupons, useCreateCoupon, useDeleteCoupon, useUpdateCoupon } from "@/hooks/useCoupon";
-import { ICoupon, CouponStatus, CouponDiscountType } from "@/interface/coupon";
+import { ICoupon, CouponStatus, CouponDiscountType } from "@/types/coupon";
 import { mdiChevronRight, mdiPlus, mdiRefresh, mdiMagnify, mdiTune, mdiClose } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";

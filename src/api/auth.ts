@@ -1,4 +1,4 @@
-import { IAuthResponse, IProfileResponse, IRefreshTokenResponse } from "@/interface/auth";
+import { IAuthResponse, IProfileResponse, IRefreshTokenResponse } from "@/types/auth";
 import { sendGet, sendPost, sendPostWithConfig, sendPut } from "./axios";
 
 export const authApi = {

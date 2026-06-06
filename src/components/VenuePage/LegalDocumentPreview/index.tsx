@@ -4,7 +4,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { mdiClose, mdiFileDocumentOutline } from "@mdi/js";
 import Icon from "@mdi/react";
 import { Button } from "@/components/ui/button";

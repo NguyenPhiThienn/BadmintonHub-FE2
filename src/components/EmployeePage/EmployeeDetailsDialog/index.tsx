@@ -25,7 +25,7 @@ import {
 } from "@/hooks/useEmployees";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useUploadImage } from "@/hooks/useUpload";
-import { IEmployee } from "@/interface/employee";
+import { IEmployee } from "@/types/employee";
 import {
     mdiAccount,
     mdiAccountEdit,

@@ -18,7 +18,7 @@ import {
   useVenueDetails,
   useVenuePricing
 } from "@/hooks/useVenue";
-import { IAvailability } from "@/interface/venue";
+import { IAvailability } from "@/types/venue";
 import {
   mdiAlertCircleOutline,
   mdiChevronLeft,

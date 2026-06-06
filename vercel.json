@@ -1,8 +1,6 @@
 {
-  "rewrites": [],
-  "functions": {
-    "src/app/laboratory-work/preview/[id]/actions.ts": {
-      "maxDuration": 60
-    }
-  }
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next"
 }

@@ -29,7 +29,7 @@ import { useResponsive } from "@/hooks/use-mobile";
 import { useUpdateBookingStatus } from "@/hooks/useBooking";
 import { useOwnerBookings } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/types/booking";
 import { mdiMagnify, mdiPlus, mdiRefresh, mdiClose, mdiTune } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";

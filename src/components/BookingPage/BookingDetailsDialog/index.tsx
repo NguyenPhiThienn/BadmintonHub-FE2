@@ -18,7 +18,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/types/booking";
 import { BookingStatusBadge } from "@/components/Common/BookingStatusBadge";
 import { formatDateWithTime } from "@/lib/format";
 import {

@@ -1,10 +1,10 @@
 import {
   IAdminBookingQuery,
   IBookingRequest,
-  IManualBookingRequest,
   IOwnerBookingQuery,
+  IManualBookingRequest,
   IUpdateBookingStatusRequest
-} from "@/interface/booking";
+} from "@/types/booking";
 import { sendGet, sendPost, sendPut } from "./axios";
 
 export const bookingApi = {

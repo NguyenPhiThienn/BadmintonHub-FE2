@@ -25,7 +25,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useUpdateUser, useUserById, useBlockUser } from "@/hooks/useUsers";
-import { IUser } from "@/interface/auth";
+import { IUser } from "@/types/auth";
 import { formatDateOnly, formatDateWithTime } from "@/lib/format";
 import {
     mdiAccount,

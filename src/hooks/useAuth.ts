@@ -2,7 +2,7 @@ import { authApi } from "@/api/auth";
 import { usersApi } from "@/api/users";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { IProfileResponse } from "@/interface/auth";
+import { IProfileResponse } from "@/types/auth";
 
 export const useLogin = () => {
   return useMutation({

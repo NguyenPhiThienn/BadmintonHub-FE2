@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useOwnerBookings } from "@/hooks/useOwner";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/types/booking";
 import { formatDateWithTime } from "@/lib/format";
 import {
     mdiClose,

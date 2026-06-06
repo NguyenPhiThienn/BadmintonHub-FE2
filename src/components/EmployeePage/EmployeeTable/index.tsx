@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { IEmployee } from "@/interface/employee";
+import { IEmployee } from "@/types/employee";
 import { mdiEyeOutline, mdiFaceManProfile, mdiPlaylistRemove, mdiSquareEditOutline, mdiTrashCanOutline } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";

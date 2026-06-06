@@ -330,7 +330,7 @@ export default function AdminDashboardPage() {
               </Link>
 
               {/* Duyệt đóng sân */}
-              <Link href="/admin/venue-request" className="flex items-center justify-between p-3 rounded-xl bg-darkBackgroundV1/50 border border-darkBorderV1 hover:border-amber-500/40 hover:bg-darkBorderV1/20 transition-all group">
+              <Link href="/admin/venues?status=PENDING" className="flex items-center justify-between p-3 rounded-xl bg-darkBackgroundV1/50 border border-darkBorderV1 hover:border-amber-500/40 hover:bg-darkBorderV1/20 transition-all group">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Icon path={mdiAlertOctagon} size={0.6} />

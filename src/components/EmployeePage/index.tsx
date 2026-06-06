@@ -22,7 +22,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useDeleteEmployee, useEmployees, useEmployeesMetadata } from "@/hooks/useEmployees";
 import { usePermissions } from "@/hooks/usePermissions";
-import { IEmployee } from "@/interface/employee";
+import { IEmployee } from "@/types/employee";
 import { mdiAccountPlusOutline, mdiLockReset, mdiMagnify, mdiRefresh } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";

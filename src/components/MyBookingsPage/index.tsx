@@ -34,7 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/context/useUserContext";
 import { useMyBookings, useMyStatistics, useRequestRefund, useUpdateBookingStatus } from "@/hooks/useBooking";
-import { IBooking } from "@/interface/booking";
+import { IBooking } from "@/types/booking";
 import {
     mdiAccountOutline,
     mdiAlertCircleOutline,

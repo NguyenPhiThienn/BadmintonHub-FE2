@@ -1,4 +1,4 @@
-import { IAdminDashboardResponse, IChartData, ISummaryStats } from "@/interface/admin";
+import { IAdminDashboardResponse, IChartData, ISummaryStats } from "@/types/admin";
 import { sendGet } from "./axios";
 
 export const adminApi = {

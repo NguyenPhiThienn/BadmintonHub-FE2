@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { couponApi } from "@/api/coupon";
-import { ICreateCouponData, IUpdateCouponData } from "@/interface/coupon";
+import { ICreateCouponData, IUpdateCouponData } from "@/types/coupon";
 
 export const useCoupons = (params?: { page?: number; limit?: number; status?: string; venueId?: string; search?: string }) => {
     return useQuery({

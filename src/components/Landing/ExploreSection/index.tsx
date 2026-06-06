@@ -3,7 +3,7 @@
 import { Icon } from "@/components/ui/mdi-icon";
 import { useUser } from "@/context/useUserContext";
 import { useAiRecommendations, useVenues } from "@/hooks/useVenue";
-import { IAIRecommendationResponse, IVenue } from "@/interface/venue";
+import { IAIRecommendationResponse, IVenue, IVenueResponse, IVenuesListResponse } from "@/types/venue";
 import { mdiFire, mdiLoading } from "@mdi/js";
 import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";

@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMe } from "@/hooks/useAuth";
 import { useOccupancyStats, useRevenueChart, useOverviewStats, useRecentBookings, useTopCustomers, usePeakHours } from "@/hooks/useOwner";
 import { useMyVenues } from "@/hooks/useVenue";
-import { IOccupancyData } from "@/interface/owner";
+import { IOccupancyData } from "@/types/owner";
 import { mdiChartBar, mdiChartLine, mdiTune } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import { useState } from "react";

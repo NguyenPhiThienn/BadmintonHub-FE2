@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Icon } from "@/components/ui/mdi-icon";
-import { IAvailability, ICourt, ISlot } from "@/interface/venue";
+import { IAvailability, ICourt, ISlot } from "@/types/venue";
 import { cn } from "@/lib/utils";
 import {
   mdiBadminton, mdiChevronLeft, mdiChevronRight,
@@ -23,7 +23,7 @@ import { vi } from "date-fns/locale";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useAvailableCoupons } from "@/hooks/useBooking";
-import { CouponDiscountType, ICoupon } from "@/interface/coupon";
+import { CouponDiscountType, ICoupon } from "@/types/coupon";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface BookingSectionProps {

@@ -28,8 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
 import { useCreateManualBooking, useCreatePaymentUrl } from "@/hooks/useBooking";
 import { useVenueDetails, useVenuePricing } from "@/hooks/useVenue";
-import { IManualBookingRequest } from "@/interface/booking";
-import { ICourt, IVenue } from "@/interface/venue";
+import { IBookingRequest, IManualBookingRequest } from "@/types/booking";
+import { ICourt, IVenue, IVenueResponse, IVenuesListResponse, IAIRecommendationResponse, IAIRecommendationRequest } from "@/types/venue";
 import {
     mdiCalendarPlus,
     mdiCheck,

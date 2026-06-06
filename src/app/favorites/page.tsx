@@ -5,7 +5,7 @@ import { Footer } from "@/components/Landing/Footer";
 import { VenueCard } from "@/components/Venues/VenueListExplorer/VenueCard";
 import { useFavoriteVenues } from "@/hooks/useUsers";
 import { useUser } from "@/context/useUserContext";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { Icon } from "@/components/ui/mdi-icon";
 import { mdiHeartOutline, mdiMagnify } from "@mdi/js";
 import Link from "next/link";

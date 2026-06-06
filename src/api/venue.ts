@@ -1,5 +1,5 @@
-import { IAIRecommendationRequest } from "@/interface/venue";
 import { sendDelete, sendGet, sendPatch, sendPost, sendPut } from "./axios";
+import { uploadApi } from "./upload";
 
 export const venueApi = {
   getVenues: (params?: { 
@@ -37,23 +37,6 @@ export const venueApi = {
   getPricing: (venueId: string) =>
     sendGet(`/venues/${venueId}/pricing`),
 
-  createPricing: (data: {
-    venueId: string;
-    startTime: string;
-    endTime: string;
-    pricePerHour: number;
-    label?: string;
-    dayOfWeek?: number;
-  }) =>
-    sendPost("/pricings", {
-      venueId: data.venueId,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      price_per_hour: data.pricePerHour,
-      label: data.label,
-      day_of_week: data.dayOfWeek,
-    }),
-
   updatePricing: (id: string, data: {
     startTime?: string;
     endTime?: string;
@@ -71,15 +54,6 @@ export const venueApi = {
 
   deletePricing: (id: string) =>
     sendDelete(`/pricings/${id}`),
-
-  getAiRecommendations: (data: IAIRecommendationRequest) =>
-    sendPost("/ai/recommendations", data),
-
-  getDemandAnalytics: (params: { venueId: string }) =>
-    sendGet("/ai/analytics/demand", params),
-
-  getAiBookingRecommendation: (venueId: string) =>
-    sendGet("/ai/booking-recommendation", { venueId }),
 
   // Admin specific
   getAdminVenues: (params?: { page?: number; limit?: number; status?: string; search?: string; sortBy?: string }) =>
@@ -106,11 +80,61 @@ export const venueApi = {
   deleteVenue: (id: string) =>
     sendDelete(`/venues/${id}`),
 
-  createVenue: (data: any) =>
-    sendPost("/venues", data),
+  createVenue: async (data: any) => {
+    // Upload venue images if any
+    const venueImages: string[] = [];
+    if (data.venueImageFiles && data.venueImageFiles.length > 0) {
+      for (const file of data.venueImageFiles) {
+        const result = await uploadApi.uploadImage(file);
+        if (result?.url) {
+          venueImages.push(result.url);
+        }
+      }
+    }
 
-  updateVenue: (id: string, data: any) =>
-    sendPut(`/venues/${id}`, data),
+    // Upload business license if any
+    let businessLicense = data.businessLicense || "";
+    if (data.businessLicenseFile && !data.businessLicense.startsWith('http')) {
+      const result = await uploadApi.uploadPdf(data.businessLicenseFile);
+      if (result?.url) {
+        businessLicense = result.url;
+      }
+    }
+
+    return sendPost("/venues", {
+      ...data,
+      venueImages,
+      businessLicense,
+    });
+  },
+
+  updateVenue: async (id: string, data: any) => {
+    // Upload new venue images if any
+    const venueImages: string[] = data.venueImages || [];
+    if (data.venueImageFiles && data.venueImageFiles.length > 0) {
+      for (const file of data.venueImageFiles) {
+        const result = await uploadApi.uploadImage(file);
+        if (result?.url) {
+          venueImages.push(result.url);
+        }
+      }
+    }
+
+    // Upload business license if new file provided
+    let businessLicense = data.businessLicense || "";
+    if (data.businessLicenseFile && !data.businessLicense.startsWith('http')) {
+      const result = await uploadApi.uploadPdf(data.businessLicenseFile);
+      if (result?.url) {
+        businessLicense = result.url;
+      }
+    }
+
+    return sendPut(`/venues/${id}`, {
+      ...data,
+      venueImages,
+      businessLicense,
+    });
+  },
 
   addVenueImage: (id: string, data: { imageUrl: string; isPrimary: boolean }) =>
     sendPost(`/venues/${id}/images`, data),

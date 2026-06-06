@@ -21,7 +21,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/types/booking";
 import { formatDateWithTime } from "@/lib/format";
 import {
     mdiAlertCircleOutline,

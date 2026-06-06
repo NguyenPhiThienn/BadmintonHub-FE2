@@ -18,7 +18,7 @@ import { useVenues } from "@/hooks/useVenue";
 import { useUser } from "@/context/useUserContext";
 import { useFavoriteVenues } from "@/hooks/useUsers";
 import { toast } from "react-toastify";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,

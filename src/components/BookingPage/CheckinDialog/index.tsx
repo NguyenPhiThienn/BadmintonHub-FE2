@@ -19,7 +19,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useBookingDetails, useUpdateBookingStatus } from "@/hooks/useBooking";
-import { BookingStatus } from "@/interface/booking";
+import { BookingStatus } from "@/types/booking";
 import { formatDateWithTime } from "@/lib/format";
 import {
     mdiAccountOutline,

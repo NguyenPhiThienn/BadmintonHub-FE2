@@ -22,7 +22,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useVenueDetails, useVenuePricing } from "@/hooks/useVenue";
-import { IVenue } from "@/interface/venue";
+import { IVenue, IVenueImage } from "@/types/venue";
 import {
     mdiAccount,
     mdiClose,

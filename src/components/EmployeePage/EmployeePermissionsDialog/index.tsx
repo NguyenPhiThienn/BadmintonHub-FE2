@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useUpdateEmployee } from "@/hooks/useEmployees";
-import { IEmployee } from "@/interface/employee";
+import { IEmployee } from "@/types/employee";
 import { mdiClose, mdiContentSave, mdiLoading, mdiShieldAccount } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useEffect, useState } from "react";

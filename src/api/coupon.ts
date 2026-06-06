@@ -1,5 +1,5 @@
 import { sendDelete, sendGet, sendPost, sendPut } from "./axios";
-import { ICreateCouponData, IUpdateCouponData } from "@/interface/coupon";
+import { ICreateCouponData, IUpdateCouponData } from "@/types/coupon";
 
 export const couponApi = {
     getCoupons: (params?: { page?: number; limit?: number; status?: string; venueId?: string; search?: string }) =>

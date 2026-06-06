@@ -21,7 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useAdminBookings, useUpdateBookingStatus, useConfirmRefundSuccess } from "@/hooks/useBooking";
 import { toast } from "react-toastify";
-import { BookingStatus, IBooking } from "@/interface/booking";
+import { BookingStatus, IBooking } from "@/types/booking";
 import { mdiMagnify, mdiRefresh, mdiClose, mdiTune } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";

@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/mdi-icon";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { mdiBadminton, mdiClock, mdiMapMarker, mdiStar, mdiStarHalfFull, mdiStarOutline, mdiTagOutline, mdiHeart, mdiHeartOutline } from "@mdi/js";
 import Image from "next/image";
 import Link from "next/link";

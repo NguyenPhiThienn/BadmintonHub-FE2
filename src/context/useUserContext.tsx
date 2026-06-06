@@ -4,7 +4,7 @@ import type React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { authApi } from "@/api/auth";
-import { IProfileResponse, IUser } from "@/interface/auth";
+import { IProfileResponse, IUser } from "@/types/auth";
 import { clearToken, setTokenToLocalStorage } from "@/lib/tokenStorage";
 import { QueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

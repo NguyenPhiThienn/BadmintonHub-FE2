@@ -1,5 +1,5 @@
 import { venueApi } from "@/api/venue";
-import { IAIRecommendationRequest, IVenueResponse, IVenuesListResponse } from "@/interface/venue";
+import { IAIRecommendationRequest, IVenueResponse, IVenuesListResponse } from "@/types/venue";
 import { useMutation, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 export const useVenues = (params?: { 

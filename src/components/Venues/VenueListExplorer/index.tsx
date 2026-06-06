@@ -1,6 +1,6 @@
 "use client";
 
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import { useEffect, useRef } from "react";
 import { Drawer } from "vaul";
 import { VenueCard } from "./VenueCard";

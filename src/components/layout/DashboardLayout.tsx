@@ -7,7 +7,7 @@ import { useUser } from "@/context/useUserContext";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useMe } from "@/hooks/useAuth";
 import { usePendingVenues } from "@/hooks/useVenue";
-import { MenuItem } from "@/interface/types";
+import { MenuItem } from "@/types/menu";
 import { cn } from "@/lib/utils";
 import { useMenuSidebar } from "@/stores/useMenuSidebar";
 import { mdiFullscreen, mdiFullscreenExit } from "@mdi/js";

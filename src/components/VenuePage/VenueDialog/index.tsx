@@ -20,15 +20,17 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeSlotPicker } from "@/components/ui/time-slot-picker";
-import { IVenue } from "@/interface/venue";
+import { IVenue } from "@/types/venue";
 import {
     mdiClockOutline,
     mdiClose,
     mdiContentSave,
     mdiFormatListBulleted,
+    mdiImageOutline,
     mdiInformationOutline,
     mdiLoading,
     mdiMapMarkerOutline,
+    mdiPaperclip,
     mdiPlus,
     mdiStoreOutline,
     mdiTrashCanOutline
@@ -57,6 +59,9 @@ export const VenueDialog = ({
     isSubmitting = false,
 }: VenueDialogProps) => {
     const [customTypeModes, setCustomTypeModes] = useState<Record<number, boolean>>({});
+    const [venueImageFiles, setVenueImageFiles] = useState<File[]>([]);
+    const [businessLicenseFile, setBusinessLicenseFile] = useState<File | null>(null);
+    
     const form = useForm({
         defaultValues: {
             name: "",
@@ -71,6 +76,8 @@ export const VenueDialog = ({
             pricePerHour: 0,
             courts: [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
             images: [{ imageUrl: "", isPrimary: true }],
+            venueImages: [] as string[],
+            businessLicense: "",
         },
     });
 
@@ -87,6 +94,8 @@ export const VenueDialog = ({
     useEffect(() => {
         if (isOpen) {
             setCustomTypeModes({});
+            setVenueImageFiles([]);
+            setBusinessLicenseFile(null);
             if (initialData && mode === "edit") {
                 form.reset({
                     name: initialData.name || "",
@@ -101,6 +110,8 @@ export const VenueDialog = ({
                     pricePerHour: initialData.pricePerHour || 0,
                     courts: (initialData.courts as any) || [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
                     images: (initialData.images as any) || [{ imageUrl: "", isPrimary: true }],
+                    venueImages: (initialData as any).venueImages || [],
+                    businessLicense: (initialData as any).businessLicense || "",
                 });
             } else {
                 form.reset({
@@ -116,6 +127,8 @@ export const VenueDialog = ({
                     pricePerHour: 0,
                     courts: [{ name: "Sân số 1", type: "Sàn gỗ", status: "AVAILABLE" }],
                     images: [{ imageUrl: "", isPrimary: true }],
+                    venueImages: [],
+                    businessLicense: "",
                 });
             }
         }
@@ -283,7 +296,14 @@ export const VenueDialog = ({
                     </DialogHeader>
 
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit((data) => {
+                            // Add files to the data before submitting
+                            onSubmit({
+                                ...data,
+                                venueImageFiles,
+                                businessLicenseFile,
+                            });
+                        })} className="space-y-4">
                             <div className="space-y-4 md:space-y-4 max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar p-3 md:p-4">
 
                                 {/* SECTION: THÔNG TIN CƠ BẢN */}
@@ -349,6 +369,109 @@ export const VenueDialog = ({
                                             </FormItem>
                                         )}
                                     />
+                                </div>
+
+                                {/* SECTION: HÌNH ẢNH SÂN */}
+                                <div className="flex items-center gap-3 md:gap-4 mt-4">
+                                    <h3 className="text-accent font-semibold whitespace-nowrap flex items-center gap-1.5">
+                                        <Icon path={mdiImageOutline} size={0.8} />
+                                        Hình ảnh cơ sở
+                                    </h3>
+                                    <div className="flex-1 border-b border-dashed border-accent mr-1" />
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-sm font-medium text-neutral-300 mb-2 block">
+                                            Ảnh sân (tối đa 5 ảnh)
+                                        </label>
+                                        <div className="border-2 border-dashed border-darkBorderV1 rounded-lg p-4 text-center hover:border-accent/50 transition-colors">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                multiple
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files || []);
+                                                    if (files.length > 5) {
+                                                        alert("Tối đa 5 ảnh");
+                                                        return;
+                                                    }
+                                                    setVenueImageFiles(files);
+                                                }}
+                                                className="hidden"
+                                                id="venue-images-upload"
+                                            />
+                                            <label
+                                                htmlFor="venue-images-upload"
+                                                className="cursor-pointer flex flex-col items-center gap-2"
+                                            >
+                                                <Icon path={mdiImageOutline} size={2} className="text-neutral-400" />
+                                                <span className="text-sm text-neutral-400">
+                                                    Nhấn để chọn ảnh sân
+                                                </span>
+                                            </label>
+                                        </div>
+                                        {venueImageFiles.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {venueImageFiles.map((file, idx) => (
+                                                    <div key={idx} className="relative group">
+                                                        <img
+                                                            src={URL.createObjectURL(file)}
+                                                            alt={`Preview ${idx}`}
+                                                            className="w-20 h-20 object-cover rounded-lg border border-darkBorderV1"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setVenueImageFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm font-medium text-neutral-300 mb-2 block">
+                                            Giấy phép kinh doanh
+                                        </label>
+                                        <div className="border-2 border-dashed border-darkBorderV1 rounded-lg p-4 text-center hover:border-accent/50 transition-colors">
+                                            <input
+                                                type="file"
+                                                accept="image/*,.pdf"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) setBusinessLicenseFile(file);
+                                                }}
+                                                className="hidden"
+                                                id="business-license-upload"
+                                            />
+                                            <label
+                                                htmlFor="business-license-upload"
+                                                className="cursor-pointer flex flex-col items-center gap-2"
+                                            >
+                                                <Icon path={mdiPaperclip} size={2} className="text-neutral-400" />
+                                                <span className="text-sm text-neutral-400">
+                                                    Nhấn để chọn giấy phép kinh doanh (PDF/Ảnh)
+                                                </span>
+                                            </label>
+                                        </div>
+                                        {businessLicenseFile && (
+                                            <div className="mt-2 flex items-center gap-2 text-sm text-green-400">
+                                                <Icon path={mdiPaperclip} size={0.8} />
+                                                <span>{businessLicenseFile.name}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setBusinessLicenseFile(null)}
+                                                    className="text-red-400 hover:text-red-300 ml-2"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* SECTION: THÔNG TIN HOẠT ĐỘNG */}

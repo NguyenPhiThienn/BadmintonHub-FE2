@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { IBooking } from "@/interface/booking";
+import { IBooking } from "@/types/booking";
 import { Icon } from "@/components/ui/mdi-icon";
 import {
     mdiCheckCircle,

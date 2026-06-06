@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IUser } from "@/interface/auth";
+import { IUser } from "@/types/auth";
 import { mdiAlertCircleOutline, mdiLockOutline, mdiLockOpenVariantOutline, mdiLoading } from "@mdi/js";
 import Icon from "@mdi/react";
 import { useState, useEffect } from "react";

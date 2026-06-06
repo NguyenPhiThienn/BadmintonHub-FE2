@@ -21,7 +21,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useResponsive } from "@/hooks/use-mobile";
 import { useDeleteUser, useUsers } from "@/hooks/useUsers";
-import { IUser } from "@/interface/auth";
+import { IUser } from "@/types/auth";
 import { mdiAccountPlus, mdiMagnify, mdiRefresh, mdiClose, mdiTune } from "@mdi/js";
 import Icon from "@mdi/react";
 import { motion } from "framer-motion";
